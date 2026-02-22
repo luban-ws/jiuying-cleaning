@@ -1,0 +1,13 @@
+{
+  "name": "cleaning",
+  "version": "1.0.0",
+  "private": true,
+  "description": "macOS clean app - browser, Docker, AI tools space management",
+  "scripts": {
+    "build:app": "cd app && xcodebuild -scheme CleanSpace -configuration Debug build -quiet",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11"
+  }
+}

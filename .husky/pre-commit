@@ -1,0 +1,3 @@
+# 提交前：确保 CleanSpace Mac 应用可构建
+. "$(dirname -- "$0")/_/husky.sh"
+cd app && xcodebuild -scheme CleanSpace -configuration Debug build -quiet

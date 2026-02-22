@@ -1,0 +1,7 @@
+# 校验 commit message 非空且至少 3 字符
+. "$(dirname -- "$0")/_/husky.sh"
+msg=$(cat "$1")
+if [ -z "$msg" ] || [ ${#msg} -lt 3 ]; then
+  echo "错误: commit message 不能为空且至少 3 个字符"
+  exit 1
+fi

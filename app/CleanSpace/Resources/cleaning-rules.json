@@ -1,0 +1,76 @@
+[
+  {
+    "id": "trash",
+    "category": "system",
+    "name": "废纸篓",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/.Trash", "dirs": ["*"] }
+    ]
+  },
+  {
+    "id": "xcode-derived-data",
+    "category": "system",
+    "name": "Xcode DerivedData",
+    "type": "dir",
+    "risk": "low",
+    "warning": "清理后下次编译会稍慢。",
+    "paths": [
+      { "base": "~/Library/Developer/Xcode/DerivedData", "dirs": ["*"] }
+    ]
+  },
+  {
+    "id": "chrome-cache",
+    "category": "browser",
+    "name": "Chrome 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/Google/Chrome", "dirs": ["*"] },
+      { "base": "~/Library/Application Support/Google/Chrome", "dirs": ["Default/Application Cache", "Default/Code Cache", "Default/GPUCache"] }
+    ]
+  },
+  {
+    "id": "chrome-cookies-history",
+    "category": "browser",
+    "name": "Chrome Cookie 与历史",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站登录状态与浏览历史。",
+    "paths": [
+      { "base": "~/Library/Application Support/Google/Chrome/Default", "dirs": ["Cookies", "History", "Local Storage"] }
+    ]
+  },
+  {
+    "id": "docker-system-prune",
+    "category": "docker",
+    "name": "Docker 系统清理",
+    "type": "command",
+    "risk": "medium",
+    "warning": "将删除未使用的容器、镜像、卷与构建缓存。",
+    "command": "docker system prune -a -f",
+    "estimate": "依当前未使用资源而定"
+  },
+  {
+    "id": "docker-builder-prune",
+    "category": "docker",
+    "name": "Docker 构建缓存",
+    "type": "command",
+    "risk": "low",
+    "command": "docker builder prune -a -f",
+    "estimate": "依构建缓存大小而定"
+  },
+  {
+    "id": "cursor-cache",
+    "category": "ai-tools",
+    "name": "Cursor 缓存与扩展缓存",
+    "type": "dir",
+    "risk": "low",
+    "warning": "扩展可能需重新下载。",
+    "paths": [
+      { "base": "~/Library/Application Support/Cursor", "dirs": ["Cache", "CachedData", "CachedExtensions", "Code Cache", "GPUCache", "logs"] },
+      { "base": "~/Library/Caches/Cursor", "dirs": ["*"] }
+    ]
+  }
+]
