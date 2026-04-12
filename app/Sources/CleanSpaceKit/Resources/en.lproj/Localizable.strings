@@ -49,18 +49,19 @@
 
 "rules.empty.title" = "No rules";
 "rules.empty.description" = "Check that cleaning-rules.json is present in the app bundle.";
-"rules.intro" = "Check rules, use Preview to see targets, Scan for sizes, then Clean. Command rules show notes instead of exact sizes.";
+"rules.flow.section_title" = "How to use this page";
+"rules.flow.steps" = "1. Select rules with checkboxes, or the Clean column in browser-style tables.\n2. Tap Analyze to measure sizes; the Size column updates for path-based rules.\n3. Tap Preview to review paths or commands—nothing is deleted yet.\n4. Tap Run Clean and confirm to remove data for the selection.\n5. Tip: Select All / Select None (on the action card) adjust many rows at once.";
 "rules.chart.card_title" = "Size by category (scan)";
 "rules.nav_title" = "Rules";
 "rules.nav_subtitle_format" = "%lld of %lld selected";
 "rules.overview.title" = "At a glance";
-"rules.overview.blurb" = "Scan measures path sizes; Clean removes data for checked items.";
+"rules.overview.blurb" = "Chips update as you select rules and run Analyze. Read the steps next, then use the action card.";
 "rules.overview.chip.total_format" = "%lld rules";
 "rules.overview.chip.selected_format" = "%lld selected";
 "rules.overview.chip.scanned_format" = "%lld sized";
-"rules.scan" = "Scan";
-"rules.clean" = "Clean";
-"rules.scanning" = "Scanning…";
+"rules.scan" = "Analyze";
+"rules.clean" = "Run Clean";
+"rules.scanning" = "Analyzing…";
 "rules.cleaning" = "Cleaning…";
 "rules.alert.confirm.title" = "Confirm clean";
 "rules.alert.result.title" = "Clean result";
@@ -75,6 +76,15 @@
 
 "rules.help.scan" = "Measure on-disk size for each path-based rule before cleaning.";
 "rules.help.clean" = "Delete data for selected rules. Medium or high risk rules ask for confirmation first.";
+"rules.action.title" = "Cleaning";
+"rules.action.blurb" = "Analyze → Preview → Run Clean. Hover buttons for details; progress appears here while working.";
+"rules.action.recoverable_label" = "Recoverable (path rules)";
+"rules.action.metric.placeholder" = "—";
+"rules.action.metric.tap_analyze" = "Tap Analyze";
+"rules.action.caption.none" = "No rules selected.";
+"rules.action.caption.counts_format" = "%1$lld selected · %2$lld path · %3$lld command";
+"rules.action.select_all" = "Select All";
+"rules.action.select_none" = "Select None";
 "rules.dry_run" = "Preview";
 "rules.dry_run.sheet_title" = "Preview selection";
 "rules.dry_run.help" = "Show paths or shell commands for checked rules. Nothing is deleted.";
@@ -86,6 +96,9 @@
 "rules.browser.table.item" = "Item";
 "rules.browser.table.size" = "Size";
 "rules.browser.table.risk" = "Risk";
+
+"rules.list.help.scan_column" = "Updates after you run Analyze on the action card.";
+"rules.list.a11y.toggle_hint" = "Includes or excludes this item from clean-up. The size column shows the last scan estimate.";
 
 "docker.intro" = "Run docker commands in order; use together with Rules if needed.";
 "docker.section.desktop" = "Docker Desktop folders";

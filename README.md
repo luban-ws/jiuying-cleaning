@@ -19,6 +19,10 @@ pnpm install
 
 开发与再小的 UI 改动也请遵守仓库根目录 **[AGENTS.md](./AGENTS.md)** 中的基线（本地化走 `L10n`、双语文案、测试不断言翻译句等）。
 
+## 使用流程（规则清理界面）
+
+面向最终用户时，侧栏进入 **「规则清理」** 后，窗口内自上而下为：**概览**（计数芯片）→ **「本页怎么用」**（分步说明）→ **流程卡**（分析 / 预览 / 运行清理）→ 按分类的规则列表（及可选图表）。推荐顺序与界面文案一致：**先勾选 → 分析 → 预览（可选）→ 运行清理并确认**。细节与交互约定见 **[RFC 010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md)**。
+
 ## 常用命令
 
 在**仓库根目录**执行：
@@ -26,13 +30,14 @@ pnpm install
 | 目的 | 命令 |
 |------|------|
 | 调试构建 | `pnpm run build:app` |
-| 运行应用（SwiftPM） | `pnpm run:app` |
-| 单元测试 | `pnpm run test:app` |
+| 运行应用（SwiftPM） | `pnpm run run:app` |
+| 单元测试 | `pnpm test`（同 `pnpm run test:app`） |
+| 提交前自检（l10n + 构建 + 测试） | `pnpm run check` |
 | 打可在访达双击的 `.app` | `pnpm run bundle:app` |
 
 **应用起不来？**
 
-- 包管理器是 **pnpm**（不是 `pap` / `npm` 混用）：在**仓库根目录**（有 `package.json` 的那一层）执行 `pnpm run:app`。`run:app` 会调用 `scripts/run-app.sh`，不依赖你当前终端是否已 `cd app`。
+- 包管理器是 **pnpm**（不是 `pap` / `npm` 混用）：在**仓库根目录**（有 `package.json` 的那一层）执行 `pnpm run run:app`。`run:app` 会调用 `scripts/run-app.sh`，不依赖你当前终端是否已 `cd app`。
 - 若终端里构建成功但「像没反应」：窗口可能在其他应用后面，用 **Command+Tab** 或程序坞切到 **CleanSpace**。
 - 等价命令：`./scripts/run-app.sh` 或 `cd app && swift run CleanSpace`（需本机已安装 Swift / macOS SDK）。
 

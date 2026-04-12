@@ -8,7 +8,9 @@
     "build:app": "./design/generate-app-icon.sh && cd app && swift build",
     "run:app": "bash scripts/run-app.sh",
     "bundle:app": "./scripts/bundle-mac-app.sh release",
-    "test:app": "cd app && swift test",
+    "test": "cd app && swift test",
+    "test:app": "pnpm run test",
+    "check": "./scripts/check-swift-ui-l10n.sh && cd app && swift build && pnpm run test",
     "prepare": "husky"
   },
   "devDependencies": {

@@ -137,6 +137,146 @@ struct CSRulesOverviewPanel: View {
     }
 }
 
+// MARK: - 规则：主清理流程（参考常见清理工具：勾选 → 分析 → 预览 → 运行）
+/// 大字号可回收体积 + 横向主按钮，避免操作只藏在工具栏里。
+struct CSRulesCleanWorkflowCard: View {
+    let recoverableBytes: Int64
+    let selectedCount: Int
+    let selectedPathRuleCount: Int
+    let selectedCommandRuleCount: Int
+    let sizedSelectedPathCount: Int
+    let rulesNonEmpty: Bool
+    let isScanning: Bool
+    let isCleaning: Bool
+    let onAnalyze: () -> Void
+    let onPreview: () -> Void
+    let onRunClean: () -> Void
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    private var needsAnalyze: Bool {
+        selectedPathRuleCount > 0 && sizedSelectedPathCount < selectedPathRuleCount
+    }
+
+    private var metricText: String {
+        if selectedCount == 0 {
+            return L10n.Rules.actionMetricPlaceholder
+        }
+        if needsAnalyze {
+            return L10n.Rules.actionMetricTapAnalyze
+        }
+        return SpaceFormat.bytes(recoverableBytes)
+    }
+
+    private var metricAccent: Bool {
+        selectedCount > 0 && !needsAnalyze && recoverableBytes > 0
+    }
+
+    private var captionText: String {
+        if selectedCount == 0 {
+            return L10n.Rules.actionCaptionNone
+        }
+        return L10n.Rules.actionCaptionCounts(
+            selected: selectedCount,
+            pathRules: selectedPathRuleCount,
+            commandRules: selectedCommandRuleCount
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(L10n.Rules.actionTitle)
+                    .font(.headline)
+                Text(L10n.Rules.actionBlurb)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(L10n.Rules.actionRecoverableLabel)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(metricText)
+                    .font(.system(size: 30, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(metricAccent ? Color.accentColor : Color.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.55)
+                Text(captionText)
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+
+            // 进度放在主操作区：避免在 unified 工具栏再堆三个与下方重复的图标按钮（HIG：标题栏保持轻量）。
+            if isScanning || isCleaning {
+                HStack(spacing: 10) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text(isScanning ? L10n.Rules.scanning : L10n.Rules.cleaning)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+            }
+
+            HStack(spacing: 10) {
+                Button(action: onAnalyze) {
+                    Label(L10n.Rules.scan, systemImage: "gauge.with.dots.needle.bottom.50percent")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
+                .help(L10n.Rules.helpScan)
+                .disabled(!rulesNonEmpty || isScanning)
+
+                Button(action: onPreview) {
+                    Label(L10n.Rules.dryRun, systemImage: "eye")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
+                .help(L10n.Rules.helpDryRun)
+                .disabled(selectedCount == 0 || isCleaning)
+
+                Button(action: onRunClean) {
+                    Label(L10n.Rules.clean, systemImage: "trash")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
+                .help(L10n.Rules.helpClean)
+                .disabled(selectedCount == 0 || isCleaning)
+            }
+
+            HStack(spacing: 18) {
+                Button(L10n.Rules.actionSelectAll, action: onSelectAll)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Color.accentColor)
+                    .disabled(!rulesNonEmpty)
+                Button(L10n.Rules.actionSelectNone, action: onSelectNone)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Color.accentColor)
+                    .disabled(selectedCount == 0)
+            }
+            .font(.subheadline.weight(.medium))
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: CS.cornerHero, style: .continuous)
+                .fill(Material.regular)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: CS.cornerHero, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+        }
+    }
+}
+
 // MARK: - Docker：预设卡片（宫格）
 struct CSDockerPresetCard: View {
     let symbolName: String

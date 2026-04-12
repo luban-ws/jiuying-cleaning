@@ -26,6 +26,12 @@ public final class SystemMetricsController: ObservableObject {
 
     private init() {}
 
+    /// 接口累计字节单调递增；若变小则视为重置，本 interval 按 0 计，避免 UInt 下溢产生天文速率。
+    private nonisolated static func deltaBytesPerSecond(current: UInt64, previous: UInt64, seconds: Double) -> Double {
+        guard seconds > 0, current >= previous else { return 0 }
+        return Double(current - previous) / seconds
+    }
+
     public func start() {
         MetricsThresholdNotifier.shared.requestPermissionIfNeeded()
         timer?.invalidate()
@@ -66,10 +72,11 @@ public final class SystemMetricsController: ObservableObject {
         if let prev = netPrevious {
             let dt = t.timeIntervalSince(prev.time)
             if dt > 0.2 {
-                let din = Double(curNet.in &- prev.in) / dt
-                let dout = Double(curNet.out &- prev.out) / dt
-                networkDownBps = max(0, din)
-                networkUpBps = max(0, dout)
+                // 不用 `&-`：计数器重置或回绕时无符号差会爆到近 UInt64.max，再转成 Int64 会触发运行时 trap。
+                let din = Self.deltaBytesPerSecond(current: curNet.in, previous: prev.in, seconds: dt)
+                let dout = Self.deltaBytesPerSecond(current: curNet.out, previous: prev.out, seconds: dt)
+                networkDownBps = din
+                networkUpBps = dout
             }
         }
         netPrevious = (curNet.in, curNet.out, t)

@@ -52,6 +52,8 @@ struct BrowserRulesTableBlock: View {
                 )
                 .labelsHidden()
                 .toggleStyle(.checkbox)
+                .accessibilityLabel(rule.name)
+                .accessibilityHint(L10n.Rules.listA11yToggleHint)
             }
             .width(52)
 
@@ -81,18 +83,20 @@ struct BrowserRulesTableBlock: View {
                             .font(.caption)
                             .monospacedDigit()
                             .foregroundStyle(.secondary)
+                            .help(L10n.Rules.listHelpScanColumn)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .width(100)
+            .width(RulesScanListLayoutMetrics.scanColumnWidth)
 
             TableColumn(L10n.Rules.browserTableRisk) { rule in
                 RuleRiskChip(risk: rule.riskLevel)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .width(56)
+            .width(RulesScanListLayoutMetrics.riskColumnWidth)
         }
-        .frame(minHeight: CGFloat(min(360, max(100, 40 + rules.count * 30))))
+        .tableStyle(.inset(alternatesRowBackgrounds: true))
+        .frame(minHeight: CGFloat(min(380, max(120, 52 + rules.count * 32))))
     }
 }

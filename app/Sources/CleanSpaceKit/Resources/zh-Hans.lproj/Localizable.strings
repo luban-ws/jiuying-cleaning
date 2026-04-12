@@ -49,18 +49,19 @@
 
 "rules.empty.title" = "没有规则";
 "rules.empty.description" = "请检查应用包中的 cleaning-rules.json。";
-"rules.intro" = "勾选规则后可用「预览」查看目标路径或命令，再「扫描」测体积，最后「清理」。命令类规则无精确体积时显示说明。";
+"rules.flow.section_title" = "本页怎么用";
+"rules.flow.steps" = "1. 用复选框勾选规则；浏览器类分组中可在表格的「清理」列勾选。\n2. 点「分析」测算占用；路径类规则的「大小」列会更新。\n3. 点「预览」查看将删除的路径或将执行的命令，此时不会改动磁盘。\n4. 点「运行清理」并在确认后执行删除。\n5. 提示：流程卡上的「全选 / 全不选」可快速调整大量勾选。";
 "rules.chart.card_title" = "按分类占用（扫描）";
 "rules.nav_title" = "规则清理";
 "rules.nav_subtitle_format" = "已选 %lld / 共 %lld 条";
 "rules.overview.title" = "概览";
-"rules.overview.blurb" = "扫描可测量路径占用；清理将删除已勾选项对应的数据。";
+"rules.overview.blurb" = "摘要随勾选与「分析」结果变化。先看下方步骤，再使用流程卡上的按钮。";
 "rules.overview.chip.total_format" = "共 %lld 条规则";
 "rules.overview.chip.selected_format" = "已选 %lld 条";
 "rules.overview.chip.scanned_format" = "已测 %lld 条";
-"rules.scan" = "扫描";
-"rules.clean" = "清理";
-"rules.scanning" = "正在扫描…";
+"rules.scan" = "分析";
+"rules.clean" = "运行清理";
+"rules.scanning" = "正在分析…";
 "rules.cleaning" = "正在清理…";
 "rules.alert.confirm.title" = "清理确认";
 "rules.alert.result.title" = "清理结果";
@@ -75,6 +76,15 @@
 
 "rules.help.scan" = "清理前先估算各路径类规则在磁盘上的占用。";
 "rules.help.clean" = "删除已勾选规则对应的数据；中/高风险项会先要求确认。";
+"rules.action.title" = "清理流程";
+"rules.action.blurb" = "按「分析 → 预览 → 运行清理」顺序操作。按钮可悬停查看说明；进行中时进度显示在此处。";
+"rules.action.recoverable_label" = "可回收（路径类规则）";
+"rules.action.metric.placeholder" = "—";
+"rules.action.metric.tap_analyze" = "点击「分析」测算";
+"rules.action.caption.none" = "尚未勾选任何规则。";
+"rules.action.caption.counts_format" = "已选 %1$lld 条 · 路径类 %2$lld · 命令类 %3$lld";
+"rules.action.select_all" = "全选";
+"rules.action.select_none" = "全不选";
 "rules.dry_run" = "预览";
 "rules.dry_run.sheet_title" = "预览（演练）";
 "rules.dry_run.help" = "列出已勾选规则将删除的路径或将执行的命令，不会改动磁盘。";
@@ -86,6 +96,9 @@
 "rules.browser.table.item" = "项目";
 "rules.browser.table.size" = "大小";
 "rules.browser.table.risk" = "风险";
+
+"rules.list.help.scan_column" = "在上方流程卡中运行「分析」后会更新。";
+"rules.list.a11y.toggle_hint" = "开关此项是否纳入清理。大小列为上次扫描的估算值。";
 
 "docker.intro" = "按顺序执行多条 docker 命令；可与「规则清理」中的单条命令配合。";
 "docker.section.desktop" = "本机 Docker Desktop 目录";

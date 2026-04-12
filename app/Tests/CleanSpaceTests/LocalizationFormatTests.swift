@@ -53,6 +53,25 @@ struct LocalizationFormatTests {
         #expect(!L10n.Metrics.chartNetworkAxisDownload.isEmpty)
     }
 
+    @Test("Rules flow how-to strings are non-empty")
+    func rulesFlowHowToStringsNonEmpty() {
+        #expect(!L10n.Rules.flowSectionTitle.isEmpty)
+        #expect(!L10n.Rules.flowSteps.isEmpty)
+        #expect(L10n.Rules.flowSteps.contains("1"))
+    }
+
+    @Test("Rules action workflow strings are non-empty")
+    func rulesActionWorkflowStringsNonEmpty() {
+        #expect(!L10n.Rules.actionTitle.isEmpty)
+        #expect(!L10n.Rules.actionBlurb.isEmpty)
+        #expect(!L10n.Rules.actionRecoverableLabel.isEmpty)
+        #expect(!L10n.Rules.actionCaptionNone.isEmpty)
+        let counts = L10n.Rules.actionCaptionCounts(selected: 2, pathRules: 1, commandRules: 1)
+        #expect(counts.contains("2"))
+        #expect(!L10n.Rules.actionSelectAll.isEmpty)
+        #expect(!L10n.Rules.actionSelectNone.isEmpty)
+    }
+
     @Test("Rules dry-run strings are non-empty")
     func rulesDryRunStringsNonEmpty() {
         #expect(!L10n.Rules.dryRun.isEmpty)

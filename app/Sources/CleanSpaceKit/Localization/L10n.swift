@@ -33,7 +33,9 @@ enum L10n {
     enum Rules {
         static var emptyTitle: String { tr("rules.empty.title") }
         static var emptyDescription: String { tr("rules.empty.description") }
-        static var intro: String { tr("rules.intro") }
+        /// 规则页分步使用说明（置于概览与操作卡之间）。
+        static var flowSectionTitle: String { tr("rules.flow.section_title") }
+        static var flowSteps: String { tr("rules.flow.steps") }
         static var chartCardTitle: String { tr("rules.chart.card_title") }
         static var navTitle: String { tr("rules.nav_title") }
         /// 导航副标题：已选规则数 / 总规则数。
@@ -82,11 +84,28 @@ enum L10n {
         static var dryRunPathMissing: String { tr("rules.dry_run.path_missing") }
         static var dryRunNoPaths: String { tr("rules.dry_run.no_paths") }
 
+        /// 主内容区清理流程卡（分析 → 预览 → 运行清理，与常见清理工具主流程一致）。
+        static var actionTitle: String { tr("rules.action.title") }
+        static var actionBlurb: String { tr("rules.action.blurb") }
+        static var actionRecoverableLabel: String { tr("rules.action.recoverable_label") }
+        static var actionMetricPlaceholder: String { tr("rules.action.metric.placeholder") }
+        static var actionMetricTapAnalyze: String { tr("rules.action.metric.tap_analyze") }
+        static var actionCaptionNone: String { tr("rules.action.caption.none") }
+        static func actionCaptionCounts(selected: Int, pathRules: Int, commandRules: Int) -> String {
+            String(format: tr("rules.action.caption.counts_format"), selected, pathRules, commandRules)
+        }
+        static var actionSelectAll: String { tr("rules.action.select_all") }
+        static var actionSelectNone: String { tr("rules.action.select_none") }
+
         /// 浏览器类规则表格列标题
         static var browserTableClean: String { tr("rules.browser.table.clean") }
         static var browserTableItem: String { tr("rules.browser.table.item") }
         static var browserTableSize: String { tr("rules.browser.table.size") }
         static var browserTableRisk: String { tr("rules.browser.table.risk") }
+
+        /// 扫描列表行：指针悬停在「大小」列上时的说明（VoiceOver 用 `listA11yToggleHint`）。
+        static var listHelpScanColumn: String { tr("rules.list.help.scan_column") }
+        static var listA11yToggleHint: String { tr("rules.list.a11y.toggle_hint") }
     }
 
     enum Docker {

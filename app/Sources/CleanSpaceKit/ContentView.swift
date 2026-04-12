@@ -167,6 +167,22 @@ private struct RulesWorkspaceView: View {
         return L10n.Rules.navSubtitleSelected(selected: selectedRuleIds.count, total: rules.count)
     }
 
+    private var selectedPathRules: [CleaningRule] {
+        rules.filter { selectedRuleIds.contains($0.id) && $0.type == .dir }
+    }
+
+    private var selectedCommandRules: [CleaningRule] {
+        rules.filter { selectedRuleIds.contains($0.id) && $0.type == .command }
+    }
+
+    private var selectedRecoverableBytes: Int64 {
+        selectedPathRules.reduce(0) { $0 + (scannedSizes[$1.id] ?? 0) }
+    }
+
+    private var sizedSelectedPathCount: Int {
+        selectedPathRules.filter { scannedSizes[$0.id] != nil }.count
+    }
+
     var body: some View {
         Group {
             if rules.isEmpty {
@@ -191,12 +207,39 @@ private struct RulesWorkspaceView: View {
                         .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 4, trailing: 0))
                         .listRowBackground(Color.clear)
 
+                        // 先读步骤再看到操作卡：自上而下与「概览 → 怎么做 → 动手」一致（RFC 010）。
                         Section {
-                            Text(L10n.Rules.intro)
+                            Text(L10n.Rules.flowSteps)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
+                                .textSelection(.enabled)
+                        } header: {
+                            Text(L10n.Rules.flowSectionTitle)
+                                .font(.subheadline.weight(.semibold))
                         }
+                        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 6, trailing: 0))
+
+                        Section {
+                            CSRulesCleanWorkflowCard(
+                                recoverableBytes: selectedRecoverableBytes,
+                                selectedCount: selectedRuleIds.count,
+                                selectedPathRuleCount: selectedPathRules.count,
+                                selectedCommandRuleCount: selectedCommandRules.count,
+                                sizedSelectedPathCount: sizedSelectedPathCount,
+                                rulesNonEmpty: !rules.isEmpty,
+                                isScanning: isScanning,
+                                isCleaning: isCleaning,
+                                onAnalyze: { scanAll() },
+                                onPreview: { showDryRunSheet = true },
+                                onRunClean: { prepareAndConfirmClean() },
+                                onSelectAll: { selectedRuleIds = Set(rules.map(\.id)) },
+                                onSelectNone: { selectedRuleIds = [] }
+                            )
+                        }
+                        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 8, trailing: 0))
+                        .listRowBackground(Color.clear)
 
                         if hasDirScanResults {
                             Section {
@@ -223,7 +266,19 @@ private struct RulesWorkspaceView: View {
                             } else {
                                 Section(CleaningRule.categoryDisplayName(item.0)) {
                                     ForEach(item.1) { rule in
-                                        ruleToggleRow(rule)
+                                        RulesScanListRow(
+                                            rule: rule,
+                                            isIncluded: Binding(
+                                                get: { selectedRuleIds.contains(rule.id) },
+                                                set: { newValue in
+                                                    if newValue { selectedRuleIds.insert(rule.id) }
+                                                    else { selectedRuleIds.remove(rule.id) }
+                                                }
+                                            ),
+                                            scannedBytes: scannedSizes[rule.id],
+                                            formatBytes: formatBytes
+                                        )
+                                        .listRowInsets(EdgeInsets(top: 6, leading: 4, bottom: 6, trailing: 8))
                                     }
                                 }
                             }
@@ -235,42 +290,6 @@ private struct RulesWorkspaceView: View {
         }
         .navigationTitle(L10n.Rules.navTitle)
         .optionalNavigationSubtitle(rulesNavSubtitle)
-        .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
-                Button {
-                    scanAll()
-                } label: {
-                    Label(L10n.Rules.scan, systemImage: "arrow.clockwise")
-                }
-                .help(L10n.Rules.helpScan)
-                .disabled(isScanning || rules.isEmpty)
-                Button {
-                    showDryRunSheet = true
-                } label: {
-                    Label(L10n.Rules.dryRun, systemImage: "eye")
-                }
-                .help(L10n.Rules.helpDryRun)
-                .disabled(selectedRuleIds.isEmpty || isCleaning)
-                Button {
-                    prepareAndConfirmClean()
-                } label: {
-                    Label(L10n.Rules.clean, systemImage: "trash")
-                }
-                .help(L10n.Rules.helpClean)
-                .disabled(selectedRuleIds.isEmpty || isCleaning)
-            }
-            ToolbarItem(placement: .status) {
-                if isScanning || isCleaning {
-                    HStack(spacing: 8) {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text(isScanning ? L10n.Rules.scanning : L10n.Rules.cleaning)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
         .alert(L10n.Rules.alertConfirmTitle, isPresented: $showCleanConfirm) {
             Button(L10n.Common.cancel, role: .cancel) { }
             Button(L10n.Rules.clean, role: .destructive) { performClean() }
@@ -285,44 +304,6 @@ private struct RulesWorkspaceView: View {
         .sheet(isPresented: $showDryRunSheet) {
             RulesDryRunSheet(rules: rules.filter { selectedRuleIds.contains($0.id) })
         }
-    }
-
-    @ViewBuilder
-    private func ruleToggleRow(_ rule: CleaningRule) -> some View {
-        Toggle(isOn: Binding(
-            get: { selectedRuleIds.contains(rule.id) },
-            set: { if $0 { selectedRuleIds.insert(rule.id) } else { selectedRuleIds.remove(rule.id) } }
-        )) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(rule.name)
-                        .font(.body)
-                    if let w = rule.warning, !w.isEmpty {
-                        Text(w)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                Spacer(minLength: 8)
-                Group {
-                    if rule.type == .command {
-                        Text(rule.estimate ?? L10n.Rules.estimateCommand)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                            .multilineTextAlignment(.trailing)
-                    } else {
-                        Text(formatBytes(scannedSizes[rule.id]))
-                            .font(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .frame(minWidth: 72, alignment: .trailing)
-                RuleRiskChip(risk: rule.riskLevel)
-            }
-        }
-        .toggleStyle(.checkbox)
     }
 
     private func scanAll() {
