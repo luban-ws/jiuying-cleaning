@@ -56,7 +56,7 @@ private enum MetricsMonitoringDetailBlocks {
     @ViewBuilder
     static func cpu(cpuPercent: Double) -> some View {
         Text(L10n.Metrics.menuCpuHeadline)
-            .font(.headline)
+            .font(.subheadline.weight(.semibold))
         Text(L10n.Metrics.menuCpuCurrent(MetricsFormat.percent0(cpuPercent)))
         Text(L10n.Metrics.menuThresholdCpu(Int(MetricsThresholds.cpuPercent)))
             .font(.caption)
@@ -66,7 +66,7 @@ private enum MetricsMonitoringDetailBlocks {
     @ViewBuilder
     static func memory(usedBytes: UInt64, totalBytes: UInt64, memoryPercent: Double) -> some View {
         Text(L10n.Metrics.menuMemoryHeadline)
-            .font(.headline)
+            .font(.subheadline.weight(.semibold))
         Text(L10n.Metrics.menuMemoryCurrent(
             used: formatBytes(usedBytes),
             total: formatBytes(totalBytes),
@@ -80,7 +80,7 @@ private enum MetricsMonitoringDetailBlocks {
     @ViewBuilder
     static func network(upBps: Double, downBps: Double) -> some View {
         Text(L10n.Metrics.menuNetworkHeadline)
-            .font(.headline)
+            .font(.subheadline.weight(.semibold))
         Text(L10n.Metrics.menuNetworkUp(MetricsFormat.bytesPerSecond(upBps)))
         Text(L10n.Metrics.menuNetworkDown(MetricsFormat.bytesPerSecond(downBps)))
         if MetricsThresholds.notifyOnNetwork {
@@ -153,9 +153,9 @@ public struct MetricsMenuBarDetailsList: View {
     public init() {}
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 14) {
-                MetricsPopoverPercentDonut(
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                MetricsPopoverDonutWithCenterLabel(
                     percent: metrics.cpuPercent,
                     accent: MetricsMonitoringPalette.cpuTint(metrics.cpuPercent)
                 )
@@ -165,8 +165,8 @@ public struct MetricsMenuBarDetailsList: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             Divider()
-            HStack(alignment: .top, spacing: 14) {
-                MetricsPopoverPercentDonut(
+            HStack(alignment: .top, spacing: 12) {
+                MetricsPopoverDonutWithCenterLabel(
                     percent: metrics.memoryPercent,
                     accent: MetricsMonitoringPalette.memoryTint(metrics.memoryPercent)
                 )
@@ -180,7 +180,7 @@ public struct MetricsMenuBarDetailsList: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             Divider()
-            HStack(alignment: .top, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
                 MetricsPopoverNetworkBarChart(upBps: metrics.networkUpBps, downBps: metrics.networkDownBps)
                 VStack(alignment: .leading, spacing: 4) {
                     MetricsMonitoringDetailBlocks.network(upBps: metrics.networkUpBps, downBps: metrics.networkDownBps)
@@ -188,9 +188,9 @@ public struct MetricsMenuBarDetailsList: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .frame(minWidth: 320, alignment: .leading)
-        .padding(.horizontal, 4)
-        .padding(.vertical, 6)
+        .frame(minWidth: 300, alignment: .leading)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
     }
 }
 

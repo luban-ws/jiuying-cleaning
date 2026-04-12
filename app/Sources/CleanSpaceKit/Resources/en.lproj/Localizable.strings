@@ -2,9 +2,16 @@
 
 "app.name" = "CleanSpace";
 
-"menu.new_main_window" = "New Window";
+"menu.show_main_window" = "Show Main Window";
 "menu.bar.open_format" = "Open %@";
 "menu.quit_format" = "Quit %@";
+
+"menubar.tab.monitor" = "Monitor";
+"menubar.tab.disk" = "Disk";
+"menubar.tab.manager" = "Workspace";
+"menubar.disk.boot_title" = "Boot volume";
+"menubar.disk.unavailable" = "Could not read disk space.";
+"menubar.manager.intro" = "Use the main window to pick volumes, scan folders, and run rules or Docker presets.";
 
 "metrics.menu_bar.accessibility" = "CPU, memory, and network usage";
 "metrics.menu_bar.help_live_format" = "Live: CPU %@, memory %@, network %@. Click for details and alert thresholds.";
@@ -42,7 +49,7 @@
 
 "rules.empty.title" = "No rules";
 "rules.empty.description" = "Check that cleaning-rules.json is present in the app bundle.";
-"rules.intro" = "Select items, tap Scan, then Clean. Command rules show notes instead of exact sizes.";
+"rules.intro" = "Check rules, use Preview to see targets, Scan for sizes, then Clean. Command rules show notes instead of exact sizes.";
 "rules.chart.card_title" = "Size by category (scan)";
 "rules.nav_title" = "Rules";
 "rules.nav_subtitle_format" = "%lld of %lld selected";
@@ -68,6 +75,12 @@
 
 "rules.help.scan" = "Measure on-disk size for each path-based rule before cleaning.";
 "rules.help.clean" = "Delete data for selected rules. Medium or high risk rules ask for confirmation first.";
+"rules.dry_run" = "Preview";
+"rules.dry_run.sheet_title" = "Preview selection";
+"rules.dry_run.help" = "Show paths or shell commands for checked rules. Nothing is deleted.";
+"rules.dry_run.disclaimer" = "This is a dry run. No files are removed until you click Clean and confirm.";
+"rules.dry_run.path_missing" = "Path not found (clean will skip if still missing).";
+"rules.dry_run.no_paths" = "No paths resolved for this rule.";
 
 "rules.browser.table.clean" = "Clean";
 "rules.browser.table.item" = "Item";

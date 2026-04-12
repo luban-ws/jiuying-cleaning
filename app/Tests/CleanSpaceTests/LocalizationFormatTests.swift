@@ -22,12 +22,12 @@ struct LocalizationFormatTests {
         #expect(!L10n.Disk.navSubtitlePickVolume.isEmpty)
     }
 
-    @Test("File menu new window label is non-empty")
-    func menuNewMainWindowNonEmpty() {
-        #expect(!L10n.Menu.newMainWindow.isEmpty)
+    @Test("File menu show main window label is non-empty")
+    func menuShowMainWindowNonEmpty() {
+        #expect(!L10n.Menu.showMainWindow.isEmpty)
     }
 
-    @Test("Main window scene id matches WindowGroup")
+    @Test("Main window scene id matches Window scene")
     func appWindowSceneIdStable() {
         #expect(AppWindowSceneID.main == "main")
     }
@@ -51,5 +51,25 @@ struct LocalizationFormatTests {
     func metricsChartNetworkAxisLabels() {
         #expect(!L10n.Metrics.chartNetworkAxisUpload.isEmpty)
         #expect(!L10n.Metrics.chartNetworkAxisDownload.isEmpty)
+    }
+
+    @Test("Rules dry-run strings are non-empty")
+    func rulesDryRunStringsNonEmpty() {
+        #expect(!L10n.Rules.dryRun.isEmpty)
+        #expect(!L10n.Rules.dryRunSheetTitle.isEmpty)
+        #expect(!L10n.Rules.helpDryRun.isEmpty)
+        #expect(!L10n.Rules.dryRunDisclaimer.isEmpty)
+        #expect(!L10n.Rules.dryRunPathMissing.isEmpty)
+        #expect(!L10n.Rules.dryRunNoPaths.isEmpty)
+    }
+
+    @Test("Menu bar popover tab labels and disk copy are non-empty")
+    func menuBarPopoverStringsNonEmpty() {
+        #expect(!L10n.MenuBarPopover.tabMonitor.isEmpty)
+        #expect(!L10n.MenuBarPopover.tabDisk.isEmpty)
+        #expect(!L10n.MenuBarPopover.tabManager.isEmpty)
+        #expect(!L10n.MenuBarPopover.diskBootTitle.isEmpty)
+        #expect(!L10n.MenuBarPopover.diskUnavailable.isEmpty)
+        #expect(!L10n.MenuBarPopover.managerIntro.isEmpty)
     }
 }

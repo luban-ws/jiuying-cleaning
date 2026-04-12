@@ -8,6 +8,25 @@
 import Charts
 import SwiftUI
 
+// MARK: - 环形占比 + 中心百分比（菜单栏弹层）
+struct MetricsPopoverDonutWithCenterLabel: View {
+    let percent: Double
+    let accent: Color
+
+    var body: some View {
+        ZStack {
+            MetricsPopoverPercentDonut(percent: percent, accent: accent)
+            Text(MetricsFormat.percent0(percent))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.primary)
+                .minimumScaleFactor(0.85)
+                .lineLimit(1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
 // MARK: - 环形占比（0–100%）
 struct MetricsPopoverPercentDonut: View {
     let percent: Double

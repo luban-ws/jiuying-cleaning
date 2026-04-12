@@ -12,24 +12,61 @@ import SwiftUI
 public struct CleanSpaceUnifiedMenuBarExtraContent: View {
     @Environment(\.openWindow) private var openWindow
 
+    private enum PopoverTab: String, CaseIterable, Hashable {
+        case monitor
+        case disk
+        case manager
+    }
+
+    @State private var tab: PopoverTab = .monitor
+
     public init() {}
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            MetricsMenuBarDetailsList()
+        VStack(alignment: .leading, spacing: 10) {
+            Picker(selection: $tab) {
+                Text(L10n.MenuBarPopover.tabMonitor).tag(PopoverTab.monitor)
+                Text(L10n.MenuBarPopover.tabDisk).tag(PopoverTab.disk)
+                Text(L10n.MenuBarPopover.tabManager).tag(PopoverTab.manager)
+            } label: {
+                EmptyView()
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+
+            Group {
+                switch tab {
+                case .monitor:
+                    MetricsMenuBarDetailsList()
+                case .disk:
+                    MenuBarDiskTabContent()
+                case .manager:
+                    MenuBarManagerTabContent()
+                }
+            }
+            .frame(minWidth: 300, alignment: .leading)
+
             Divider()
-            VStack(alignment: .leading, spacing: 8) {
+
+            HStack(spacing: 8) {
                 Button(L10n.Menu.openApp(L10n.App.name)) {
                     openWindow(id: AppWindowSceneID.main)
                     NSApp.activate(ignoringOtherApps: true)
                 }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .frame(maxWidth: .infinity)
+
                 Button(L10n.Menu.quitApp(L10n.App.name)) {
                     NSApp.terminate(nil)
                 }
                 .keyboardShortcut("q", modifiers: .command)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .frame(maxWidth: .infinity)
             }
         }
         .padding(.horizontal, 10)
-        .padding(.bottom, 10)
+        .padding(.vertical, 8)
     }
 }

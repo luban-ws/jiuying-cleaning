@@ -12,7 +12,8 @@ import SwiftUI
 @main
 struct CleanSpaceApp: App {
     var body: some Scene {
-        WindowGroup(id: AppWindowSceneID.main) {
+        // 使用 `Window`（非 `WindowGroup`）保证全局仅一扇主窗口；`openWindow(id:)` 会前置已有窗口而不会叠开多扇。
+        Window("app.name", id: AppWindowSceneID.main) {
             ContentView()
                 .environmentObject(SystemMetricsController.shared)
                 .frame(minWidth: 1000, minHeight: 640)

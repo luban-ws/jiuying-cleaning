@@ -74,6 +74,13 @@ enum L10n {
         /// 工具栏与指针悬停提示（macOS HIG：桌面应用应提供 `.help`）
         static var helpScan: String { tr("rules.help.scan") }
         static var helpClean: String { tr("rules.help.clean") }
+        /// 演练：仅列出将删除的路径或将执行的命令，不写入磁盘。
+        static var dryRun: String { tr("rules.dry_run") }
+        static var dryRunSheetTitle: String { tr("rules.dry_run.sheet_title") }
+        static var helpDryRun: String { tr("rules.dry_run.help") }
+        static var dryRunDisclaimer: String { tr("rules.dry_run.disclaimer") }
+        static var dryRunPathMissing: String { tr("rules.dry_run.path_missing") }
+        static var dryRunNoPaths: String { tr("rules.dry_run.no_paths") }
 
         /// 浏览器类规则表格列标题
         static var browserTableClean: String { tr("rules.browser.table.clean") }
@@ -225,10 +232,10 @@ enum L10n {
         static var name: String { tr("app.name") }
     }
 
-    /// 应用级菜单（File 等），与 `Commands` / `WindowGroup(id:)` 配合。
+    /// 应用级菜单（File 等），与 `Commands` / `Window(id:)` 配合。
     enum Menu {
-        /// 无文档型应用仍须提供此项，关窗后或 Dock 再次打开时可显式创建主窗口。
-        static var newMainWindow: String { tr("menu.new_main_window") }
+        /// 唯一主窗口场景下用于前置主窗口（⌘N / 程序坞），与「新建第二扇窗口」语义不同。
+        static var showMainWindow: String { tr("menu.show_main_window") }
         /// 菜单栏下拉：打开或前置主窗口（`%@` 为应用名）。
         static func openApp(_ name: String) -> String {
             String(format: tr("menu.bar.open_format"), name)
@@ -237,6 +244,16 @@ enum L10n {
         static func quitApp(_ name: String) -> String {
             String(format: tr("menu.quit_format"), name)
         }
+    }
+
+    /// 菜单栏弹层分段标签与磁盘 / 工作台说明。
+    enum MenuBarPopover {
+        static var tabMonitor: String { tr("menubar.tab.monitor") }
+        static var tabDisk: String { tr("menubar.tab.disk") }
+        static var tabManager: String { tr("menubar.tab.manager") }
+        static var diskBootTitle: String { tr("menubar.disk.boot_title") }
+        static var diskUnavailable: String { tr("menubar.disk.unavailable") }
+        static var managerIntro: String { tr("menubar.manager.intro") }
     }
 
     /// 工具栏系统监控（CPU / 内存 / 网络）与阈值通知文案。

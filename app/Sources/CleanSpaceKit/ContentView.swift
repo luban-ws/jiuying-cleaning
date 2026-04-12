@@ -147,6 +147,7 @@ private struct RulesWorkspaceView: View {
     @State private var statusMessage: String?
     @State private var showCleanConfirm = false
     @State private var showCleanResult = false
+    @State private var showDryRunSheet = false
     @State private var rulesToClean: [CleaningRule] = []
 
     private var groupedRules: [(String, [CleaningRule])] {
@@ -244,6 +245,13 @@ private struct RulesWorkspaceView: View {
                 .help(L10n.Rules.helpScan)
                 .disabled(isScanning || rules.isEmpty)
                 Button {
+                    showDryRunSheet = true
+                } label: {
+                    Label(L10n.Rules.dryRun, systemImage: "eye")
+                }
+                .help(L10n.Rules.helpDryRun)
+                .disabled(selectedRuleIds.isEmpty || isCleaning)
+                Button {
                     prepareAndConfirmClean()
                 } label: {
                     Label(L10n.Rules.clean, systemImage: "trash")
@@ -273,6 +281,9 @@ private struct RulesWorkspaceView: View {
             Button(L10n.Common.ok, role: .cancel) { }
         } message: {
             if let msg = statusMessage { Text(msg) }
+        }
+        .sheet(isPresented: $showDryRunSheet) {
+            RulesDryRunSheet(rules: rules.filter { selectedRuleIds.contains($0.id) })
         }
     }
 
@@ -351,6 +362,74 @@ private struct RulesWorkspaceView: View {
                 statusMessage = msgs.joined(separator: "\n")
                 showCleanResult = true
             }
+        }
+    }
+}
+
+// MARK: - 规则演练预览（dry run，不删文件）
+private struct RulesDryRunSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let rules: [CleaningRule]
+
+    private var sortedRules: [CleaningRule] {
+        rules.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Text(L10n.Rules.dryRunDisclaimer)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                ForEach(sortedRules) { rule in
+                    Section(rule.name) {
+                        dryRunSectionBody(for: rule)
+                    }
+                }
+            }
+            .formStyle(.grouped)
+            .navigationTitle(L10n.Rules.dryRunSheetTitle)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(L10n.Common.ok) { dismiss() }
+                }
+            }
+        }
+        .frame(minWidth: 440, minHeight: 380)
+    }
+
+    @ViewBuilder
+    private func dryRunSectionBody(for rule: CleaningRule) -> some View {
+        switch ruleDryRunPayload(for: rule) {
+        case .directory(let targets):
+            if targets.isEmpty {
+                Text(L10n.Rules.dryRunNoPaths)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(Array(targets.enumerated()), id: \.offset) { _, item in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.path)
+                            .font(.body.monospaced())
+                            .textSelection(.enabled)
+                        if !item.exists {
+                            Text(L10n.Rules.dryRunPathMissing)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        case .commandLine(let cmd):
+            Text(cmd)
+                .font(.body.monospaced())
+                .textSelection(.enabled)
+        case .noCommand:
+            Text(L10n.Clean.missingCommand)
+                .foregroundStyle(.secondary)
         }
     }
 }

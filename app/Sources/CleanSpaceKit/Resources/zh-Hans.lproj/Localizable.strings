@@ -2,9 +2,16 @@
 
 "app.name" = "CleanSpace";
 
-"menu.new_main_window" = "新建窗口";
+"menu.show_main_window" = "显示主窗口";
 "menu.bar.open_format" = "打开 %@";
 "menu.quit_format" = "退出 %@";
+
+"menubar.tab.monitor" = "监控";
+"menubar.tab.disk" = "磁盘";
+"menubar.tab.manager" = "工作台";
+"menubar.disk.boot_title" = "启动磁盘";
+"menubar.disk.unavailable" = "无法读取磁盘空间。";
+"menubar.manager.intro" = "请打开主窗口以选择卷、扫描目录，或使用规则与 Docker 预设进行清理。";
 
 "metrics.menu_bar.accessibility" = "处理器、内存与网络占用";
 "metrics.menu_bar.help_live_format" = "实时：CPU %@，内存 %@，网络 %@。点击查看详情与通知阈值。";
@@ -42,7 +49,7 @@
 
 "rules.empty.title" = "没有规则";
 "rules.empty.description" = "请检查应用包中的 cleaning-rules.json。";
-"rules.intro" = "勾选后先「扫描」再「清理」。命令类规则无精确体积时显示说明。";
+"rules.intro" = "勾选规则后可用「预览」查看目标路径或命令，再「扫描」测体积，最后「清理」。命令类规则无精确体积时显示说明。";
 "rules.chart.card_title" = "按分类占用（扫描）";
 "rules.nav_title" = "规则清理";
 "rules.nav_subtitle_format" = "已选 %lld / 共 %lld 条";
@@ -68,6 +75,12 @@
 
 "rules.help.scan" = "清理前先估算各路径类规则在磁盘上的占用。";
 "rules.help.clean" = "删除已勾选规则对应的数据；中/高风险项会先要求确认。";
+"rules.dry_run" = "预览";
+"rules.dry_run.sheet_title" = "预览（演练）";
+"rules.dry_run.help" = "列出已勾选规则将删除的路径或将执行的命令，不会改动磁盘。";
+"rules.dry_run.disclaimer" = "此为演练：在点击「清理」并确认之前，不会删除任何文件。";
+"rules.dry_run.path_missing" = "路径不存在（若清理时仍不存在将跳过）。";
+"rules.dry_run.no_paths" = "此规则未解析出任何路径。";
 
 "rules.browser.table.clean" = "清理";
 "rules.browser.table.item" = "项目";

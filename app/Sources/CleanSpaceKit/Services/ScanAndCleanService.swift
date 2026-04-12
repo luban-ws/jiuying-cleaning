@@ -12,8 +12,8 @@ private func expandingTilde(in path: String) -> String {
     (path as NSString).expandingTildeInPath
 }
 
-/// 对单条 dir 规则，解析出所有要扫描/删除的绝对路径
-private func resolvePaths(for rule: CleaningRule) -> [String] {
+/// 对单条 dir 规则，解析出所有要扫描/删除的绝对路径（`dir` + `paths`；`command` 规则返回空数组）。
+func resolvePaths(for rule: CleaningRule) -> [String] {
     guard rule.type == .dir, let paths = rule.paths else { return [] }
     var result: [String] = []
     for p in paths {
@@ -28,6 +28,27 @@ private func resolvePaths(for rule: CleaningRule) -> [String] {
         }
     }
     return result
+}
+
+/// 演练用：目录规则为「将作用的目标路径 + 是否已存在于磁盘」；命令规则为将执行的 shell（若无则为空）。
+enum RuleDryRunPayload: Sendable {
+    case directory(targets: [(path: String, exists: Bool)])
+    case commandLine(String)
+    case noCommand
+}
+
+/// 不读文件体积、不删文件；供「预览」面板展示即将清理的对象。
+func ruleDryRunPayload(for rule: CleaningRule) -> RuleDryRunPayload {
+    switch rule.type {
+    case .dir:
+        let paths = resolvePaths(for: rule)
+        let fm = FileManager.default
+        let targets = paths.map { ($0, fm.fileExists(atPath: $0)) }
+        return .directory(targets: targets)
+    case .command:
+        guard let cmd = rule.command, !cmd.isEmpty else { return .noCommand }
+        return .commandLine(cmd)
+    }
 }
 
 /// 递归计算目录占用字节（仅统计文件；`options` 默认可跳过隐藏项以贴近访达部分视图）
