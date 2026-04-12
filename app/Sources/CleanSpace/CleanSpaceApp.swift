@@ -31,18 +31,12 @@ struct CleanSpaceApp: App {
             CleanSpaceMenuCommands()
         }
 
-        // 系统级菜单栏：CPU / 内存 / 网络（与窗口解耦，关窗后仍可查看）。
+        // 仅一个菜单栏图标：仪表盘标签；点开后为监控图表 +「打开 CleanSpace」「退出」。
         MenuBarExtra {
-            MetricsMenuBarDetailsList()
+            CleanSpaceUnifiedMenuBarExtraContent()
         } label: {
             MetricsMenuBarCompactLabel()
         }
         .menuBarExtraStyle(.window)
-
-        // 应用菜单：打开主窗口、退出（与 Dock 并存）。
-        MenuBarExtra(CleanSpaceMenuBarExtraChrome.menuBarTitle, systemImage: CleanSpaceMenuBarExtraChrome.systemImageName) {
-            CleanSpaceMenuBarExtraMenuContent()
-        }
-        .menuBarExtraStyle(.menu)
     }
 }
