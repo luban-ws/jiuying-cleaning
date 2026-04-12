@@ -2,9 +2,10 @@
 //  CleanSpaceApp.swift
 //  CleanSpace
 //
-//  macOS 清理应用入口：管理浏览器、Docker、AI 工具等占用空间。
+//  可执行入口：界面与业务在 CleanSpaceKit，本目标仅 @main。
 //
 
+import CleanSpaceKit
 import SwiftUI
 
 @main

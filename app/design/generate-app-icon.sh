@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# 从 icon.svg 生成 AppIcon-1024.png；由 Xcode「Run Script」在构建前自动执行。
+# 从 icon.svg 生成 AppIcon-1024.png；在 SwiftPM 构建前由 npm / bundle 脚本调用。
 # 若本机有 rsvg-convert（Homebrew librsvg）则始终从矢量重新导出；否则保留仓库内已有 PNG，不中断构建。
 
 set -euo pipefail
 
 DESIGN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ICON_SVG="${DESIGN_DIR}/icon.svg"
-OUT_DIR="${DESIGN_DIR}/../CleanSpace/Assets.xcassets/AppIcon.appiconset"
+OUT_DIR="${DESIGN_DIR}/../Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset"
 OUT_PNG="${OUT_DIR}/AppIcon-1024.png"
 
 mkdir -p "${OUT_DIR}"

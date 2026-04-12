@@ -22,6 +22,48 @@ struct TopLevelFolderSize: Identifiable {
     let bytes: Int64
 }
 
+/// 卷「已用」与顶层扫描合计的差额（纯函数，便于单测）
+enum VolumeDiskAccounting {
+    /// 系统报告的已用字节（总容量 − 可用）；任一缺失则返回 nil
+    static func volumeUsedBytes(total: Int64?, free: Int64?) -> Int64? {
+        guard let t = total, let f = free, t > 0 else { return nil }
+        return max(0, t - f)
+    }
+
+    /// 顶层扫描结果之和
+    static func topLevelFoldersSum(_ rows: [TopLevelFolderSize]) -> Int64 {
+        rows.reduce(0) { $0 + $1.bytes }
+    }
+
+    /// 已用 − 顶层合计，不为负；表示快照、无权目录、APFS 特性等未体现在逐文件累加中的部分
+    static func unaccountedUsedBytes(volumeUsed: Int64, topLevelSum: Int64) -> Int64 {
+        max(0, volumeUsed - topLevelSum)
+    }
+
+    /// 根目录下多条目若解析到同一规范路径（如 `/var` → `/private/var`），只保留一条以免重复累加
+    static func filterCanonicalRootDuplicates(candidates: [(url: URL, name: String)]) -> [(url: URL, name: String)] {
+        struct Item {
+            let url: URL
+            let name: String
+            let canonical: String
+        }
+        let items: [Item] = candidates.map { Item(url: $0.url, name: $0.name, canonical: $0.url.resolvingSymlinksInPath().path) }
+        let sorted = items.sorted {
+            if $0.canonical.count != $1.canonical.count { return $0.canonical.count < $1.canonical.count }
+            return $0.name.localizedStandardCompare($1.name) == .orderedAscending
+        }
+        var kept: [Item] = []
+        for cand in sorted {
+            if kept.contains(where: { $0.canonical == cand.canonical }) { continue }
+            if kept.contains(where: { cand.canonical.hasPrefix($0.canonical + "/") }) { continue }
+            kept.append(cand)
+        }
+        return kept
+            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+            .map { ($0.url, $0.name) }
+    }
+}
+
 enum VolumeScannerService {
     /// 启动卷 + /Volumes 下外置卷
     static func listMountedVolumes() -> [MountedVolume] {
@@ -63,6 +105,7 @@ enum VolumeScannerService {
     }
 
     /// 扫描某卷根目录下一层文件夹占用（跳过快照等常见系统项以减轻耗时）
+    /// 枚举时包含隐藏文件、并对 `/var`↔`/private` 等重复挂载点去重；仍可能小于系统「已用」——见界面「未由扫描计入」说明。
     static func scanTopLevelFolders(on volume: URL) async -> [TopLevelFolderSize] {
         await Task.detached {
             let fm = FileManager.default
@@ -73,15 +116,22 @@ enum VolumeScannerService {
                 options: [.skipsHiddenFiles]
             ) else { return [] }
 
-            var rows: [TopLevelFolderSize] = []
+            var candidates: [(url: URL, name: String)] = []
             for entry in entries {
                 let path = entry.path
                 let name = entry.lastPathComponent
                 if skipPrefixes.contains(where: { name.hasPrefix($0) }) { continue }
                 var isDir: ObjCBool = false
                 guard fm.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else { continue }
-                let bytes = directorySizeBytes(url: entry)
-                rows.append(TopLevelFolderSize(name: name, path: path, bytes: bytes))
+                candidates.append((entry, name))
+            }
+
+            let deduped = VolumeDiskAccounting.filterCanonicalRootDuplicates(candidates: candidates)
+            var rows: [TopLevelFolderSize] = []
+            for (entry, name) in deduped {
+                // 磁盘页：尽量不跳过隐藏子项，更接近 du；无权限子树仍会偏少
+                let bytes = directorySizeBytes(url: entry, enumeratorOptions: [])
+                rows.append(TopLevelFolderSize(name: name, path: entry.path, bytes: bytes))
             }
             return rows.sorted { $0.bytes > $1.bytes }
         }.value

@@ -30,10 +30,10 @@ private func resolvePaths(for rule: CleaningRule) -> [String] {
     return result
 }
 
-/// 递归计算目录占用字节（仅统计文件）
-func directorySizeBytes(url: URL) -> Int64 {
+/// 递归计算目录占用字节（仅统计文件；`options` 默认可跳过隐藏项以贴近访达部分视图）
+func directorySizeBytes(url: URL, enumeratorOptions: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles]) -> Int64 {
     let fm = FileManager.default
-    guard let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey], options: [.skipsHiddenFiles]) else { return 0 }
+    guard let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey], options: enumeratorOptions) else { return 0 }
     var total: Int64 = 0
     for case let fileURL as URL in enumerator {
         guard let resource = try? fileURL.resourceValues(forKeys: [.fileSizeKey, .isDirectoryKey]),

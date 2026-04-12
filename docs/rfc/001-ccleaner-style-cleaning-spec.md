@@ -349,7 +349,7 @@ paths:
 
 ### 配置文件放置与格式
 
-- **内置规则**：`app/CleanSpace/Resources/cleaning-rules.json`（随应用打包，从 `Bundle.main` 读取）。格式支持 **JSON** 或 **YAML**；当前实现使用 JSON，顶层为规则数组 `[ ... ]`。
+- **内置规则**：`app/Sources/CleanSpaceKit/Resources/cleaning-rules.json`（随应用打包，从 SwiftPM 模块 `Bundle.module` 读取）。格式支持 **JSON** 或 **YAML**；当前实现使用 JSON，顶层为规则数组 `[ ... ]`。
 - **用户规则**：`~/Library/Application Support/CleanSpace/user-cleaning-rules.json`（若存在则与内置合并；同 `id` 时用户规则覆盖内置）。可选后续支持 `user-cleaning-rules.yaml`。
 - 规则格式：每条规则字段见上文「规则通用字段」与「按 type 的差异化字段」；JSON 即相同结构的数组，YAML 可为 `rules: [ ... ]` 或直接 `[ ... ]`。
 
@@ -372,7 +372,7 @@ paths:
 
 **增改规则**
 
-- **改内置**：编辑 `app/CleanSpace/Resources/cleaning-rules.json`，保持与本节及上文规则 schema 一致，重新构建运行即可。
+- **改内置**：编辑 `app/Sources/CleanSpaceKit/Resources/cleaning-rules.json`，保持与本节及上文规则 schema 一致，重新构建运行即可。
 - **用户自定义**：在 `~/Library/Application Support/CleanSpace/` 下创建或编辑 `user-cleaning-rules.json`（同一 JSON 数组结构），应用下次启动或重新加载时合并；同 `id` 覆盖内置。长期可增加设置页“自定义规则”的增删改与导入/导出。
 
 **安全**
@@ -421,7 +421,7 @@ Chrome 等有多配置时，可用一条规则 + 多个 `paths.base` 覆盖各 p
 ## 实现要点（高层）
 
 - **数据模型**：每条“清理规则”对应一项或一组，包含：分类（system/browser/docker/ai-tools）、显示名、路径、类型（dir/sqlite/command）、可选 CLI 命令、风险等级。
-- **配置文件**：YAML 或 JSON，放在 `app/CleanSpace/Resources/` 或用户应用支持目录，列出全部规则；新增浏览器或 AI 工具即新增配置项。
+- **配置文件**：YAML 或 JSON，放在 `app/Sources/CleanSpaceKit/Resources/` 或用户应用支持目录，列出全部规则；新增浏览器或 AI 工具即新增配置项。
 - **扫描阶段**：按规则计算占用（目录大小或预定义）；展示列表与预估可回收空间。
 - **清理阶段**：按用户勾选执行删除路径、执行 `docker … prune` 或调用脚本；记录操作便于审计（撤销可单独 RFC）。
 - **安全**：无用户勾选不删除；可选“预演”（仅列出将删除项）；不编辑 plist/注册表；Docker 路径删除需强确认。

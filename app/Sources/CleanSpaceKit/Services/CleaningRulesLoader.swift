@@ -20,7 +20,8 @@ final class CleaningRulesLoader {
 
     /// 从主 Bundle 加载内置规则
     static func loadBuiltinRules() throws -> [CleaningRule] {
-        guard let url = Bundle.main.url(forResource: Self.builtinFileName, withExtension: Self.builtinExtension) else {
+        // SwiftPM 资源随 CleanSpaceKit 打入资源包，使用模块 Bundle（非可执行体 Bundle.main）
+        guard let url = Bundle.module.url(forResource: Self.builtinFileName, withExtension: Self.builtinExtension) else {
             throw CleaningRulesLoaderError.resourceNotFound
         }
         let data = try Data(contentsOf: url)
