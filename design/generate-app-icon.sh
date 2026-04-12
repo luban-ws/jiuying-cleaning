@@ -6,7 +6,7 @@ set -euo pipefail
 
 DESIGN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ICON_SVG="${DESIGN_DIR}/icon.svg"
-OUT_DIR="${DESIGN_DIR}/../Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset"
+OUT_DIR="${DESIGN_DIR}/../app/Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset"
 OUT_PNG="${OUT_DIR}/AppIcon-1024.png"
 
 mkdir -p "${OUT_DIR}"

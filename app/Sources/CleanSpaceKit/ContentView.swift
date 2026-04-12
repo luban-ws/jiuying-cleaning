@@ -129,6 +129,13 @@ private struct RulesWorkspaceView: View {
         groupRulesByCategory(rules)
     }
 
+    /// 是否存在至少一条 dir 规则已有正扫描值（用于展示图表区块）
+    private var hasDirScanResults: Bool {
+        rules.contains { rule in
+            rule.type == .dir && (scannedSizes[rule.id] ?? 0) > 0
+        }
+    }
+
     var body: some View {
         Group {
             if rules.isEmpty {
@@ -148,6 +155,12 @@ private struct RulesWorkspaceView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        if hasDirScanResults {
+                            Section {
+                                RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
+                            }
                         }
 
                         ForEach(Array(groupedRules.enumerated()), id: \.offset) { _, item in
@@ -328,13 +341,7 @@ private struct DockerSpecialWorkspaceView: View {
                         Text("加载中…")
                             .foregroundStyle(.secondary)
                     } else {
-                        ForEach(Array(desktopRows.enumerated()), id: \.offset) { _, row in
-                            LabeledContent(row.0) {
-                                Text(formatBytes(row.2))
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
+                        DockerDesktopChartBlock(rows: desktopRows)
                     }
                     Button("重新计算目录占用") {
                         refreshDesktopScan()
@@ -505,6 +512,20 @@ private struct VolumesWorkspaceView: View {
                         }
                     }
 
+                    Section {
+                        DiskSpaceChartsBlock(
+                            totalBytes: vol.totalBytes,
+                            freeBytes: vol.freeBytes,
+                            topFolders: topFolders,
+                            unaccountedBytes: unaccountedGapBytes(for: vol),
+                            onOpenPath: { path in
+                                NSWorkspace.shared.open(URL(fileURLWithPath: path))
+                            }
+                        )
+                    } header: {
+                        Text("可视化")
+                    }
+
                     Section("顶层文件夹") {
                         Button {
                             scanVolume(vol)
@@ -523,18 +544,10 @@ private struct VolumesWorkspaceView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        ForEach(topFolders) { row in
-                            LabeledContent(row.name) {
-                                HStack(spacing: 10) {
-                                    Text(formatBytes(row.bytes))
-                                        .monospacedDigit()
-                                        .foregroundStyle(.secondary)
-                                    Button("访达") {
-                                        NSWorkspace.shared.open(URL(fileURLWithPath: row.path))
-                                    }
-                                    .buttonStyle(.borderless)
-                                }
-                            }
+                        if topFolders.isEmpty, !scanning {
+                            Text("尚未扫描。扫描后上方将显示环形图与明细表。")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
                         }
                     }
 
@@ -542,7 +555,7 @@ private struct VolumesWorkspaceView: View {
                        let usedVolume = VolumeDiskAccounting.volumeUsedBytes(total: vol.totalBytes, free: vol.freeBytes) {
                         let summed = VolumeDiskAccounting.topLevelFoldersSum(topFolders)
                         let gap = VolumeDiskAccounting.unaccountedUsedBytes(volumeUsed: usedVolume, topLevelSum: summed)
-                        Section("与系统已用对照") {
+                        Section {
                             LabeledContent("顶层扫描合计") {
                                 Text(formatExactByteCount(summed))
                                     .monospacedDigit()
@@ -553,6 +566,8 @@ private struct VolumesWorkspaceView: View {
                                     .monospacedDigit()
                                     .foregroundStyle(.secondary)
                             }
+                        } header: {
+                            Text("与系统已用对照")
                         } footer: {
                             Text(
                                 "「已用空间」由系统报告；顶层各文件夹为对可读文件的估算。两者之差通常来自 APFS 快照、系统保留与「系统数据」、受保护或无权限路径、文件系统元数据等，属正常现象。"
@@ -588,6 +603,14 @@ private struct VolumesWorkspaceView: View {
             return "\(vol.name)  ·  \(formatBytes(f)) 可用"
         }
         return vol.name
+    }
+
+    private func unaccountedGapBytes(for vol: MountedVolume) -> Int64 {
+        guard !topFolders.isEmpty,
+              let u = VolumeDiskAccounting.volumeUsedBytes(total: vol.totalBytes, free: vol.freeBytes)
+        else { return 0 }
+        let sum = VolumeDiskAccounting.topLevelFoldersSum(topFolders)
+        return VolumeDiskAccounting.unaccountedUsedBytes(volumeUsed: u, topLevelSum: sum)
     }
 
     /// 显示包括 0 在内的字节数（与「已用空间」对照用）

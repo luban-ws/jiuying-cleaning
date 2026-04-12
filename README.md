@@ -1,40 +1,93 @@
 # CleanSpace
 
-macOS 清理应用：管理浏览器、Docker、AI 工具（如 Cursor / Antigravity）等占用，释放多余空间。
+macOS 原生清理工具（Swift / SwiftUI）：按规则扫描与清理浏览器缓存、Docker 相关目录、AI 工具缓存等，并在「磁盘」页查看卷空间与顶层目录占用（与系统「已用」口径差异见应用内说明）。
 
-## 项目结构
+## 环境要求
 
-- **`app/`** — Swift Package（SwiftPM）与 Mac 应用源码
-  - `app/Package.swift` — 包清单；用 **`swift build`** 编译，无需打开 Xcode.app
-  - `app/Sources/CleanSpaceKit/` — SwiftUI 界面与业务库
-  - `app/Sources/CleanSpace/` — 可执行入口（`@main`）
-  - `app/design/` — 应用图标矢量源（SVG）及生成说明
-- **`.husky/`** — Git 钩子：提交前 `swift build`，推送前 `swift build` + `swift test`
+- **系统**：macOS 14 及以上（与 `Package.swift` 中部署目标一致）。
+- **构建**：本机已安装 **Swift** 与 **Apple 平台 SDK**（`xcode-select --install` 的 Command Line Tools 即可，**不必**打开 Xcode.app）。
+- **可选**：**Node.js**（用于 Husky 与 `npm run` 封装命令）；**rsvg-convert**（`brew install librsvg`，从 SVG 再生应用图标 PNG）。
 
-## 快速开始
+## 克隆后
 
-1. **命令行构建**：`npm run build:app` 或 `cd app && swift build`（需 macOS 与 Swift 工具链 / Command Line Tools）。
-2. **运行**：`cd app && swift run CleanSpace`。
-3. **打 .app**：`npm run bundle:app`，然后打开 `app/.build/.../release/CleanSpace.app`（详见 [app/README.md](app/README.md)）。
-4. **图标**：应用图标源为 `app/design/icon.svg`（几何原创）；构建前脚本会尝试生成 `AppIcon-1024.png`（需 `rsvg-convert` 时见 `app/design/README.md`）。
+```bash
+npm install
+```
+
+会安装 Husky，启用提交/推送前的构建与测试钩子。
+
+## 常用命令
+
+在**仓库根目录**执行：
+
+| 目的 | 命令 |
+|------|------|
+| 调试构建 | `npm run build:app` |
+| 单元测试 | `npm run test:app` |
+| 打可在访达双击的 `.app` | `npm run bundle:app` |
+
+等价的 SwiftPM 命令（在 `app/` 下）：
+
+```bash
+cd app
+swift build          # 调试构建
+swift run CleanSpace # 运行
+swift test           # 测试
+```
+
+Release 产物示例路径：
+
+- 可执行文件与资源包：`app/.build/<架构>-apple-macosx/release/CleanSpace` 与 `CleanSpace_CleanSpaceKit.bundle`
+- 打包后的应用：`app/.build/<架构>-apple-macosx/release/CleanSpace.app`（由 `scripts/bundle-mac-app.sh` 生成）
+
+构建缓存目录 `app/.build/` 已被 Git 忽略。
+
+## 仓库结构
+
+| 路径 | 说明 |
+|------|------|
+| `app/Package.swift` | Swift Package 清单 |
+| `app/Sources/CleanSpaceKit/` | 界面与业务（库目标） |
+| `app/Sources/CleanSpace/` | 可执行入口（`@main`） |
+| `app/Sources/CleanSpaceKit/Resources/` | 内置 `cleaning-rules.json`、素材目录 |
+| `app/Tests/CleanSpaceTests/` | 单元测试 |
+| `app/Support/Info.plist` | 打 `.app` 时使用的 Bundle 信息 |
+| `design/` | 应用图标矢量源 `icon.svg` 与 `generate-app-icon.sh` |
+| `scripts/bundle-mac-app.sh` | 将 `swift build` 产物组装为 `.app` |
+| `docs/rfc/` | 能力范围与规则格式等说明 |
+| `ROADMAP.md` | RFC **顺序与路线图状态**（与 RFC 正文、`TASK_TRACKING.md` 同步） |
+| `TASK_TRACKING.md` | RFC 落地的**细项任务**与完成状态 |
+| `.husky/` | `pre-commit` / `pre-push` 等 Git 钩子 |
+
+## 清理能力（规范）
+
+内置规则文件：`app/Sources/CleanSpaceKit/Resources/cleaning-rules.json`。用户覆盖规则（同结构、同 `id` 时覆盖内置）：`~/Library/Application Support/CleanSpace/user-cleaning-rules.json`。
+
+### RFC 索引
+
+**进度与状态以 [`ROADMAP.md`](ROADMAP.md) 为准**；**任务拆解以 [`TASK_TRACKING.md`](TASK_TRACKING.md) 为准**。RFC 文件头部「状态」应与 `ROADMAP.md` 同步更新。
+
+新 RFC 文件命名：`NNN-功能简述.md`（三位数字补零）。
+
+| RFC | 标题 |
+|-----|------|
+| [001](docs/rfc/001-ccleaner-style-cleaning-spec.md) | CCleaner 式清理规范 |
 
 ## Git 钩子（Husky）
 
-- **pre-commit**：提交前执行 `swift build`，失败则禁止提交。
-- **commit-msg**：校验提交信息非空且至少 3 个字符。
-- **pre-push**：推送前执行 `swift build` 与 `swift test`。
+- **pre-commit**：`cd app && swift build`
+- **pre-push**：`cd app && swift build && swift test`
+- **commit-msg**：提交说明非空且不少于 3 个字符（见 `.husky/commit-msg`）
 
-安装依赖后自动启用：`npm install`（会执行 `husky` prepare）。
+## 应用图标
 
-## 清理能力定义（RFC）
+- **`design/icon.svg`**：应用图标矢量源（几何原创，无第三方图案）。
+- **`AppIcon-1024.png`**：由 `design/generate-app-icon.sh` 生成，输出到 `app/Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png`。
 
-清理范围与行为以 **CCleaner** 为参考，并针对 macOS 与当前目标（浏览器、Docker、AI 工具）做了明确约定：
+在 **`npm run build:app`**、**`npm run bundle:app`** 时会自动调用该脚本。若本机有 **`rsvg-convert`**（例如 `brew install librsvg`），会从 SVG 重新导出 PNG；若没有，则使用仓库里已提交的 PNG，构建照常通过。
 
-- **规范文档**：[docs/rfc/001-ccleaner-style-cleaning-spec.md](docs/rfc/001-ccleaner-style-cleaning-spec.md)
-- **内容概要**：系统（Trash、用户缓存、Xcode）、浏览器（Chrome/Safari/Firefox/Edge/Arc 等路径与项）、Docker（prune 与可选路径清理）、AI 工具（Cursor/Antigravity 等缓存与可配置规则）。
-- 实现顺序与 UI 在 RFC 之外按需迭代。
+手动从 SVG 同步图标：
 
-## 后续扩展
-
-- 在 `CleanCategory` 与详情视图中接入真实扫描/清理逻辑。
-- 用 RFC 001 中的配置文件或插件定义每类清理规则与路径，便于维护与扩展。
+```bash
+cd design && ./generate-app-icon.sh
+```

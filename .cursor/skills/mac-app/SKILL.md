@@ -17,14 +17,14 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 - **位置**：`app/Package.swift`；界面与业务放在库目标（如 `Sources/CleanSpaceKit/`），`@main` 入口放在可执行目标（如 `Sources/CleanSpace/`）。
 - **构建**：`cd app && swift build`；运行：`swift run <ProductName>`。
 - **产物**：可执行文件与 `*_CleanSpaceKit.bundle` 等资源包位于 `app/.build/`（应加入 `.gitignore`）。
-- **.app 包**：用脚本将可执行文件、`Support/Info.plist` 与资源 bundle 拷入 `Contents/MacOS` 与 `Contents/Resources`，便于访达双击（见本仓库 `app/scripts/bundle-mac-app.sh`）。
+- **.app 包**：用脚本将可执行文件、`app/Support/Info.plist` 与资源 bundle 拷入 `Contents/MacOS` 与 `Contents/Resources`，便于访达双击（见本仓库 `scripts/bundle-mac-app.sh`）。
 - **部署目标**：在 `Package.swift` 的 `platforms: [.macOS(.v14)]`（或所需版本）中声明。
 
 ## 2. 应用图标（无图案问题）
 
 - **原则**：使用 **原创几何/矢量设计**，避免第三方素材或易产生版权争议的图案。
 - **实现方式**：
-  - 在 `app/design/icon.svg` 维护 **唯一矢量源**（纯几何、渐变、无复杂纹理）。
+  - 在仓库根目录 `design/icon.svg` 维护 **唯一矢量源**（纯几何、渐变、无复杂纹理）。
   - 用 `rsvg-convert` 生成 1024×1024 PNG 到 **`Sources/<Kit>/Resources/Assets.xcassets/AppIcon.appiconset/`**。
   - macOS 11+ 可只在 `AppIcon.appiconset` 中提供 **单张 1024×1024**，在 `Contents.json` 里声明 `"idiom": "mac", "scale": "1x", "size": "1024x1024"` 及对应 `filename`。
 - **避免**：剪贴画、明显仿制他人图标、通用“图标库”图案。
@@ -59,8 +59,8 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 | 库与资源   | `app/Sources/CleanSpaceKit/` |
 | 可执行入口 | `app/Sources/CleanSpace/` |
 | 单元测试   | `app/Tests/CleanSpaceTests/` |
-| 图标源 SVG | `app/design/icon.svg` |
-| 打 .app 脚本 | `app/scripts/bundle-mac-app.sh` |
+| 图标源 SVG | `design/icon.svg` |
+| 打 .app 脚本 | `scripts/bundle-mac-app.sh` |
 | Info.plist | `app/Support/Info.plist` |
 | Husky 钩子 | `.husky/pre-commit`, `.husky/commit-msg`, `.husky/pre-push` |
-| app 构建说明 | `app/README.md` |
+| 仓库说明 | 根目录 `README.md` |

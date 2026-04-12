@@ -4,8 +4,8 @@
   "private": true,
   "description": "macOS clean app - browser, Docker, AI tools space management",
   "scripts": {
-    "build:app": "cd app && ./design/generate-app-icon.sh && swift build",
-    "bundle:app": "cd app && ./scripts/bundle-mac-app.sh release",
+    "build:app": "./design/generate-app-icon.sh && cd app && swift build",
+    "bundle:app": "./scripts/bundle-mac-app.sh release",
     "test:app": "cd app && swift test",
     "prepare": "husky"
   },
