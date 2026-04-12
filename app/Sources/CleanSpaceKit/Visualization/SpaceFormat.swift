@@ -8,14 +8,11 @@
 import Foundation
 
 enum SpaceFormat {
-    static let byteFormatter: ByteCountFormatter = {
+    /// 每次调用新建 formatter，避免 Swift 6 下共享 `ByteCountFormatter` 的全局可变状态诊断；体量上图表/表格调用次数可接受。
+    static func bytes(_ value: Int64) -> String {
         let f = ByteCountFormatter()
         f.countStyle = .file
-        return f
-    }()
-
-    static func bytes(_ value: Int64) -> String {
-        byteFormatter.string(fromByteCount: value)
+        return f.string(fromByteCount: value)
     }
 
     static func percent(part: Int64, of total: Int64) -> String {

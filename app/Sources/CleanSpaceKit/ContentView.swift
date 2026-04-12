@@ -2,40 +2,49 @@
 //  ContentView.swift
 //  CleanSpace
 //
-//  侧栏导航 + 限宽详情区，风格贴近 macOS「系统设置」。
+//  侧栏导航 + 限宽详情区：NavigationSplitView + grouped Form，与当前 macOS HIG / 系统设置类应用一致。
 //
 
 import SwiftUI
 import AppKit
 
 // MARK: - 导航
+/// 侧栏顺序：清理类应用先展示「整机/卷空间」再进入「按规则清理」，专项能力放后。
 private enum MainSection: String, CaseIterable, Identifiable {
+    case volumes
     case rules
     case docker
-    case volumes
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .rules: return "规则清理"
-        case .docker: return "Docker"
-        case .volumes: return "磁盘"
+        case .volumes: return L10n.Sidebar.volumes
+        case .rules: return L10n.Sidebar.rules
+        case .docker: return L10n.Sidebar.docker
         }
     }
 
     var symbol: String {
         switch self {
+        case .volumes: return "internaldrive"
         case .rules: return "checklist"
         case .docker: return "shippingbox"
-        case .volumes: return "internaldrive"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .volumes: return L10n.Sidebar.volumesBlurb
+        case .rules: return L10n.Sidebar.rulesBlurb
+        case .docker: return L10n.Sidebar.dockerBlurb
         }
     }
 }
 
 private func groupRulesByCategory(_ rules: [CleaningRule]) -> [(String, [CleaningRule])] {
     let grouped = Dictionary(grouping: rules) { $0.category }
-    let order = ["system", "browser", "docker", "ai-tools", "custom"]
+    let order = CleaningRule.CategoryId.ordered
     return order.compactMap { key in
         guard let list = grouped[key], !list.isEmpty else { return nil }
         return (key, list.sorted { $0.name < $1.name })
@@ -56,6 +65,7 @@ private func formatBytes(_ bytes: Int64) -> String {
 // MARK: - 侧栏行（避免 Label + sidebar List 在部分系统上贴左裁字）
 private struct SidebarNavRow: View {
     let title: String
+    let subtitle: String
     let systemImage: String
 
     var body: some View {
@@ -63,12 +73,21 @@ private struct SidebarNavRow: View {
             Image(systemName: systemImage)
                 .symbolRenderingMode(.hierarchical)
                 .font(.body)
-                .frame(width: 20, alignment: .center)
-            Text(title)
-                .font(.body)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .imageScale(.medium)
+                .frame(width: 22, alignment: .center)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
@@ -76,40 +95,45 @@ private struct SidebarNavRow: View {
 
 // MARK: - 根视图（供可执行目标导入）
 public struct ContentView: View {
-    @State private var section: MainSection = .rules
+    @State private var section: MainSection = .volumes
 
     public init() {}
 
-    /// 侧栏行水平 inset：与窗口左缘留出安全距离，防止首字被裁
-    private static let sidebarRowInsets = EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 12)
+    /// 侧栏行水平 inset：双行文案略增高，仍防贴边裁字
+    private static let sidebarRowInsets = EdgeInsets(top: 6, leading: 14, bottom: 6, trailing: 10)
 
     public var body: some View {
         NavigationSplitView {
             // 显式行内边距：避免 macOS 上 .sidebar List 与 Label 组合时首字贴边被裁切
             List(MainSection.allCases, selection: $section) { item in
-                SidebarNavRow(title: item.title, systemImage: item.symbol)
+                SidebarNavRow(title: item.title, subtitle: item.subtitle, systemImage: item.symbol)
                     .tag(item)
                     .listRowInsets(Self.sidebarRowInsets)
             }
             .listStyle(.sidebar)
             .scrollIndicators(.hidden)
-            .navigationTitle("CleanSpace")
-            .navigationSplitViewColumnWidth(min: 212, ideal: 228, max: 280)
+            .navigationTitle(L10n.App.name)
+            .navigationSplitViewColumnWidth(min: 232, ideal: 258, max: 320)
+            .simultaneousGesture(WindowDragGesture())
         } detail: {
             NavigationStack {
                 Group {
                     switch section {
+                    case .volumes:
+                        VolumesWorkspaceView()
                     case .rules:
                         RulesWorkspaceView()
                     case .docker:
                         DockerSpecialWorkspaceView()
-                    case .volumes:
-                        VolumesWorkspaceView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            // macOS 15+：显式参与窗口工具栏材质/可见性，与 unified 标题栏行为一致（见 Apple「Customizing window styles」）
+            .toolbarBackground(.automatic, for: .windowToolbar)
+            .toolbarBackgroundVisibility(.automatic, for: .windowToolbar)
         }
+        // 系统监控在系统菜单栏 `MenuBarExtra` 中展示，不再占用窗口工具栏。
     }
 }
 
@@ -136,14 +160,20 @@ private struct RulesWorkspaceView: View {
         }
     }
 
+    /// 导航栏副标题：规则数量与勾选状态（空列表时不展示）。
+    private var rulesNavSubtitle: String? {
+        guard !rules.isEmpty else { return nil }
+        return L10n.Rules.navSubtitleSelected(selected: selectedRuleIds.count, total: rules.count)
+    }
+
     var body: some View {
         Group {
             if rules.isEmpty {
                 DetailScaffold {
                     ContentUnavailableView(
-                        "没有规则",
+                        L10n.Rules.emptyTitle,
                         systemImage: "doc.text",
-                        description: Text("请检查 Bundle 中的 cleaning-rules.json。")
+                        description: Text(L10n.Rules.emptyDescription)
                     )
                     .frame(maxWidth: .infinity, minHeight: 280)
                 }
@@ -151,7 +181,17 @@ private struct RulesWorkspaceView: View {
                 DetailScaffold {
                     Form {
                         Section {
-                            Text("勾选后先「扫描」再「清理」。命令类规则无精确体积时显示说明。")
+                            CSRulesOverviewPanel(
+                                totalRules: rules.count,
+                                selectedCount: selectedRuleIds.count,
+                                scannedWithSizeCount: scannedSizes.values.filter { $0 > 0 }.count
+                            )
+                        }
+                        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 4, trailing: 0))
+                        .listRowBackground(Color.clear)
+
+                        Section {
+                            Text(L10n.Rules.intro)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -159,14 +199,31 @@ private struct RulesWorkspaceView: View {
 
                         if hasDirScanResults {
                             Section {
-                                RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
+                                CSChartCard(title: L10n.Rules.chartCardTitle) {
+                                    RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
+                                        .frame(minHeight: 260)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
                             }
                         }
 
                         ForEach(Array(groupedRules.enumerated()), id: \.offset) { _, item in
-                            Section(CleaningRule.categoryDisplayName(item.0)) {
-                                ForEach(item.1) { rule in
-                                    ruleToggleRow(rule)
+                            if item.0 == CleaningRule.CategoryId.browser {
+                                Section {
+                                    BrowserRulesTableBlock(
+                                        rules: item.1,
+                                        scannedSizes: scannedSizes,
+                                        selectedRuleIds: $selectedRuleIds,
+                                        formatBytes: formatBytes
+                                    )
+                                } header: {
+                                    Text(CleaningRule.categoryDisplayName(item.0))
+                                }
+                            } else {
+                                Section(CleaningRule.categoryDisplayName(item.0)) {
+                                    ForEach(item.1) { rule in
+                                        ruleToggleRow(rule)
+                                    }
                                 }
                             }
                         }
@@ -175,20 +232,23 @@ private struct RulesWorkspaceView: View {
                 }
             }
         }
-        .navigationTitle("规则清理")
+        .navigationTitle(L10n.Rules.navTitle)
+        .optionalNavigationSubtitle(rulesNavSubtitle)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {
                     scanAll()
                 } label: {
-                    Label("扫描", systemImage: "arrow.clockwise")
+                    Label(L10n.Rules.scan, systemImage: "arrow.clockwise")
                 }
+                .help(L10n.Rules.helpScan)
                 .disabled(isScanning || rules.isEmpty)
                 Button {
                     prepareAndConfirmClean()
                 } label: {
-                    Label("清理", systemImage: "trash")
+                    Label(L10n.Rules.clean, systemImage: "trash")
                 }
+                .help(L10n.Rules.helpClean)
                 .disabled(selectedRuleIds.isEmpty || isCleaning)
             }
             ToolbarItem(placement: .status) {
@@ -196,21 +256,21 @@ private struct RulesWorkspaceView: View {
                     HStack(spacing: 8) {
                         ProgressView()
                             .controlSize(.small)
-                        Text(isScanning ? "正在扫描…" : "正在清理…")
+                        Text(isScanning ? L10n.Rules.scanning : L10n.Rules.cleaning)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
         }
-        .alert("清理确认", isPresented: $showCleanConfirm) {
-            Button("取消", role: .cancel) { }
-            Button("清理", role: .destructive) { performClean() }
+        .alert(L10n.Rules.alertConfirmTitle, isPresented: $showCleanConfirm) {
+            Button(L10n.Common.cancel, role: .cancel) { }
+            Button(L10n.Rules.clean, role: .destructive) { performClean() }
         } message: {
             if let msg = statusMessage { Text(msg) }
         }
-        .alert("清理结果", isPresented: $showCleanResult) {
-            Button("好", role: .cancel) { }
+        .alert(L10n.Rules.alertResultTitle, isPresented: $showCleanResult) {
+            Button(L10n.Common.ok, role: .cancel) { }
         } message: {
             if let msg = statusMessage { Text(msg) }
         }
@@ -236,7 +296,7 @@ private struct RulesWorkspaceView: View {
                 Spacer(minLength: 8)
                 Group {
                     if rule.type == .command {
-                        Text(rule.estimate ?? "命令")
+                        Text(rule.estimate ?? L10n.Rules.estimateCommand)
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.trailing)
@@ -248,32 +308,10 @@ private struct RulesWorkspaceView: View {
                     }
                 }
                 .frame(minWidth: 72, alignment: .trailing)
-                riskTag(rule.riskLevel)
+                RuleRiskChip(risk: rule.riskLevel)
             }
         }
         .toggleStyle(.checkbox)
-    }
-
-    @ViewBuilder
-    private func riskTag(_ risk: CleaningRuleRisk) -> some View {
-        switch risk {
-        case .low:
-            EmptyView()
-        case .medium:
-            Text("中")
-                .font(.caption2.weight(.medium))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Color.orange.opacity(0.18))
-                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-        case .high:
-            Text("高")
-                .font(.caption2.weight(.medium))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Color.red.opacity(0.14))
-                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-        }
     }
 
     private func scanAll() {
@@ -293,7 +331,7 @@ private struct RulesWorkspaceView: View {
     private func prepareAndConfirmClean() {
         rulesToClean = rules.filter { selectedRuleIds.contains($0.id) }
         let risky = rulesToClean.contains { $0.riskLevel != .low }
-        statusMessage = risky ? "所选包含中/高风险项，确认后将执行。" : "确认清理 \(rulesToClean.count) 项？"
+        statusMessage = risky ? L10n.Rules.confirmCleanRisky() : L10n.Rules.confirmCleanSafe(rulesToClean.count)
         showCleanConfirm = true
     }
 
@@ -304,7 +342,7 @@ private struct RulesWorkspaceView: View {
         Task {
             let msgs = batch.map { r in
                 let out = cleanRule(r)
-                return "\(r.name): \(out.success ? "成功" : "失败") \(out.message)"
+                return L10n.Rules.cleanResultLine(name: r.name, success: out.success, message: out.message)
             }
             await MainActor.run {
                 isCleaning = false
@@ -319,10 +357,13 @@ private struct RulesWorkspaceView: View {
 
 // MARK: - Docker
 private struct DockerSpecialWorkspaceView: View {
-    @State private var dfText = ""
+    @State private var dfReport = DockerDfReport.empty
     @State private var desktopRows: [(String, String, Int64)] = []
     @State private var logText = ""
     @State private var running = false
+    @State private var runTotalSteps = 0
+    @State private var runCompletedSteps = 0
+    @State private var runActiveCommand = ""
     @State private var showPresetConfirm = false
     @State private var pendingPreset: DockerCleanPreset?
 
@@ -330,106 +371,116 @@ private struct DockerSpecialWorkspaceView: View {
         DetailScaffold {
             Form {
                 Section {
-                    Text("按顺序执行多条 docker 命令；可与「规则清理」中的单条命令配合。")
+                    Text(L10n.Docker.intro)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Section("本机 Docker Desktop 目录") {
+                if running {
+                    Section {
+                        DockerPresetRunProgressBlock(
+                            completedSteps: runCompletedSteps,
+                            totalSteps: runTotalSteps,
+                            activeCommand: runActiveCommand
+                        )
+                    }
+                }
+
+                Section(L10n.Docker.sectionDesktop) {
                     if desktopRows.isEmpty {
-                        Text("加载中…")
+                        Text(L10n.Docker.loading)
                             .foregroundStyle(.secondary)
                     } else {
-                        DockerDesktopChartBlock(rows: desktopRows)
+                        CSChartCard(title: L10n.Docker.chartCardTitle) {
+                            DockerDesktopChartBlock(rows: desktopRows)
+                                .frame(minHeight: 140)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
-                    Button("重新计算目录占用") {
+                    Button(L10n.Docker.refreshSizes) {
                         refreshDesktopScan()
                     }
+                    .help(L10n.Docker.helpRefreshSizes)
                     .disabled(running)
                 }
 
-                Section("预设") {
-                    ForEach(DockerCleanPreset.allCases) { preset in
-                        HStack(alignment: .center, spacing: 16) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(preset.title)
-                                    .font(.body.weight(.medium))
-                                Text(preset.subtitle)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer(minLength: 12)
-                            Button(preset.isDestructive ? "执行" : "运行") {
-                                pendingPreset = preset
-                                showPresetConfirm = true
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.small)
-                            .tint(preset.isDestructive ? .red : Color.accentColor)
-                            .disabled(running)
+                Section {
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12),
+                        ],
+                        spacing: 12
+                    ) {
+                        ForEach(DockerCleanPreset.allCases) { preset in
+                            CSDockerPresetCard(
+                                symbolName: preset.symbolName,
+                                title: preset.title,
+                                subtitle: preset.subtitle,
+                                actionTitle: preset.isDestructive ? L10n.Docker.execute : L10n.Docker.run,
+                                isDestructive: preset.isDestructive,
+                                disabled: running,
+                                action: {
+                                    pendingPreset = preset
+                                    showPresetConfirm = true
+                                }
+                            )
                         }
-                        .padding(.vertical, 4)
                     }
+                    .padding(.vertical, 6)
+                } header: {
+                    Text(L10n.Docker.sectionPresets)
                 }
 
-                Section("docker system df -v") {
-                    Button("刷新输出") {
+                Section(L10n.Docker.sectionDf) {
+                    Button(L10n.Docker.refreshOutput) {
                         refreshDf()
                     }
+                    .help(L10n.Docker.helpRefreshDf)
                     .disabled(running)
-                    CSMonospaceBlock(text: dfText, placeholder: "点击「刷新输出」")
+                    DockerDiskUsageReportView(report: dfReport)
                 }
 
-                if !logText.isEmpty {
-                    Section("执行日志") {
-                        CSMonospaceBlock(text: logText, placeholder: "")
+                if running || !logText.isEmpty {
+                    Section(L10n.Docker.sectionLog) {
+                        CSMonospaceBlock(
+                            text: logText,
+                            placeholder: running && logText.isEmpty ? L10n.Docker.logStreamingPlaceholder : ""
+                        )
                     }
                 }
             }
             .formStyle(.grouped)
-            .disabled(running)
         }
-        .navigationTitle("Docker")
+        .navigationTitle(L10n.Sidebar.docker)
+        .optionalNavigationSubtitle(L10n.Docker.navSubtitle)
         .onAppear {
             refreshDf()
             refreshDesktopScan()
         }
-        .toolbar {
-            ToolbarItem(placement: .status) {
-                if running {
-                    HStack(spacing: 8) {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text("执行中…")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-        .alert("确认", isPresented: $showPresetConfirm) {
-            Button("取消", role: .cancel) { pendingPreset = nil }
+        .alert(L10n.Docker.alertTitle, isPresented: $showPresetConfirm) {
+            Button(L10n.Common.cancel, role: .cancel) { pendingPreset = nil }
             if let p = pendingPreset, p.isDestructive {
-                Button("执行清理", role: .destructive) {
+                Button(L10n.Docker.alertRunDestructive, role: .destructive) {
                     if let x = pendingPreset { runPreset(x) }
                     pendingPreset = nil
                 }
             } else {
-                Button("运行") {
+                Button(L10n.Docker.alertRunSafe) {
                     if let x = pendingPreset { runPreset(x) }
                     pendingPreset = nil
                 }
             }
         } message: {
             if let p = pendingPreset {
-                Text(p.isDestructive ? "将按顺序执行多条清理命令。" : "仅查询占用，不删除数据。")
+                Text(p.isDestructive ? L10n.Docker.alertMsgDestructive : L10n.Docker.alertMsgSafe)
             }
         }
     }
 
     private func refreshDf() {
-        dfText = DockerSpecialCleanService.dockerSystemDf()
+        dfReport = DockerSpecialCleanService.dockerDiskUsageReport()
     }
 
     private func refreshDesktopScan() {
@@ -437,16 +488,34 @@ private struct DockerSpecialWorkspaceView: View {
     }
 
     private func runPreset(_ preset: DockerCleanPreset) {
+        let steps = preset.commandSteps
         running = true
         logText = ""
+        runTotalSteps = steps.count
+        runCompletedSteps = 0
+        runActiveCommand = ""
         Task {
-            let lines = DockerSpecialCleanService.runPreset(preset)
-            let text = lines.map { step in
-                "\(step.success ? "✓" : "✗") \(step.command)\n\(step.output)"
-            }.joined(separator: "\n\n")
+            await Task.detached { @Sendable in
+                _ = DockerSpecialCleanService.runPreset(
+                    preset,
+                    onCommandWillRun: { _, total, cmd in
+                        Task { @MainActor in
+                            runTotalSteps = max(runTotalSteps, total)
+                            runActiveCommand = cmd
+                        }
+                    },
+                    onCommandDidRun: { _, _, cmd, ok, out in
+                        Task { @MainActor in
+                            runCompletedSteps += 1
+                            let sym = ok ? "✓" : "✗"
+                            logText += "\(sym) \(cmd)\n\(out)\n\n"
+                        }
+                    }
+                )
+            }.value
             await MainActor.run {
                 running = false
-                logText = text
+                runActiveCommand = ""
                 refreshDf()
                 refreshDesktopScan()
             }
@@ -466,130 +535,156 @@ private struct VolumesWorkspaceView: View {
         return volumes.first { $0.id == id }
     }
 
+    /// 当前卷或未选择时的引导文案（无可用卷时不展示副标题）。
+    private var diskNavSubtitle: String? {
+        if let vol = selectedVolume {
+            return vol.name
+        }
+        if volumes.isEmpty {
+            return nil
+        }
+        return L10n.Disk.navSubtitlePickVolume
+    }
+
     var body: some View {
         DetailScaffold {
             Form {
-                Section {
-                    if volumes.isEmpty {
-                        Text("未检测到可用卷。")
+                if volumes.isEmpty {
+                    Section {
+                        Text(L10n.Disk.noVolumes)
                             .foregroundStyle(.secondary)
-                    } else {
-                        Picker("选择卷", selection: $selectedVolumeID) {
-                            Text("请选择磁盘").tag(Optional<String>.none)
+                    }
+                } else {
+                    Section {
+                        Picker(L10n.Disk.pickerLabel, selection: $selectedVolumeID) {
+                            Text(L10n.Disk.pickerPlaceholder).tag(Optional<String>.none)
                             ForEach(volumes) { vol in
                                 Text(volumePickerTitle(vol)).tag(Optional(vol.id))
                             }
                         }
-                    }
-                }
-
-                if let vol = selectedVolume {
-                    Section {
-                        LabeledContent("路径") {
-                            Text(vol.url.path)
-                                .font(.caption)
-                                .textSelection(.enabled)
-                                .multilineTextAlignment(.trailing)
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        if let t = vol.totalBytes, let f = vol.freeBytes, t > 0 {
-                            let used = max(0, t - f)
-                            let ratio = min(1, max(0, Double(used) / Double(t)))
-                            VStack(alignment: .leading, spacing: 8) {
-                                LabeledContent("已用空间") {
-                                    Text("\(formatBytes(used)) / \(formatBytes(t))")
-                                        .monospacedDigit()
-                                        .foregroundStyle(.secondary)
-                                }
-                                ProgressView(value: ratio)
-                                    .progressViewStyle(.linear)
-                                LabeledContent("可用") {
-                                    Text(formatBytes(f))
-                                        .monospacedDigit()
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                    }
-
-                    Section {
-                        DiskSpaceChartsBlock(
-                            totalBytes: vol.totalBytes,
-                            freeBytes: vol.freeBytes,
-                            topFolders: topFolders,
-                            unaccountedBytes: unaccountedGapBytes(for: vol),
-                            onOpenPath: { path in
-                                NSWorkspace.shared.open(URL(fileURLWithPath: path))
-                            }
-                        )
                     } header: {
-                        Text("可视化")
+                        Text(L10n.Disk.sectionSource)
                     }
 
-                    Section("顶层文件夹") {
-                        Button {
-                            scanVolume(vol)
-                        } label: {
-                            Label("计算根目录下一层占用", systemImage: "folder.badge.gearshape")
-                        }
-                        .disabled(scanning)
-                        Button("在访达中显示") {
-                            NSWorkspace.shared.open(vol.url)
-                        }
-                        if scanning {
-                            HStack(spacing: 10) {
-                                ProgressView()
-                                    .controlSize(.small)
-                                Text("正在统计…")
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        if topFolders.isEmpty, !scanning {
-                            Text("尚未扫描。扫描后上方将显示环形图与明细表。")
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
-                        }
-                    }
-
-                    if !topFolders.isEmpty,
-                       let usedVolume = VolumeDiskAccounting.volumeUsedBytes(total: vol.totalBytes, free: vol.freeBytes) {
-                        let summed = VolumeDiskAccounting.topLevelFoldersSum(topFolders)
-                        let gap = VolumeDiskAccounting.unaccountedUsedBytes(volumeUsed: usedVolume, topLevelSum: summed)
+                    if let vol = selectedVolume {
                         Section {
-                            LabeledContent("顶层扫描合计") {
-                                Text(formatExactByteCount(summed))
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
+                            CSVolumeHeroPanel(
+                                volumeName: vol.name,
+                                freeText: formatBytes(vol.freeBytes),
+                                usedText: volumeUsedBytesOnly(vol),
+                                totalText: formatBytes(vol.totalBytes),
+                                usageRatio: volumeUsageRatio(vol)
+                            )
+                        }
+                        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                        .listRowBackground(Color.clear)
+
+                        Section {
+                            HStack(spacing: 12) {
+                                Button {
+                                    scanVolume(vol)
+                                } label: {
+                                    Label(L10n.Disk.scanTopLevel, systemImage: "folder.badge.gearshape")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .controlSize(.large)
+                                .help(L10n.Disk.helpScanTopLevel)
+                                .disabled(scanning)
+
+                                Button {
+                                    NSWorkspace.shared.open(vol.url)
+                                } label: {
+                                    Label(L10n.Disk.showInFinder, systemImage: "arrow.right.circle")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.large)
+                                .help(L10n.Disk.helpShowInFinder)
                             }
-                            LabeledContent("未由扫描计入") {
-                                Text(formatExactByteCount(gap))
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
+                            if scanning {
+                                HStack(spacing: 10) {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                    Text(L10n.Disk.scanning)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         } header: {
-                            Text("与系统已用对照")
-                        } footer: {
-                            Text(
-                                "「已用空间」由系统报告；顶层各文件夹为对可读文件的估算。两者之差通常来自 APFS 快照、系统保留与「系统数据」、受保护或无权限路径、文件系统元数据等，属正常现象。"
-                            )
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            Text(L10n.Disk.sectionQuickActions)
                         }
-                    }
-                } else if !volumes.isEmpty {
-                    Section {
-                        Label("在菜单中选择磁盘后可查看空间并扫描顶层目录。", systemImage: "internaldrive")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .symbolRenderingMode(.hierarchical)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 24)
+
+                        Section {
+                            LabeledContent(L10n.Disk.path) {
+                                Text(vol.url.path)
+                                    .font(.caption)
+                                    .textSelection(.enabled)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                        }
+
+                        Section {
+                            CSChartCard(title: L10n.Disk.chartCardTitle) {
+                                DiskSpaceChartsBlock(
+                                    totalBytes: vol.totalBytes,
+                                    freeBytes: vol.freeBytes,
+                                    topFolders: topFolders,
+                                    unaccountedBytes: unaccountedGapBytes(for: vol),
+                                    onOpenPath: { path in
+                                        NSWorkspace.shared.open(URL(fileURLWithPath: path))
+                                    }
+                                )
+                            }
+                        }
+
+                        Section(L10n.Disk.sectionTopLevel) {
+                            if topFolders.isEmpty, !scanning {
+                                Text(L10n.Disk.scanHintEmpty)
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+
+                        if !topFolders.isEmpty,
+                           let usedVolume = VolumeDiskAccounting.volumeUsedBytes(total: vol.totalBytes, free: vol.freeBytes) {
+                            let summed = VolumeDiskAccounting.topLevelFoldersSum(topFolders)
+                            let gap = VolumeDiskAccounting.unaccountedUsedBytes(volumeUsed: usedVolume, topLevelSum: summed)
+                            Section {
+                                LabeledContent(L10n.Disk.sumTopLevel) {
+                                    Text(formatExactByteCount(summed))
+                                        .monospacedDigit()
+                                        .foregroundStyle(.secondary)
+                                }
+                                LabeledContent(L10n.Disk.unaccounted) {
+                                    Text(formatExactByteCount(gap))
+                                        .monospacedDigit()
+                                        .foregroundStyle(.secondary)
+                                }
+                            } header: {
+                                Text(L10n.Disk.sectionAccounting)
+                            } footer: {
+                                Text(L10n.Disk.accountingFooter)
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    } else {
+                        Section {
+                            Label(L10n.Disk.selectVolumeHint, systemImage: "internaldrive")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .symbolRenderingMode(.hierarchical)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 24)
+                        }
                     }
                 }
             }
             .formStyle(.grouped)
         }
-        .navigationTitle("磁盘")
+        .navigationTitle(L10n.Disk.navTitle)
+        .optionalNavigationSubtitle(diskNavSubtitle)
         .onAppear {
             volumes = VolumeScannerService.listMountedVolumes()
             if selectedVolumeID == nil, let boot = volumes.first {
@@ -600,9 +695,23 @@ private struct VolumesWorkspaceView: View {
 
     private func volumePickerTitle(_ vol: MountedVolume) -> String {
         if let f = vol.freeBytes {
-            return "\(vol.name)  ·  \(formatBytes(f)) 可用"
+            return L10n.Disk.volumePickerLine(name: vol.name, freeFormatted: formatBytes(f))
         }
         return vol.name
+    }
+
+    /// 已用字节单行展示（首屏三列大数字需保持简短）。
+    private func volumeUsedBytesOnly(_ vol: MountedVolume) -> String {
+        guard let t = vol.totalBytes, let f = vol.freeBytes, t > 0 else { return "—" }
+        let used = max(0, t - f)
+        return formatBytes(used)
+    }
+
+    /// 已用占总容量比例，用于首屏线性进度条。
+    private func volumeUsageRatio(_ vol: MountedVolume) -> Double? {
+        guard let t = vol.totalBytes, let f = vol.freeBytes, t > 0 else { return nil }
+        let used = max(0, t - f)
+        return min(1, max(0, Double(used) / Double(t)))
     }
 
     private func unaccountedGapBytes(for vol: MountedVolume) -> Int64 {
@@ -633,7 +742,28 @@ private struct VolumesWorkspaceView: View {
     }
 }
 
+// MARK: - navigationSubtitle（可选，避免空串占位）
+/// 仅在字符串非空时应用 `navigationSubtitle`，与 HIG 中「标题 + 简短上下文」一致。
+private struct OptionalNavigationSubtitle: ViewModifier {
+    let text: String?
+
+    func body(content: Content) -> some View {
+        if let text, !text.isEmpty {
+            content.navigationSubtitle(text)
+        } else {
+            content
+        }
+    }
+}
+
+private extension View {
+    func optionalNavigationSubtitle(_ text: String?) -> some View {
+        modifier(OptionalNavigationSubtitle(text: text))
+    }
+}
+
 #Preview {
     ContentView()
+        .environmentObject(SystemMetricsController.shared)
         .frame(width: 1000, height: 680)
 }

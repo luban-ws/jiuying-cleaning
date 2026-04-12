@@ -1,2 +1,30 @@
+# Dependencies（勿提交；pnpm 下 husky 等为符号链接，git 对 pathspec 会报 beyond symlink）
 node_modules/
-app/.build/
+
+# 使用 pnpm 时勿提交 npm 锁文件
+package-lock.json
+
+# pnpm
+.pnpm-debug.log*
+
+# Swift Package Manager
+.build/
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Local env / secrets (keep examples committed if you add them)
+.env
+.env.*.local
+
+# Tooling / editors (uncomment if you do not commit shared IDE settings)
+# .vscode/
+# .idea/

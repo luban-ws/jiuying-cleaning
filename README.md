@@ -4,17 +4,20 @@ macOS 原生清理工具（Swift / SwiftUI）：按规则扫描与清理浏览�
 
 ## 环境要求
 
-- **系统**：macOS 14 及以上（与 `Package.swift` 中部署目标一致）。
+- **系统**：macOS 15 及以上（与 `Package.swift` 中 `swift-tools-version: 6.0`、`platforms: [.macOS(.v15)]` 及 `Support/Info.plist` 的 `LSMinimumSystemVersion` 一致）。
 - **构建**：本机已安装 **Swift** 与 **Apple 平台 SDK**（`xcode-select --install` 的 Command Line Tools 即可，**不必**打开 Xcode.app）。
-- **可选**：**Node.js**（用于 Husky 与 `npm run` 封装命令）；**rsvg-convert**（`brew install librsvg`，从 SVG 再生应用图标 PNG）。
+- **可选**：**Node.js 18+** 与 **pnpm**（用于 Husky 与根目录脚本封装；可用 [Corepack](https://nodejs.org/api/corepack.html) 对齐 `package.json` 里的 `packageManager` 字段）；**rsvg-convert**（`brew install librsvg`，从 SVG 再生应用图标 PNG）。
 
 ## 克隆后
 
 ```bash
-npm install
+corepack enable   # 可选：按 package.json 的 packageManager 固定 pnpm 版本
+pnpm install
 ```
 
 会安装 Husky，启用提交/推送前的构建与测试钩子。
+
+开发与再小的 UI 改动也请遵守仓库根目录 **[AGENTS.md](./AGENTS.md)** 中的基线（本地化走 `L10n`、双语文案、测试不断言翻译句等）。
 
 ## 常用命令
 
@@ -22,9 +25,16 @@ npm install
 
 | 目的 | 命令 |
 |------|------|
-| 调试构建 | `npm run build:app` |
-| 单元测试 | `npm run test:app` |
-| 打可在访达双击的 `.app` | `npm run bundle:app` |
+| 调试构建 | `pnpm run build:app` |
+| 运行应用（SwiftPM） | `pnpm run:app` |
+| 单元测试 | `pnpm run test:app` |
+| 打可在访达双击的 `.app` | `pnpm run bundle:app` |
+
+**应用起不来？**
+
+- 包管理器是 **pnpm**（不是 `pap` / `npm` 混用）：在**仓库根目录**（有 `package.json` 的那一层）执行 `pnpm run:app`。`run:app` 会调用 `scripts/run-app.sh`，不依赖你当前终端是否已 `cd app`。
+- 若终端里构建成功但「像没反应」：窗口可能在其他应用后面，用 **Command+Tab** 或程序坞切到 **CleanSpace**。
+- 等价命令：`./scripts/run-app.sh` 或 `cd app && swift run CleanSpace`（需本机已安装 Swift / macOS SDK）。
 
 等价的 SwiftPM 命令（在 `app/` 下）：
 
@@ -46,6 +56,7 @@ Release 产物示例路径：
 
 | 路径 | 说明 |
 |------|------|
+| `package.json` / `pnpm-lock.yaml` | 根目录脚本（Husky、Swift 构建/运行/测试封装）与 pnpm 锁文件 |
 | `app/Package.swift` | Swift Package 清单 |
 | `app/Sources/CleanSpaceKit/` | 界面与业务（库目标） |
 | `app/Sources/CleanSpace/` | 可执行入口（`@main`） |
@@ -75,7 +86,7 @@ Release 产物示例路径：
 
 ## Git 钩子（Husky）
 
-- **pre-commit**：`cd app && swift build`
+- **pre-commit**：`scripts/check-swift-ui-l10n.sh`（需 `rg`）+ `cd app && swift build`
 - **pre-push**：`cd app && swift build && swift test`
 - **commit-msg**：提交说明非空且不少于 3 个字符（见 `.husky/commit-msg`）
 
@@ -84,7 +95,7 @@ Release 产物示例路径：
 - **`design/icon.svg`**：应用图标矢量源（几何原创，无第三方图案）。
 - **`AppIcon-1024.png`**：由 `design/generate-app-icon.sh` 生成，输出到 `app/Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png`。
 
-在 **`npm run build:app`**、**`npm run bundle:app`** 时会自动调用该脚本。若本机有 **`rsvg-convert`**（例如 `brew install librsvg`），会从 SVG 重新导出 PNG；若没有，则使用仓库里已提交的 PNG，构建照常通过。
+在 **`pnpm run build:app`**、**`pnpm run bundle:app`** 时会自动调用该脚本。若本机有 **`rsvg-convert`**（例如 `brew install librsvg`），会从 SVG 重新导出 PNG；若没有，则使用仓库里已提交的 PNG，构建照常通过。
 
 手动从 SVG 同步图标：
 

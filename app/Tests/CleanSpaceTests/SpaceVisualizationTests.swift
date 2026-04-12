@@ -15,6 +15,13 @@ final class SpaceVisualizationTests: XCTestCase {
         XCTAssertEqual(SpaceFormat.percent(part: 1, of: 0), "—")
     }
 
+    /// `disk.used_over_total_format` 由 .strings 控制顺序与分隔符；此处只校验占位符被替换。
+    func testDiskUsedOverTotalFormatSubstitutesBothValues() {
+        let line = L10n.Disk.usedOverTotal(usedFormatted: "10 B", totalFormatted: "20 B")
+        XCTAssertTrue(line.contains("10 B"))
+        XCTAssertTrue(line.contains("20 B"))
+    }
+
     func testTopLevelBreakdownMergesTailAndUnaccounted() {
         let rows = [
             TopLevelFolderSize(name: "A", path: "/A", bytes: 100),
@@ -26,10 +33,11 @@ final class SpaceVisualizationTests: XCTestCase {
             TopLevelFolderSize(name: "G", path: "/G", bytes: 10),
         ]
         let slices = SpaceChartSliceBuilder.topLevelBreakdownSlices(rows: rows, unaccountedBytes: 500, maxTopNames: 5)
-        let labels = slices.map(\.label)
-        XCTAssertTrue(labels.contains("未由扫描计入"))
-        XCTAssertTrue(labels.contains { $0.contains("其余顶层项") })
-        XCTAssertEqual(slices.first { $0.label == "A" }?.bytes, 100)
+        let ids = slices.map(\.id)
+        // 断言稳定 `id`，避免随系统语言/本地化文案变化导致测试失败
+        XCTAssertTrue(ids.contains("unaccounted"))
+        XCTAssertTrue(ids.contains("other-toplevel"))
+        XCTAssertEqual(slices.first { $0.id == "/A" }?.bytes, 100)
     }
 
     func testRulesCategorySlicesAggregates() throws {

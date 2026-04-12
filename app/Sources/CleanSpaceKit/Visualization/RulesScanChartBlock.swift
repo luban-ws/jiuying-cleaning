@@ -26,14 +26,11 @@ struct RulesScanChartBlock: View {
                 EmptyView()
             } else {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("按分类占用（扫描结果）")
-                        .font(.headline)
-
                     HStack(alignment: .top, spacing: 28) {
                         Chart(slices) { s in
                             BarMark(
-                                x: .value("字节", s.bytes),
-                                y: .value("分类", s.label)
+                                x: .value(L10n.Chart.axisBytes, s.bytes),
+                                y: .value(L10n.Chart.axisCategory, s.label)
                             )
                             .foregroundStyle(s.color)
                             .cornerRadius(4)
@@ -47,11 +44,12 @@ struct RulesScanChartBlock: View {
                             }
                         }
                         .frame(height: CGFloat(max(140, slices.count * 36)))
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                         if totalScanned > 0 {
                             Chart(slices) { s in
                                 SectorMark(
-                                    angle: .value("占比", s.bytes),
+                                    angle: .value(L10n.Chart.axisShare, s.bytes),
                                     innerRadius: .ratio(0.62),
                                     angularInset: 1
                                 )
@@ -64,14 +62,14 @@ struct RulesScanChartBlock: View {
                     }
 
                     Table(slices) {
-                        TableColumn("分类") { (row: SpaceChartSlice) in
+                        TableColumn(L10n.Chart.tableCategory) { (row: SpaceChartSlice) in
                             Text(row.label)
                         }
-                        TableColumn("合计") { (row: SpaceChartSlice) in
+                        TableColumn(L10n.Chart.tableSum) { (row: SpaceChartSlice) in
                             Text(SpaceFormat.bytes(row.bytes))
                                 .monospacedDigit()
                         }
-                        TableColumn("占比") { (row: SpaceChartSlice) in
+                        TableColumn(L10n.Chart.tablePercent) { (row: SpaceChartSlice) in
                             Text(SpaceFormat.percent(part: row.bytes, of: totalScanned))
                                 .monospacedDigit()
                                 .foregroundStyle(.secondary)

@@ -48,6 +48,12 @@ final class CleaningRuleDecodingTests: XCTestCase {
         XCTAssertEqual(rule.command, "docker system prune -f")
     }
 
+    /// `CategoryId` 与 cleaning-rules.json 中 `category` 字符串一致（供 UI 分支与表格使用）
+    func testCategoryIdBrowserMatchesJsonWireFormat() {
+        XCTAssertEqual(CleaningRule.CategoryId.browser, "browser")
+        XCTAssertTrue(CleaningRule.CategoryId.ordered.contains(CleaningRule.CategoryId.browser))
+    }
+
     /// 缺省 risk 时视为 low
     func testRiskDefaultsToLow() throws {
         let json = """

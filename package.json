@@ -2,9 +2,11 @@
   "name": "cleaning",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.27.0",
   "description": "macOS clean app - browser, Docker, AI tools space management",
   "scripts": {
     "build:app": "./design/generate-app-icon.sh && cd app && swift build",
+    "run:app": "bash scripts/run-app.sh",
     "bundle:app": "./scripts/bundle-mac-app.sh release",
     "test:app": "cd app && swift test",
     "prepare": "husky"

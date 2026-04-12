@@ -36,8 +36,8 @@ struct DockerDesktopChartBlock: View {
             } else {
                 Chart(chartRows) { row in
                     BarMark(
-                        x: .value("字节", row.bytes),
-                        y: .value("目录", row.label)
+                        x: .value(L10n.Chart.axisBytes, row.bytes),
+                        y: .value(L10n.Chart.axisDirectory, row.label)
                     )
                     .foregroundStyle(SpaceVisualizationPalette.diskColor(at: row.id))
                     .cornerRadius(3)
@@ -47,14 +47,14 @@ struct DockerDesktopChartBlock: View {
                 .frame(height: CGFloat(max(100, chartRows.count * 32)))
 
                 Table(chartRows) {
-                    TableColumn("目录") { (row: DockerChartRow) in
+                    TableColumn(L10n.Chart.axisDirectory) { (row: DockerChartRow) in
                         Text(row.label)
                     }
-                    TableColumn("大小") { (row: DockerChartRow) in
+                    TableColumn(L10n.Disk.tableSize) { (row: DockerChartRow) in
                         Text(SpaceFormat.bytes(row.bytes))
                             .monospacedDigit()
                     }
-                    TableColumn("占比") { (row: DockerChartRow) in
+                    TableColumn(L10n.Chart.tablePercent) { (row: DockerChartRow) in
                         Text(SpaceFormat.percent(part: row.bytes, of: max(total, 1)))
                             .monospacedDigit()
                             .foregroundStyle(.secondary)

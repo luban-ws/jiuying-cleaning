@@ -41,17 +41,30 @@ struct CleaningRule: Codable, Identifiable {
     var estimate: String?
 }
 
-// MARK: - 分类显示名
+// MARK: - 分类键（与 cleaning-rules.json 中 `category` 一致，避免魔法字符串）
 
 extension CleaningRule {
-    /// 分类的本地化显示名
+    enum CategoryId {
+        static let system = "system"
+        static let browser = "browser"
+        static let docker = "docker"
+        static let aiTools = "ai-tools"
+        static let custom = "custom"
+
+        /// 侧栏/表单中分类分组的稳定顺序
+        static var ordered: [String] {
+            [system, browser, docker, aiTools, custom]
+        }
+    }
+
+    /// 分类的本地化显示名（键在 Localizable.strings）
     static func categoryDisplayName(_ category: String) -> String {
         switch category {
-        case "system": return "系统"
-        case "browser": return "浏览器"
-        case "docker": return "Docker"
-        case "ai-tools": return "AI 工具"
-        case "custom": return "自定义"
+        case CategoryId.system: return L10n.Category.system
+        case CategoryId.browser: return L10n.Category.browser
+        case CategoryId.docker: return L10n.Category.docker
+        case CategoryId.aiTools: return L10n.Category.aiTools
+        case CategoryId.custom: return L10n.Category.custom
         default: return category
         }
     }

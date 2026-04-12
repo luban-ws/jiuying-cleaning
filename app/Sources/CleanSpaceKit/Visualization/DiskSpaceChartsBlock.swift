@@ -39,16 +39,19 @@ struct DiskSpaceChartsBlock: View {
                 spaceTableSection
             }
         }
+        // Form 内 Chart/Table 必须有明确纵向尺寸，否则在 macOS 上常被压成不可见
+        .frame(minHeight: topFolders.isEmpty ? 220 : 520)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private func overviewSection(slices: [SpaceChartSlice]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("整卷空间")
+            Text(L10n.Disk.chartWholeVolume)
                 .font(.headline)
             HStack(alignment: .top, spacing: 24) {
                 Chart(slices) { s in
                     SectorMark(
-                        angle: .value("容量", s.bytes),
+                        angle: .value(L10n.Chart.axisCapacity, s.bytes),
                         innerRadius: .ratio(0.58),
                         angularInset: 1.2
                     )
@@ -56,6 +59,9 @@ struct DiskSpaceChartsBlock: View {
                     .cornerRadius(2)
                 }
                 .chartLegend(position: .trailing, alignment: .center)
+                .chartPlotStyle { plot in
+                    plot.frame(width: 200, height: 200)
+                }
                 .frame(width: 200, height: 200)
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -81,17 +87,17 @@ struct DiskSpaceChartsBlock: View {
 
     private func breakdownSection(slices: [SpaceChartSlice]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("顶层与对账分布")
+            Text(L10n.Disk.chartBreakdown)
                 .font(.headline)
             if slices.isEmpty {
-                Text("暂无正值可绘制。")
+                Text(L10n.Disk.chartNoPositive)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
                 HStack(alignment: .top, spacing: 24) {
                     Chart(slices) { s in
                         SectorMark(
-                            angle: .value("估算", s.bytes),
+                            angle: .value(L10n.Chart.axisEstimate, s.bytes),
                             innerRadius: .ratio(0.52),
                             angularInset: 1.0
                         )
@@ -133,21 +139,21 @@ struct DiskSpaceChartsBlock: View {
 
     private var spaceTableSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("空间明细表")
+            Text(L10n.Disk.tableTitle)
                 .font(.headline)
             Table(topFolders.sorted { $0.bytes > $1.bytes }) {
-                TableColumn("文件夹") { row in
+                TableColumn(L10n.Disk.tableFolder) { row in
                     Text(row.name)
                         .font(.body)
                 }
                 .width(min: 120, ideal: 160)
-                TableColumn("大小") { row in
+                TableColumn(L10n.Disk.tableSize) { row in
                     Text(SpaceFormat.bytes(row.bytes))
                         .monospacedDigit()
                         .foregroundStyle(row.bytes > 0 ? .primary : .secondary)
                 }
                 .width(100)
-                TableColumn("占扫描合计") { row in
+                TableColumn(L10n.Disk.tablePercent) { row in
                     let sum = topFolders.reduce(Int64(0)) { $0 + $1.bytes }
                     Text(SpaceFormat.percent(part: row.bytes, of: max(sum, 1)))
                         .monospacedDigit()
@@ -155,9 +161,10 @@ struct DiskSpaceChartsBlock: View {
                 }
                 .width(88)
                 TableColumn("") { row in
-                    Button("访达") {
+                    Button(L10n.Disk.openFinder) {
                         onOpenPath(row.path)
                     }
+                    .help(L10n.Disk.helpRevealFolder)
                     .buttonStyle(.borderless)
                 }
                 .width(52)

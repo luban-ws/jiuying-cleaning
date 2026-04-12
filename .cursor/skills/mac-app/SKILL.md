@@ -18,7 +18,7 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 - **构建**：`cd app && swift build`；运行：`swift run <ProductName>`。
 - **产物**：可执行文件与 `*_CleanSpaceKit.bundle` 等资源包位于 `app/.build/`（应加入 `.gitignore`）。
 - **.app 包**：用脚本将可执行文件、`app/Support/Info.plist` 与资源 bundle 拷入 `Contents/MacOS` 与 `Contents/Resources`，便于访达双击（见本仓库 `scripts/bundle-mac-app.sh`）。
-- **部署目标**：在 `Package.swift` 的 `platforms: [.macOS(.v14)]`（或所需版本）中声明。
+- **部署目标**：在 `Package.swift` 使用 `swift-tools-version: 6.0` 与 `platforms: [.macOS(.v15)]`，并与 `Support/Info.plist` 的 `LSMinimumSystemVersion`（`15.0`）对齐。
 
 ## 2. 应用图标（无图案问题）
 
@@ -31,7 +31,7 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 
 ## 3. Husky：commit 与 push 钩子
 
-- **安装**：在仓库根目录 `npm install husky --save-dev`，`package.json` 中 `"prepare": "husky"`。
+- **安装**：在仓库根目录 `pnpm add -D husky`，`package.json` 中 `"prepare": "husky"`；本仓库已用 **pnpm**（见 `pnpm-lock.yaml`）。
 - **钩子建议**：
   - **commit-msg**：校验提交信息非空、长度等（可接 commitlint）。
   - **pre-commit**：`cd app && swift build`。

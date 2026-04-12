@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 从 icon.svg 生成 AppIcon-1024.png；在 SwiftPM 构建前由 npm / bundle 脚本调用。
+# 从 icon.svg 生成 AppIcon-1024.png；在 SwiftPM 构建前由 pnpm（build:app）/ bundle 脚本调用。
 # 若本机有 rsvg-convert（Homebrew librsvg）则始终从矢量重新导出；否则保留仓库内已有 PNG，不中断构建。
 
 set -euo pipefail

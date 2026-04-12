@@ -19,6 +19,8 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>14.0</string>
+	<string>15.0</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>在 CPU、内存或网络超过设定阈值时向您发送提醒。</string>
 </dict>
 </plist>

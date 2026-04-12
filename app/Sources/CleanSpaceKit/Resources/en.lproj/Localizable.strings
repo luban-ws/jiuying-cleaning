@@ -1,0 +1,202 @@
+/* CleanSpace — English (development language) */
+
+"app.name" = "CleanSpace";
+
+"menu.new_main_window" = "New Window";
+"menu.bar.open_format" = "Open %@";
+"menu.quit_format" = "Quit %@";
+
+"metrics.menu_bar.accessibility" = "CPU, memory, and network usage";
+"metrics.menu_bar.help_live_format" = "Live: CPU %@, memory %@, network %@. Click for details and alert thresholds.";
+"metrics.menu_bar.accessibility_value_format" = "CPU %@, memory %@, network %@";
+"metrics.menu.cpu.headline" = "CPU";
+"metrics.menu.cpu.current_format" = "Current usage: %@";
+"metrics.menu.threshold.cpu_format" = "Notify when usage is at or above %lld%%.";
+"metrics.menu.memory.headline" = "Memory";
+"metrics.menu.memory.current_format" = "In use: %@ of %@ (%@)";
+"metrics.menu.threshold.memory_format" = "Notify when usage is at or above %lld%%.";
+"metrics.menu.network.headline" = "Network";
+"metrics.menu.network.up_format" = "Upload: %@";
+"metrics.menu.network.down_format" = "Download: %@";
+"metrics.menu.network.short_format" = "↑ %@ · ↓ %@";
+"metrics.menu.threshold.network_format" = "Notify when peak rate is at or above %@ (either direction).";
+"metrics.menu.network.notify_off" = "Network alerts are off; the menu bar still shows live upload and download rates.";
+"metrics.chart.network.axis_upload" = "Upload";
+"metrics.chart.network.axis_download" = "Download";
+"metrics.notif.cpu.title" = "High CPU usage";
+"metrics.notif.cpu.body_format" = "CPU is about %lld%%.";
+"metrics.notif.memory.title" = "High memory usage";
+"metrics.notif.memory.body_format" = "Memory usage is about %lld%%.";
+"metrics.notif.network.title" = "High network throughput";
+"metrics.notif.network.body_format" = "Down %@, up %@ — peak exceeds the threshold.";
+
+"common.cancel" = "Cancel";
+"common.ok" = "OK";
+
+"sidebar.rules" = "Rules";
+"sidebar.docker" = "Docker";
+"sidebar.volumes" = "Volumes";
+"sidebar.volumes.blurb" = "Charts, space & top folders";
+"sidebar.rules.blurb" = "Scan paths, then clean safely";
+"sidebar.docker.blurb" = "Presets & Docker Desktop data";
+
+"rules.empty.title" = "No rules";
+"rules.empty.description" = "Check that cleaning-rules.json is present in the app bundle.";
+"rules.intro" = "Select items, tap Scan, then Clean. Command rules show notes instead of exact sizes.";
+"rules.chart.card_title" = "Size by category (scan)";
+"rules.nav_title" = "Rules";
+"rules.nav_subtitle_format" = "%lld of %lld selected";
+"rules.overview.title" = "At a glance";
+"rules.overview.blurb" = "Scan measures path sizes; Clean removes data for checked items.";
+"rules.overview.chip.total_format" = "%lld rules";
+"rules.overview.chip.selected_format" = "%lld selected";
+"rules.overview.chip.scanned_format" = "%lld sized";
+"rules.scan" = "Scan";
+"rules.clean" = "Clean";
+"rules.scanning" = "Scanning…";
+"rules.cleaning" = "Cleaning…";
+"rules.alert.confirm.title" = "Confirm clean";
+"rules.alert.result.title" = "Clean result";
+"rules.estimate.command" = "Command";
+"rules.risk.medium" = "Med";
+"rules.risk.high" = "High";
+"rules.confirm.clean_risky" = "Selection includes medium/high risk. Continue?";
+"rules.confirm.clean_safe_format" = "Clean %lld selected items?";
+"rules.clean.status.success" = "OK";
+"rules.clean.status.fail" = "Failed";
+"rules.clean.result_line_format" = "%@: %@ %@";
+
+"rules.help.scan" = "Measure on-disk size for each path-based rule before cleaning.";
+"rules.help.clean" = "Delete data for selected rules. Medium or high risk rules ask for confirmation first.";
+
+"rules.browser.table.clean" = "Clean";
+"rules.browser.table.item" = "Item";
+"rules.browser.table.size" = "Size";
+"rules.browser.table.risk" = "Risk";
+
+"docker.intro" = "Run docker commands in order; use together with Rules if needed.";
+"docker.section.desktop" = "Docker Desktop folders";
+"docker.loading" = "Loading…";
+"docker.chart.card_title" = "Docker Desktop folder sizes";
+"docker.refresh_sizes" = "Recalculate folder sizes";
+"docker.section.presets" = "Presets";
+"docker.run" = "Run";
+"docker.execute" = "Execute";
+"docker.section.df" = "docker system df -v";
+"docker.refresh_output" = "Refresh output";
+"docker.df_placeholder" = "Tap “Refresh output”";
+"docker.section.log" = "Execution log";
+"docker.running" = "Running…";
+"docker.progress.completed_format" = "%lld of %lld steps completed";
+"docker.progress.starting" = "Starting…";
+"docker.progress.working" = "Working…";
+"docker.log.streaming_placeholder" = "Output appears here after each step.";
+"docker.alert.title" = "Confirm";
+"docker.alert.run_destructive" = "Run clean";
+"docker.alert.run_safe" = "Run";
+"docker.alert.msg.destructive" = "Multiple clean commands will run in order.";
+"docker.alert.msg.safe" = "Read-only; no data will be deleted.";
+
+"docker.preset.quick.title" = "Quick";
+"docker.preset.quick.subtitle" = "Stop containers + build cache; low risk";
+"docker.preset.standard.title" = "Standard";
+"docker.preset.standard.subtitle" = "Quick plus unused images and networks";
+"docker.preset.deep.title" = "Deep";
+"docker.preset.deep.subtitle" = "Includes volumes, system prune, Desktop reclaim";
+"docker.preset.desktopDataScan.title" = "Desktop size only";
+"docker.preset.desktopDataScan.subtitle" = "Only docker system df; deletes nothing";
+
+"docker.desktop.group_containers" = "Group Containers (docker)";
+"docker.desktop.app_support" = "Application Support";
+"docker.desktop.caches" = "Caches";
+"docker.desktop.containers" = "Containers";
+
+"docker.help.refresh_sizes" = "Re-measure Docker Desktop data folders on this Mac.";
+"docker.help.refresh_df" = "Run docker system df -v and show the text output below.";
+
+"docker.nav_subtitle" = "Presets · Desktop data · docker system df";
+
+"docker.df.summary.section" = "Disk usage summary";
+"docker.df.summary.unavailable" = "Summary (docker system df) could not be loaded; tables below may still show detail.";
+"docker.df.raw.toggle" = "Raw command output";
+"docker.df.orphan.note" = "Unparsed lines:";
+"docker.df.col.resource" = "Type";
+"docker.df.col.total" = "Total";
+"docker.df.col.active" = "Active";
+"docker.df.col.size" = "Size";
+"docker.df.col.reclaimable" = "Reclaimable";
+"docker.df.section.images" = "Images";
+"docker.df.section.containers" = "Containers";
+"docker.df.section.volumes" = "Local volumes";
+"docker.df.section.build_cache" = "Build cache";
+
+"docker.service.df_empty" = "(no output)";
+"docker.service.df_fail_format" = "Cannot run docker (exit %d): %@";
+"docker.service.step_done" = "Done";
+"docker.service.step_no_output" = "No output";
+
+"disk.no_volumes" = "No volumes found.";
+"disk.picker.label" = "Volume";
+"disk.picker.placeholder" = "Choose a disk";
+"disk.path" = "Path";
+"disk.used_space" = "Used";
+"disk.available" = "Free";
+"disk.used_over_total_format" = "%@ / %@";
+"disk.chart.card_title" = "Storage charts";
+"disk.section.top_level" = "Top-level folders";
+"disk.scan_top_level" = "Measure top-level usage";
+"disk.show_in_finder" = "Show in Finder";
+"disk.scanning" = "Measuring…";
+"disk.scan_hint_empty" = "Not scanned yet. Charts and table appear after scan.";
+"disk.sum_top_level" = "Scanned top-level total";
+"disk.unaccounted" = "Not counted by scan";
+"disk.section.accounting" = "vs system “used”";
+"disk.accounting.footer" = "“Used” comes from the system; folders are a file walk estimate. The gap is often snapshots, protected paths, metadata, etc.";
+"disk.select_volume_hint" = "Pick a disk to see space and scan top-level folders.";
+"disk.nav_title" = "Volumes";
+"disk.nav_subtitle_pick_volume" = "Choose a volume";
+"disk.hero.available" = "Available";
+"disk.hero.used" = "Used";
+"disk.hero.capacity" = "Capacity";
+"disk.section.source" = "Volume";
+"disk.section.quick_actions" = "Quick actions";
+"disk.volume_picker_format" = "%@ · %@ free";
+
+"disk.help.scan_top_level" = "Calculate size for each item in the volume’s root folder.";
+"disk.help.show_in_finder" = "Show this volume in Finder.";
+"disk.help.reveal_folder" = "Open this folder in Finder.";
+
+"disk.chart.whole_volume" = "Whole volume";
+"disk.chart.breakdown" = "Top-level & reconciliation";
+"disk.chart.no_positive" = "Nothing positive to chart.";
+"disk.table.title" = "Space table";
+"disk.table.folder" = "Folder";
+"disk.table.size" = "Size";
+"disk.table.percent" = "% of scan";
+"disk.open_finder" = "Finder";
+
+"chart.axis.bytes" = "Bytes";
+"chart.axis.category" = "Category";
+"chart.axis.share" = "Share";
+"chart.axis.capacity" = "Capacity";
+"chart.axis.estimate" = "Estimate";
+"chart.axis.directory" = "Folder";
+"chart.slice.used" = "Used";
+"chart.slice.free" = "Free";
+"chart.top_level.other_format" = "Other top items (%lld)";
+"chart.slice.unaccounted" = "Not counted by scan";
+"chart.table.category" = "Category";
+"chart.table.sum" = "Total";
+"chart.table.percent" = "Share";
+
+"category.system" = "System";
+"category.browser" = "Browsers";
+"category.docker" = "Docker";
+"category.ai_tools" = "AI tools";
+"category.custom" = "Custom";
+
+"clean.deleted_format" = "Removed %lld item(s)";
+"clean.partial_fail_format" = "Partial failure: %@";
+"clean.missing_command" = "Missing command";
+"clean.executed" = "Done";
+"clean.exit_code_format" = "Exit %d: %@";

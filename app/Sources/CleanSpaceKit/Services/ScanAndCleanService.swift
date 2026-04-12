@@ -79,15 +79,15 @@ func cleanRule(_ rule: CleaningRule) -> (success: Bool, message: String) {
             }
         }
         if errors.isEmpty {
-            return (true, "已删除 \(deleted) 项")
+            return (true, L10n.Clean.deleted(deleted))
         }
-        return (false, "部分失败：\(errors.prefix(2).joined(separator: " "))")
+        return (false, L10n.Clean.partialFail(errors.prefix(2).joined(separator: " ")))
     case .command:
-        guard let cmd = rule.command else { return (false, "缺少 command") }
+        guard let cmd = rule.command else { return (false, L10n.Clean.missingCommand) }
         let r = ShellCommandRunner.run(cmd)
         if r.status == 0 {
-            return (true, r.output.isEmpty ? "已执行" : r.output)
+            return (true, r.output.isEmpty ? L10n.Clean.executed : r.output)
         }
-        return (false, "退出码 \(r.status)：\(r.output)")
+        return (false, L10n.Clean.exitCode(r.status, r.output))
     }
 }

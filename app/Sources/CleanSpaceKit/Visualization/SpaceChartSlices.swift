@@ -41,8 +41,8 @@ enum SpaceChartSliceBuilder {
         let avail = max(0, f)
         if used == 0, avail == 0 { return nil }
         return [
-            SpaceChartSlice(id: "used", label: "已用", bytes: used, color: SpaceVisualizationPalette.diskColor(at: 0)),
-            SpaceChartSlice(id: "free", label: "可用", bytes: avail, color: SpaceVisualizationPalette.diskColor(at: 1)),
+            SpaceChartSlice(id: "used", label: L10n.Chart.sliceUsed, bytes: used, color: SpaceVisualizationPalette.diskColor(at: 0)),
+            SpaceChartSlice(id: "free", label: L10n.Chart.sliceFree, bytes: avail, color: SpaceVisualizationPalette.diskColor(at: 1)),
         ]
     }
 
@@ -71,7 +71,7 @@ enum SpaceChartSliceBuilder {
             slices.append(
                 SpaceChartSlice(
                     id: "other-toplevel",
-                    label: "其余顶层项（\(tail.count)）",
+                    label: L10n.Chart.topLevelOtherTail(tail.count),
                     bytes: tailSum,
                     color: SpaceVisualizationPalette.diskColor(at: idx)
                 )
@@ -83,7 +83,7 @@ enum SpaceChartSliceBuilder {
             slices.append(
                 SpaceChartSlice(
                     id: "unaccounted",
-                    label: "未由扫描计入",
+                    label: L10n.Chart.sliceUnaccounted,
                     bytes: unaccountedBytes,
                     color: Color.secondary.opacity(0.85)
                 )

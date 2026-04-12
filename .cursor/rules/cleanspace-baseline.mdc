@@ -1,0 +1,11 @@
+---
+description: CleanSpace 基线——本地化、测试与模块边界（再小的改动也遵守）
+alwaysApply: true
+---
+
+# CleanSpace 基线
+
+- **用户可见文案**：只通过 `L10n` + `app/Sources/CleanSpaceKit/Resources/*/Localizable.strings`；不在 Swift 的 `Text`/`Button`/`Section`/`.alert`/`title:`/`placeholder:` 中写 CJK 字面量。新键同时更新 **en** 与 **zh-Hans**。
+- **测试**：不断言本地化后的展示字符串；断言稳定 `id` 或数值行为。
+- **结构**：UI 与业务放在 **CleanSpaceKit**；`CleanSpace` 目标保持极薄入口。
+- **验证**：修改后应满足 `cd app && swift test`；提交前钩子会跑 `scripts/check-swift-ui-l10n.sh`（需安装 `rg`）与 `swift build`。

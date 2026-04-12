@@ -1,0 +1,202 @@
+/* CleanSpace — 简体中文 */
+
+"app.name" = "CleanSpace";
+
+"menu.new_main_window" = "新建窗口";
+"menu.bar.open_format" = "打开 %@";
+"menu.quit_format" = "退出 %@";
+
+"metrics.menu_bar.accessibility" = "处理器、内存与网络占用";
+"metrics.menu_bar.help_live_format" = "实时：CPU %@，内存 %@，网络 %@。点击查看详情与通知阈值。";
+"metrics.menu_bar.accessibility_value_format" = "CPU %@，内存 %@，网络 %@";
+"metrics.menu.cpu.headline" = "处理器";
+"metrics.menu.cpu.current_format" = "当前占用：%@";
+"metrics.menu.threshold.cpu_format" = "达到或超过 %lld%% 时发送通知。";
+"metrics.menu.memory.headline" = "内存";
+"metrics.menu.memory.current_format" = "已用 %@ / 共 %@（%@）";
+"metrics.menu.threshold.memory_format" = "达到或超过 %lld%% 时发送通知。";
+"metrics.menu.network.headline" = "网络";
+"metrics.menu.network.up_format" = "上传：%@";
+"metrics.menu.network.down_format" = "下载：%@";
+"metrics.menu.network.short_format" = "↑ %@ · ↓ %@";
+"metrics.menu.threshold.network_format" = "任一侧速率达到或超过 %@ 时发送通知。";
+"metrics.menu.network.notify_off" = "未开启网络阈值通知；菜单栏仍显示实时上下行速率。";
+"metrics.chart.network.axis_upload" = "上传";
+"metrics.chart.network.axis_download" = "下载";
+"metrics.notif.cpu.title" = "CPU 占用过高";
+"metrics.notif.cpu.body_format" = "当前 CPU 约 %lld%%。";
+"metrics.notif.memory.title" = "内存占用过高";
+"metrics.notif.memory.body_format" = "当前内存约 %lld%%。";
+"metrics.notif.network.title" = "网络流量较高";
+"metrics.notif.network.body_format" = "下行 %@，上行 %@，已超过设定阈值。";
+
+"common.cancel" = "取消";
+"common.ok" = "好";
+
+"sidebar.rules" = "规则清理";
+"sidebar.docker" = "Docker";
+"sidebar.volumes" = "磁盘";
+"sidebar.volumes.blurb" = "空间图表与顶层目录";
+"sidebar.rules.blurb" = "扫描占用后安全清理";
+"sidebar.docker.blurb" = "预设与 Desktop 数据";
+
+"rules.empty.title" = "没有规则";
+"rules.empty.description" = "请检查应用包中的 cleaning-rules.json。";
+"rules.intro" = "勾选后先「扫描」再「清理」。命令类规则无精确体积时显示说明。";
+"rules.chart.card_title" = "按分类占用（扫描）";
+"rules.nav_title" = "规则清理";
+"rules.nav_subtitle_format" = "已选 %lld / 共 %lld 条";
+"rules.overview.title" = "概览";
+"rules.overview.blurb" = "扫描可测量路径占用；清理将删除已勾选项对应的数据。";
+"rules.overview.chip.total_format" = "共 %lld 条规则";
+"rules.overview.chip.selected_format" = "已选 %lld 条";
+"rules.overview.chip.scanned_format" = "已测 %lld 条";
+"rules.scan" = "扫描";
+"rules.clean" = "清理";
+"rules.scanning" = "正在扫描…";
+"rules.cleaning" = "正在清理…";
+"rules.alert.confirm.title" = "清理确认";
+"rules.alert.result.title" = "清理结果";
+"rules.estimate.command" = "命令";
+"rules.risk.medium" = "中";
+"rules.risk.high" = "高";
+"rules.confirm.clean_risky" = "所选包含中/高风险项，确认后将执行。";
+"rules.confirm.clean_safe_format" = "确认清理 %lld 项？";
+"rules.clean.status.success" = "成功";
+"rules.clean.status.fail" = "失败";
+"rules.clean.result_line_format" = "%@：%@ %@";
+
+"rules.help.scan" = "清理前先估算各路径类规则在磁盘上的占用。";
+"rules.help.clean" = "删除已勾选规则对应的数据；中/高风险项会先要求确认。";
+
+"rules.browser.table.clean" = "清理";
+"rules.browser.table.item" = "项目";
+"rules.browser.table.size" = "大小";
+"rules.browser.table.risk" = "风险";
+
+"docker.intro" = "按顺序执行多条 docker 命令；可与「规则清理」中的单条命令配合。";
+"docker.section.desktop" = "本机 Docker Desktop 目录";
+"docker.loading" = "加载中…";
+"docker.chart.card_title" = "Docker Desktop 目录占用";
+"docker.refresh_sizes" = "重新计算目录占用";
+"docker.section.presets" = "预设";
+"docker.run" = "运行";
+"docker.execute" = "执行";
+"docker.section.df" = "docker system df -v";
+"docker.refresh_output" = "刷新输出";
+"docker.df_placeholder" = "点击「刷新输出」";
+"docker.section.log" = "执行日志";
+"docker.running" = "执行中…";
+"docker.progress.completed_format" = "已完成 %lld / %lld 步";
+"docker.progress.starting" = "正在启动…";
+"docker.progress.working" = "执行中…";
+"docker.log.streaming_placeholder" = "每步结束后将在此显示输出。";
+"docker.alert.title" = "确认";
+"docker.alert.run_destructive" = "执行清理";
+"docker.alert.run_safe" = "运行";
+"docker.alert.msg.destructive" = "将按顺序执行多条清理命令。";
+"docker.alert.msg.safe" = "仅查询占用，不删除数据。";
+
+"docker.preset.quick.title" = "快速";
+"docker.preset.quick.subtitle" = "停止容器 + 构建缓存，风险低";
+"docker.preset.standard.title" = "标准";
+"docker.preset.standard.subtitle" = "在快速基础上清理未使用镜像与网络";
+"docker.preset.deep.title" = "深度";
+"docker.preset.deep.subtitle" = "含卷清理、system prune 与 Desktop 回收（最彻底）";
+"docker.preset.desktopDataScan.title" = "仅分析 Desktop 占用";
+"docker.preset.desktopDataScan.subtitle" = "仅执行 docker system df，不删除任何资源";
+
+"docker.desktop.group_containers" = "Group Containers（docker）";
+"docker.desktop.app_support" = "Application Support";
+"docker.desktop.caches" = "Caches";
+"docker.desktop.containers" = "Containers";
+
+"docker.help.refresh_sizes" = "重新统计本机 Docker Desktop 相关数据目录占用。";
+"docker.help.refresh_df" = "执行 docker system df -v，并在下方显示终端输出。";
+
+"docker.nav_subtitle" = "预设 · Desktop 数据目录 · docker system df";
+
+"docker.df.summary.section" = "磁盘占用摘要";
+"docker.df.summary.unavailable" = "无法执行「docker system df」摘要；下方明细表仍可能可用。";
+"docker.df.raw.toggle" = "原始命令输出";
+"docker.df.orphan.note" = "未能对齐为表格的行：";
+"docker.df.col.resource" = "类型";
+"docker.df.col.total" = "总数";
+"docker.df.col.active" = "使用中";
+"docker.df.col.size" = "大小";
+"docker.df.col.reclaimable" = "可回收";
+"docker.df.section.images" = "镜像";
+"docker.df.section.containers" = "容器";
+"docker.df.section.volumes" = "本地卷";
+"docker.df.section.build_cache" = "构建缓存";
+
+"docker.service.df_empty" = "（无输出）";
+"docker.service.df_fail_format" = "无法执行 docker（退出码 %d）：%@";
+"docker.service.step_done" = "完成";
+"docker.service.step_no_output" = "无输出";
+
+"disk.no_volumes" = "未检测到可用卷。";
+"disk.picker.label" = "选择卷";
+"disk.picker.placeholder" = "请选择磁盘";
+"disk.path" = "路径";
+"disk.used_space" = "已用空间";
+"disk.available" = "可用";
+"disk.used_over_total_format" = "%@ / %@";
+"disk.chart.card_title" = "存储可视化";
+"disk.section.top_level" = "顶层文件夹";
+"disk.scan_top_level" = "计算根目录下一层占用";
+"disk.show_in_finder" = "在访达中显示";
+"disk.scanning" = "正在统计…";
+"disk.scan_hint_empty" = "尚未扫描。扫描后上方将显示环形图与明细表。";
+"disk.sum_top_level" = "顶层扫描合计";
+"disk.unaccounted" = "未由扫描计入";
+"disk.section.accounting" = "与系统已用对照";
+"disk.accounting.footer" = "「已用空间」由系统报告；顶层各文件夹为对可读文件的估算。两者之差通常来自 APFS 快照、系统保留与「系统数据」、受保护或无权限路径、文件系统元数据等，属正常现象。";
+"disk.select_volume_hint" = "在菜单中选择磁盘后可查看空间并扫描顶层目录。";
+"disk.nav_title" = "磁盘";
+"disk.nav_subtitle_pick_volume" = "请选择卷";
+"disk.hero.available" = "可用";
+"disk.hero.used" = "已用";
+"disk.hero.capacity" = "总容量";
+"disk.section.source" = "当前卷";
+"disk.section.quick_actions" = "快捷操作";
+"disk.volume_picker_format" = "%@  ·  %@ 可用";
+
+"disk.help.scan_top_level" = "统计该卷根目录下每一项的占用。";
+"disk.help.show_in_finder" = "在访达中显示此卷。";
+"disk.help.reveal_folder" = "在访达中打开此文件夹。";
+
+"disk.chart.whole_volume" = "整卷空间";
+"disk.chart.breakdown" = "顶层与对账分布";
+"disk.chart.no_positive" = "暂无正值可绘制。";
+"disk.table.title" = "空间明细表";
+"disk.table.folder" = "文件夹";
+"disk.table.size" = "大小";
+"disk.table.percent" = "占扫描合计";
+"disk.open_finder" = "访达";
+
+"chart.axis.bytes" = "字节";
+"chart.axis.category" = "分类";
+"chart.axis.share" = "占比";
+"chart.axis.capacity" = "容量";
+"chart.axis.estimate" = "估算";
+"chart.axis.directory" = "目录";
+"chart.slice.used" = "已用";
+"chart.slice.free" = "可用";
+"chart.top_level.other_format" = "其余顶层项（%lld）";
+"chart.slice.unaccounted" = "未由扫描计入";
+"chart.table.category" = "分类";
+"chart.table.sum" = "合计";
+"chart.table.percent" = "占比";
+
+"category.system" = "系统";
+"category.browser" = "浏览器";
+"category.docker" = "Docker";
+"category.ai_tools" = "AI 工具";
+"category.custom" = "自定义";
+
+"clean.deleted_format" = "已删除 %lld 项";
+"clean.partial_fail_format" = "部分失败：%@";
+"clean.missing_command" = "缺少 command";
+"clean.executed" = "已执行";
+"clean.exit_code_format" = "退出码 %d：%@";
