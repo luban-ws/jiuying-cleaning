@@ -43,14 +43,42 @@
     ]
   },
   {
-    "id": "docker-system-prune",
+    "id": "docker-container-prune",
     "category": "docker",
-    "name": "Docker 系统清理",
+    "name": "Docker 已停止容器",
+    "type": "command",
+    "risk": "low",
+    "command": "docker container prune -f",
+    "estimate": "依已停止容器占用而定"
+  },
+  {
+    "id": "docker-image-prune",
+    "category": "docker",
+    "name": "Docker 未使用镜像",
     "type": "command",
     "risk": "medium",
-    "warning": "将删除未使用的容器、镜像、卷与构建缓存。",
-    "command": "docker system prune -a -f",
-    "estimate": "依当前未使用资源而定"
+    "warning": "将删除未使用的镜像，之后需重新拉取。",
+    "command": "docker image prune -a -f",
+    "estimate": "依未使用镜像大小而定"
+  },
+  {
+    "id": "docker-volume-prune",
+    "category": "docker",
+    "name": "Docker 未使用卷",
+    "type": "command",
+    "risk": "medium",
+    "warning": "将删除未使用的卷，若卷内有数据会丢失。",
+    "command": "docker volume prune -f",
+    "estimate": "依未挂载卷占用而定"
+  },
+  {
+    "id": "docker-network-prune",
+    "category": "docker",
+    "name": "Docker 未使用网络",
+    "type": "command",
+    "risk": "low",
+    "command": "docker network prune -f",
+    "estimate": "通常较小"
   },
   {
     "id": "docker-builder-prune",
@@ -60,6 +88,26 @@
     "risk": "low",
     "command": "docker builder prune -a -f",
     "estimate": "依构建缓存大小而定"
+  },
+  {
+    "id": "docker-system-prune",
+    "category": "docker",
+    "name": "Docker 系统清理（全项）",
+    "type": "command",
+    "risk": "medium",
+    "warning": "将删除未使用的容器、镜像、卷与构建缓存。",
+    "command": "docker system prune -a -f",
+    "estimate": "依当前未使用资源而定"
+  },
+  {
+    "id": "docker-desktop-reclaim",
+    "category": "docker",
+    "name": "Docker Desktop 回收磁盘空间",
+    "type": "command",
+    "risk": "low",
+    "warning": "在 prune 之后运行可促使虚拟机内空间归还宿主机；需 Docker Desktop 可用。",
+    "command": "docker run --rm --privileged --pid=host docker/desktop-reclaim-space",
+    "estimate": "依虚拟机可回收空间而定"
   },
   {
     "id": "cursor-cache",

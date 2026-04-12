@@ -1,3 +1,4 @@
 # 提交前：确保 CleanSpace Mac 应用可构建
 . "$(dirname -- "$0")/_/husky.sh"
-cd app && xcodebuild -scheme CleanSpace -configuration Debug build -quiet
+# 使用仓库内 DerivedData，避免与 Xcode GUI 或其他并行构建争抢全局 build.db
+cd app && xcodebuild -scheme CleanSpace -configuration Debug -derivedDataPath "$(pwd)/.derivedData" build -quiet

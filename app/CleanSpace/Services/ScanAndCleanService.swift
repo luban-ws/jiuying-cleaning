@@ -84,23 +84,10 @@ func cleanRule(_ rule: CleaningRule) -> (success: Bool, message: String) {
         return (false, "部分失败：\(errors.prefix(2).joined(separator: " "))")
     case .command:
         guard let cmd = rule.command else { return (false, "缺少 command") }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.arguments = ["-c", cmd]
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = pipe
-        do {
-            try process.run()
-            process.waitUntilExit()
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8) ?? ""
-            if process.terminationStatus == 0 {
-                return (true, output.isEmpty ? "已执行" : output.trimmingCharacters(in: .whitespacesAndNewlines))
-            }
-            return (false, "退出码 \(process.terminationStatus)：\(output)")
-        } catch {
-            return (false, error.localizedDescription)
+        let r = ShellCommandRunner.run(cmd)
+        if r.status == 0 {
+            return (true, r.output.isEmpty ? "已执行" : r.output)
         }
+        return (false, "退出码 \(r.status)：\(r.output)")
     }
 }

@@ -12,8 +12,8 @@ macOS 清理应用：管理浏览器、Docker、AI 工具（如 Cursor / Antigra
 
 ## 快速开始
 
-1. **打开工程**：用 Xcode 打开 `app/CleanSpace.xcodeproj`，选择 scheme **CleanSpace** 运行。
-2. **命令行构建**：`npm run build:app` 或 `cd app && xcodebuild -scheme CleanSpace -configuration Debug build`。
+1. **打开工程**：用 Xcode 打开 `app/CleanSpace.xcodeproj`，选择 scheme **CleanSpace** 运行。Derived Data 固定为 **`app/.derivedData`**（见 `app/CleanSpace.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings`），不使用全局 `~/Library/Developer/Xcode/DerivedData`。
+2. **命令行构建**：`npm run build:app`（已带 `-derivedDataPath`）或见 [app/README.md](app/README.md)。
 3. **图标**：应用图标源为 `app/design/icon.svg`（几何原创），已生成 `AppIcon-1024.png`；如需重生成见 `app/design/README.md`。
 
 ## Git 钩子（Husky）

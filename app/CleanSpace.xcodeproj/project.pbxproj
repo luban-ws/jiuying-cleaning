@@ -14,6 +14,10 @@
 		A1000005 /* CleaningRulesLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000005 /* CleaningRulesLoader.swift */; };
 		A1000006 /* ScanAndCleanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* ScanAndCleanService.swift */; };
 		A1000007 /* cleaning-rules.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000007 /* cleaning-rules.json */; };
+		A1000008 /* ShellCommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* ShellCommandRunner.swift */; };
+		A1000009 /* DockerSpecialCleanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* DockerSpecialCleanService.swift */; };
+		A1000010 /* VolumeScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* VolumeScannerService.swift */; };
+		A1000011 /* AppChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* AppChrome.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +29,10 @@
 		A2000005 /* CleaningRulesLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningRulesLoader.swift; sourceTree = "<group>"; };
 		A2000006 /* ScanAndCleanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanAndCleanService.swift; sourceTree = "<group>"; };
 		A2000007 /* cleaning-rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "cleaning-rules.json"; sourceTree = "<group>"; };
+		A2000008 /* ShellCommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellCommandRunner.swift; sourceTree = "<group>"; };
+		A2000009 /* DockerSpecialCleanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerSpecialCleanService.swift; sourceTree = "<group>"; };
+		A2000010 /* VolumeScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeScannerService.swift; sourceTree = "<group>"; };
+		A2000011 /* AppChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChrome.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +58,7 @@
 			isa = PBXGroup;
 			children = (
 				A2000001 /* CleanSpaceApp.swift */,
+				A2000011 /* AppChrome.swift */,
 				A2000002 /* ContentView.swift */,
 				A2000003 /* Assets.xcassets */,
 				A4000003 /* Models */,
@@ -70,8 +79,11 @@
 		A4000004 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				A2000008 /* ShellCommandRunner.swift */,
 				A2000005 /* CleaningRulesLoader.swift */,
 				A2000006 /* ScanAndCleanService.swift */,
+				A2000009 /* DockerSpecialCleanService.swift */,
+				A2000010 /* VolumeScannerService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -94,11 +106,36 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A9000001 /* Generate App Icon from SVG */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/design/icon.svg",
+				"${SRCROOT}/design/generate-app-icon.sh",
+			);
+			name = "Generate App Icon from SVG";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${SRCROOT}/CleanSpace/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec \"${SRCROOT}/design/generate-app-icon.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		A5000001 /* CleanSpace */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A6000002 /* Build configuration list for PBXNativeTarget "CleanSpace" */;
 			buildPhases = (
+				A9000001 /* Generate App Icon from SVG */,
 				A5000002 /* Sources */,
 				A3000001 /* Frameworks */,
 				A5000003 /* Resources */,
@@ -163,6 +200,10 @@
 				A1000004 /* CleaningRule.swift in Sources */,
 				A1000005 /* CleaningRulesLoader.swift in Sources */,
 				A1000006 /* ScanAndCleanService.swift in Sources */,
+				A1000008 /* ShellCommandRunner.swift in Sources */,
+				A1000009 /* DockerSpecialCleanService.swift in Sources */,
+				A1000010 /* VolumeScannerService.swift in Sources */,
+				A1000011 /* AppChrome.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

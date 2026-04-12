@@ -20,7 +20,8 @@ description: Create and maintain native macOS apps with Xcode (Swift/SwiftUI), a
   - `app/<ProductName>/<App>App.swift`：`@main` + `App` 协议入口
   - `app/<ProductName>/ContentView.swift`（或主界面）
   - `app/<ProductName>/Assets.xcassets/`（AppIcon、AccentColor 等）
-- **构建**：`cd app && xcodebuild -scheme <SchemeName> -configuration Debug build -quiet`
+- **Derived Data**：固定使用仓库内 **`app/.derivedData`**，避免全局 `~/Library/Developer/Xcode/DerivedData`。在 `project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings` 中设置 `DerivedDataLocationStyle` = `WorkspaceRelativePath`、`DerivedDataCustomLocation` = `.derivedData`；命令行与 Husky 一律加 `-derivedDataPath "$(pwd)/.derivedData"`（在 `app` 目录下执行时）。
+- **构建**：`cd app && xcodebuild -scheme <SchemeName> -configuration Debug -derivedDataPath "$(pwd)/.derivedData" build -quiet`
 - **部署目标**：在 `project.pbxproj` 中设置 `MACOSX_DEPLOYMENT_TARGET`（如 14.0）。
 
 ## 2. 应用图标（无图案问题）
@@ -38,8 +39,8 @@ description: Create and maintain native macOS apps with Xcode (Swift/SwiftUI), a
 - **安装**：在仓库根目录 `npm install husky --save-dev`，`package.json` 中 `"prepare": "husky"`，保证 `npm install` 后自动启用。
 - **钩子建议**：
   - **commit-msg**：校验提交信息非空、长度等（可接 commitlint）。
-  - **pre-commit**：提交前执行 `cd app && xcodebuild -scheme CleanSpace -configuration Debug build -quiet`，确保本次提交可构建。
-  - **pre-push**：推送前再次执行同一构建命令，避免把无法构建的代码推送到远端。
+  - **pre-commit**：提交前执行 `cd app && xcodebuild … -derivedDataPath "$(pwd)/.derivedData" build -quiet`，避免与全局 DerivedData 的 `build.db` 锁冲突。
+  - **pre-push**：同上，使用仓库内 `.derivedData`。
 - **钩子脚本**：放在 `.husky/`，需可执行（`chmod +x`）；可先执行 `. "$(dirname -- "$0")/_/husky.sh"` 再写业务逻辑（注意 Husky 10 将弃用部分用法，以官方文档为准）。
 - **与 Xcode 的关系**：钩子只调用 `xcodebuild`，不依赖 Xcode GUI；CI 也可复用同一命令。
 
@@ -65,3 +66,5 @@ description: Create and maintain native macOS apps with Xcode (Swift/SwiftUI), a
 | 图标资源   | `app/CleanSpace/Assets.xcassets/AppIcon.appiconset/` |
 | 图标源 SVG | `app/design/icon.svg` |
 | Husky 钩子 | `.husky/pre-commit`, `.husky/commit-msg`, `.husky/pre-push` |
+| 工作区 Derived Data | `app/CleanSpace.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings` |
+| app 构建说明 | `app/README.md` |

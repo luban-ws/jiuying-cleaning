@@ -4,7 +4,7 @@
   "private": true,
   "description": "macOS clean app - browser, Docker, AI tools space management",
   "scripts": {
-    "build:app": "cd app && xcodebuild -scheme CleanSpace -configuration Debug build -quiet",
+    "build:app": "cd app && xcodebuild -scheme CleanSpace -configuration Debug -derivedDataPath \"$(pwd)/.derivedData\" build -quiet",
     "prepare": "husky"
   },
   "devDependencies": {
