@@ -31,6 +31,8 @@ struct RulesWorkspaceView: View {
     @State private var showCleanResult = false
     @State private var showDryRunSheet = false
     @State private var rulesToClean: [CleaningRule] = []
+    /// RFC 004：分析后若捕获权限拒绝则展示引导条。
+    @State private var showFullDiskAccessBanner = false
 
     private var presentation: RulesWorkspacePresentation {
         scope == .performance ? .performance : .storage
@@ -301,6 +303,16 @@ struct RulesWorkspaceView: View {
     private var workspaceHeaderSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             CSWorkspaceGuideBanner(text: workspaceGuideText, systemImage: workspaceGuideSymbol)
+            if showFullDiskAccessBanner {
+                FullDiskAccessBanner(
+                    onOpenSettings: { FullDiskAccessGuidance.openFullDiskAccessSettings() },
+                    onLater: { showFullDiskAccessBanner = false },
+                    onDontAskAgain: {
+                        FullDiskAccessGuidance.suppressGuidancePermanently()
+                        showFullDiskAccessBanner = false
+                    }
+                )
+            }
             overviewChips
         }
         .padding(.horizontal, CS.detailHorizontalPadding)
@@ -371,18 +383,27 @@ struct RulesWorkspaceView: View {
         Task {
             var next: [String: Int64] = [:]
             var nextProcessCounts: [String: Int] = [:]
+            var denialReport = AccessDenialReport.empty
             for rule in rules {
                 if rule.displaysScannedProcessCount {
                     let processes = await McpLeakedProcessCleaner.listLeakedProcessesInBackground()
                     nextProcessCounts[rule.id] = processes.count
                     next[rule.id] = processes.reduce(0) { $0 + $1.rssBytes }
-                } else if let b = scanRule(rule) {
-                    next[rule.id] = b
+                } else {
+                    let outcome = scanRuleWithAccessReport(rule)
+                    if let b = outcome.bytes {
+                        next[rule.id] = b
+                    }
+                    denialReport.merge(outcome.accessDenial)
                 }
             }
+            let shouldShowBanner = FullDiskAccessGuidance.shouldPresentBanner(
+                deniedPaths: denialReport.deniedPaths
+            )
             await MainActor.run {
                 scannedSizes = next
                 scannedProcessCounts = nextProcessCounts
+                showFullDiskAccessBanner = shouldShowBanner
                 isScanning = false
             }
         }

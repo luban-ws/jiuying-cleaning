@@ -33,17 +33,37 @@ private func expandBasePaths(base: String) -> [String] {
     return [base]
 }
 
-/// 对单条 dir 规则，解析出所有要扫描/删除的绝对路径（`dir` + `paths`；`command` 规则返回空数组）。
-func resolvePaths(for rule: CleaningRule) -> [String] {
-    guard rule.type == .dir, let paths = rule.paths else { return [] }
+/// 列出目录内容；权限拒绝写入 `report`（RFC 004 主触发证据）。
+private func contentsOfDirectoryCapturingDenial(at path: String, report: inout AccessDenialReport) -> [String] {
+    do {
+        return try FileManager.default.contentsOfDirectory(atPath: path)
+    } catch {
+        report.recordDenial(at: path, error: error)
+        return []
+    }
+}
+
+/// 对已存在的目录主动探测枚举权限（捕获 TCC 拒绝，避免静默得到 0 字节）。
+private func probeDirectoryAccess(at path: String, report: inout AccessDenialReport) {
+    var isDir: ObjCBool = false
+    guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else { return }
+    _ = contentsOfDirectoryCapturingDenial(at: path, report: &report)
+}
+
+/// 对单条 dir 规则解析路径，并收集枚举时的权限拒绝。
+func resolvePathsWithAccessReport(for rule: CleaningRule) -> (paths: [String], accessDenial: AccessDenialReport) {
+    guard rule.type == .dir, let paths = rule.paths else {
+        return ([], .empty)
+    }
     var result: [String] = []
+    var report = AccessDenialReport.empty
     for p in paths {
         let originalBase = expandingTilde(in: p.base)
         let bases = expandBasePaths(base: originalBase)
         for base in bases {
             for d in p.dirs {
                 if d == "*" {
-                    guard let contents = try? FileManager.default.contentsOfDirectory(atPath: base) else { continue }
+                    let contents = contentsOfDirectoryCapturingDenial(at: base, report: &report)
                     result.append(contentsOf: contents.map { (base as NSString).appendingPathComponent($0) })
                 } else if d.contains("*") {
                     let parts = d.components(separatedBy: "/")
@@ -52,9 +72,8 @@ func resolvePaths(for rule: CleaningRule) -> [String] {
                         var nextPaths: [String] = []
                         for curr in currentPaths {
                             if part == "*" {
-                                if let contents = try? FileManager.default.contentsOfDirectory(atPath: curr) {
-                                    nextPaths.append(contentsOf: contents.map { (curr as NSString).appendingPathComponent($0) })
-                                }
+                                let contents = contentsOfDirectoryCapturingDenial(at: curr, report: &report)
+                                nextPaths.append(contentsOf: contents.map { (curr as NSString).appendingPathComponent($0) })
                             } else {
                                 let nextPath = (curr as NSString).appendingPathComponent(part)
                                 nextPaths.append(nextPath)
@@ -64,12 +83,19 @@ func resolvePaths(for rule: CleaningRule) -> [String] {
                     }
                     result.append(contentsOf: currentPaths)
                 } else {
-                    result.append((base as NSString).appendingPathComponent(d))
+                    let full = (base as NSString).appendingPathComponent(d)
+                    result.append(full)
+                    probeDirectoryAccess(at: full, report: &report)
                 }
             }
         }
     }
-    return result
+    return (result, report)
+}
+
+/// 对单条 dir 规则，解析出所有要扫描/删除的绝对路径（`dir` + `paths`；`command` 规则返回空数组）。
+func resolvePaths(for rule: CleaningRule) -> [String] {
+    resolvePathsWithAccessReport(for: rule).paths
 }
 
 /// 演练用：目录规则为「将作用的目标路径 + 是否已存在于磁盘」；命令规则为将执行的 shell（若无则为空）。
@@ -98,10 +124,26 @@ func ruleDryRunPayload(for rule: CleaningRule) -> RuleDryRunPayload {
     }
 }
 
-/// 递归计算目录占用字节（仅统计文件；`options` 默认可跳过隐藏项以贴近访达部分视图）
-func directorySizeBytes(url: URL, enumeratorOptions: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles]) -> Int64 {
+/// 递归计算目录占用字节，并在无法创建 enumerator 时探测权限拒绝。
+func directorySizeBytesWithAccessReport(
+    url: URL,
+    enumeratorOptions: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles]
+) -> (bytes: Int64, accessDenial: AccessDenialReport) {
     let fm = FileManager.default
-    guard let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey], options: enumeratorOptions) else { return 0 }
+    var report = AccessDenialReport.empty
+    guard let enumerator = fm.enumerator(
+        at: url,
+        includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey],
+        options: enumeratorOptions
+    ) else {
+        // enumerator 为 nil 时主动枚举一次，以拿到可判定的 errno/Cocoa 错误
+        do {
+            _ = try fm.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+        } catch {
+            report.recordDenial(at: url.path, error: error)
+        }
+        return (0, report)
+    }
     var total: Int64 = 0
     for case let fileURL as URL in enumerator {
         guard let resource = try? fileURL.resourceValues(forKeys: [.fileSizeKey, .isDirectoryKey]),
@@ -109,34 +151,58 @@ func directorySizeBytes(url: URL, enumeratorOptions: FileManager.DirectoryEnumer
               let size = resource.fileSize else { continue }
         total += Int64(size)
     }
-    return total
+    return (total, report)
+}
+
+/// 递归计算目录占用字节（仅统计文件；`options` 默认可跳过隐藏项以贴近访达部分视图）
+func directorySizeBytes(url: URL, enumeratorOptions: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles]) -> Int64 {
+    directorySizeBytesWithAccessReport(url: url, enumeratorOptions: enumeratorOptions).bytes
+}
+
+/// 单条规则扫描结果（体积 + RFC 004 权限拒绝证据）。
+struct RuleScanOutcome: Sendable {
+    var bytes: Int64?
+    var accessDenial: AccessDenialReport
+}
+
+/// 扫描单条规则占用，并收集权限拒绝路径。
+func scanRuleWithAccessReport(_ rule: CleaningRule) -> RuleScanOutcome {
+    if rule.id == McpLeakedProcessCleaner.ruleId {
+        return RuleScanOutcome(bytes: McpLeakedProcessCleaner.scanTotalRSSBytes(), accessDenial: .empty)
+    }
+    switch rule.type {
+    case .dir:
+        let resolved = resolvePathsWithAccessReport(for: rule)
+        var report = resolved.accessDenial
+        var total: Int64 = 0
+        for path in resolved.paths {
+            let url = URL(fileURLWithPath: path)
+            var isDir: ObjCBool = false
+            guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else { continue }
+            if isDir.boolValue {
+                let sized = directorySizeBytesWithAccessReport(url: url)
+                total += sized.bytes
+                report.merge(sized.accessDenial)
+            } else {
+                do {
+                    let attrs = try FileManager.default.attributesOfItem(atPath: url.path)
+                    if let size = attrs[.size] as? Int64 {
+                        total += size
+                    }
+                } catch {
+                    report.recordDenial(at: url.path, error: error)
+                }
+            }
+        }
+        return RuleScanOutcome(bytes: total, accessDenial: report)
+    case .command:
+        return RuleScanOutcome(bytes: nil, accessDenial: .empty)
+    }
 }
 
 /// 扫描单条规则占用（dir 为实际字节，command 返回 nil 表示用 estimate）
 func scanRule(_ rule: CleaningRule) -> Int64? {
-    if rule.id == McpLeakedProcessCleaner.ruleId {
-        return McpLeakedProcessCleaner.scanTotalRSSBytes()
-    }
-    switch rule.type {
-    case .dir:
-        let urls = resolvePaths(for: rule).map { URL(fileURLWithPath: $0) }
-        var total: Int64 = 0
-        for url in urls {
-            var isDir: ObjCBool = false
-            guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else { continue }
-            if isDir.boolValue {
-                total += directorySizeBytes(url: url)
-            } else {
-                if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
-                   let size = attrs[.size] as? Int64 {
-                    total += size
-                }
-            }
-        }
-        return total
-    case .command:
-        return nil
-    }
+    scanRuleWithAccessReport(rule).bytes
 }
 
 /// 执行单条规则清理

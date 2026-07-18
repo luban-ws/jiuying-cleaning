@@ -104,17 +104,23 @@ enum VolumeScannerService {
         return result
     }
 
-    /// 扫描某卷根目录下一层文件夹占用（跳过快照等常见系统项以减轻耗时）
-    /// 枚举时包含隐藏文件、并对 `/var`↔`/private` 等重复挂载点去重；仍可能小于系统「已用」——见界面「未由扫描计入」说明。
-    static func scanTopLevelFolders(on volume: URL) async -> [TopLevelFolderSize] {
+    /// 扫描某卷根目录下一层文件夹占用，并收集权限拒绝（RFC 004）。
+    static func scanTopLevelFoldersWithAccessReport(on volume: URL) async -> (folders: [TopLevelFolderSize], accessDenial: AccessDenialReport) {
         await Task.detached {
             let fm = FileManager.default
             let skipPrefixes = ["com.apple", ".Spotlight", ".fseventsd", ".TemporaryItems"]
-            guard let entries = try? fm.contentsOfDirectory(
-                at: volume,
-                includingPropertiesForKeys: [.isDirectoryKey],
-                options: [.skipsHiddenFiles]
-            ) else { return [] }
+            var report = AccessDenialReport.empty
+            let entries: [URL]
+            do {
+                entries = try fm.contentsOfDirectory(
+                    at: volume,
+                    includingPropertiesForKeys: [.isDirectoryKey],
+                    options: [.skipsHiddenFiles]
+                )
+            } catch {
+                report.recordDenial(at: volume.path, error: error)
+                return ([], report)
+            }
 
             var candidates: [(url: URL, name: String)] = []
             for entry in entries {
@@ -129,11 +135,17 @@ enum VolumeScannerService {
             let deduped = VolumeDiskAccounting.filterCanonicalRootDuplicates(candidates: candidates)
             var rows: [TopLevelFolderSize] = []
             for (entry, name) in deduped {
-                // 磁盘页：尽量不跳过隐藏子项，更接近 du；无权限子树仍会偏少
-                let bytes = directorySizeBytes(url: entry, enumeratorOptions: [])
-                rows.append(TopLevelFolderSize(name: name, path: entry.path, bytes: bytes))
+                let sized = directorySizeBytesWithAccessReport(url: entry, enumeratorOptions: [])
+                report.merge(sized.accessDenial)
+                rows.append(TopLevelFolderSize(name: name, path: entry.path, bytes: sized.bytes))
             }
-            return rows.sorted { $0.bytes > $1.bytes }
+            return (rows.sorted { $0.bytes > $1.bytes }, report)
         }.value
+    }
+
+    /// 扫描某卷根目录下一层文件夹占用（跳过快照等常见系统项以减轻耗时）
+    /// 枚举时包含隐藏文件、并对 `/var`↔`/private` 等重复挂载点去重；仍可能小于系统「已用」——见界面「未由扫描计入」说明。
+    static func scanTopLevelFolders(on volume: URL) async -> [TopLevelFolderSize] {
+        await scanTopLevelFoldersWithAccessReport(on: volume).folders
     }
 }

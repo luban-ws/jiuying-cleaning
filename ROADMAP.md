@@ -32,7 +32,7 @@
 | 1 | [001](docs/rfc/001-ccleaner-style-cleaning-spec.md) | CCleaner 式清理规范（路径、规则、安全边界） | 实施中 | 规范母本；缺口拆至 002–009 |
 | 2 | [002](docs/rfc/002-builtin-rules-catalog-parity.md) | 内置规则与 RFC 001 目录对齐 | 已完成 | 对照矩阵固定：[appendix-002](docs/rfc/appendix-002-rfc001-rules-matrix.md)；补全 `cleaning-rules.json` |
 | 3 | [003](docs/rfc/003-chromium-profile-discovery.md) | Chromium 多 Profile 路径解析 | 已完成 | 依赖 002 浏览器规则基线 |
-| 4 | [004](docs/rfc/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 草案 | 权限 UX；主触发须 errno/API，禁止仅靠「体积为 0」 |
+| 4 | [004](docs/rfc/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 已完成 | 主触发须 errno/API；`FullDiskAccessBanner`；手工关 FDA 账号可复验 |
 | 5 | [009](docs/rfc/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 草案 | **实施上先于 005/006**：单一校验模块、argv 白名单；加载/保存/导入共用 |
 | 6 | [005](docs/rfc/005-user-rules-yaml-and-settings-editor.md) | 用户规则 YAML 与设置内编辑器 | 草案 | 调用 009；JSON 必选、YAML 可选；保存后内存重载 |
 | 7 | [006](docs/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |

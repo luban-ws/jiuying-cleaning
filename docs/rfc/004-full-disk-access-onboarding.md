@@ -1,9 +1,19 @@
 # RFC 004：完全磁盘访问与受限路径引导
 
-**状态**：草案  
+**状态**：已完成  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
 **依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 风险与权限
+
+---
+
+## 实现备注（与代码对齐）
+
+- 触发逻辑：`FullDiskAccessGuidance`（须有 `EPERM`/`EACCES`/Cocoa 无权限错误；**禁止**仅因体积为 0）。
+- 扫描侧收集拒绝路径：`scanRuleWithAccessReport`、`scanTopLevelFoldersWithAccessReport`。
+- 共用 UI：`FullDiskAccessBanner`（规则工作区 + 磁盘页）。
+- 系统设置跳转：`FullDiskAccessGuidance.openFullDiskAccessSettings()`（Ventura+ URL 优先，旧 pane 回退）。
+- 手工验收：用未授予「完全磁盘访问」的账号扫描含 `~/Library/Mail` 等规则；CI 单测覆盖触发条件（见 `FullDiskAccessGuidanceTests`）。
 
 ---
 

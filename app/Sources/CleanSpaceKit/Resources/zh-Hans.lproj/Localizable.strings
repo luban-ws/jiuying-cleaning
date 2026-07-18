@@ -40,6 +40,15 @@
 "common.cancel" = "取消";
 "common.ok" = "好";
 
+"fda.banner.title" = "可能需要「完全磁盘访问」";
+"fda.banner.body" = "CleanSpace 在读取受保护路径时收到权限拒绝。请在系统设置中授予「完全磁盘访问」，以便正确扫描邮件、Safari 等受保护文件夹的真实占用。";
+"fda.banner.honest_note" = "未授予完全磁盘访问时，部分项可能显示为 0 或不可用，并不代表没有可清理数据。";
+"fda.banner.open_settings" = "打开完全磁盘访问";
+"fda.banner.later" = "稍后";
+"fda.banner.dont_ask_again" = "不再提示";
+"fda.banner.help.open_settings" = "打开系统设置 → 隐私与安全性 → 完全磁盘访问。";
+"fda.banner.help.dont_ask_again" = "隐藏本引导，直至重置应用偏好。";
+
 "sidebar.rules" = "规则清理";
 "sidebar.ai_tools_space" = "AI 工具 · 空间";
 "sidebar.performance" = "性能";

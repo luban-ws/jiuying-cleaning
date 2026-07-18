@@ -32,7 +32,7 @@
 | TASK-001-06 | 单元测试：规则 JSON 解码、卷对账纯函数 | 已完成 | `CleanSpaceTests` |
 | TASK-001-07 | 内置规则覆盖 RFC 所列浏览器/系统/Docker/AI 路径 | 已完成 | 跟踪改挂 **[RFC 002](docs/rfc/002-builtin-rules-catalog-parity.md)** |
 | TASK-001-08 | 清理预演 / 仅列出将删除项 | 已完成 | 规则页「预览」已实现；增强项另议 |
-| TASK-001-09 | 完全磁盘访问等权限引导 | 待办 | 跟踪改挂 **[RFC 004](docs/rfc/004-full-disk-access-onboarding.md)** |
+| TASK-001-09 | 完全磁盘访问等权限引导 | 进行中 | 跟踪改挂 **[RFC 004](docs/rfc/004-full-disk-access-onboarding.md)** |
 | TASK-001-10 | 用户规则 YAML 与「自定义规则」设置页 | 待办 | 跟踪改挂 **[RFC 005](docs/rfc/005-user-rules-yaml-and-settings-editor.md)** |
 | TASK-001-11 | 规则导入/导出 | 待办 | 跟踪改挂 **[RFC 006](docs/rfc/006-rules-import-and-export.md)** |
 | TASK-001-12 | 操作审计（撤销另开 RFC） | 待办 | 跟踪改挂 **[RFC 007](docs/rfc/007-post-clean-audit-log.md)** |
@@ -62,9 +62,9 @@
 
 | ID | 任务 | 状态 | 备注 |
 |----|------|------|------|
-| TASK-004-01 | 主触发（errno/API 拒绝 + 已知前缀）；辅触发；**禁止**仅靠「体积为 0」；共用提示组件（L10n） | 待办 | 含「未授权可能显示 0」诚实文案 |
-| TASK-004-02 | 可选：跳转系统设置中完全磁盘访问页 | 待办 | 版本差异需兼容策略 |
-| TASK-004-03 | 回归：无拒绝错误时不得仅因体积 0 反复弹窗 | 待办 | UI 或逻辑单测；CI 不可行则标手工 |
+| TASK-004-01 | 主触发（errno/API 拒绝 + 已知前缀）；辅触发；**禁止**仅靠「体积为 0」；共用提示组件（L10n） | 已完成 | `FullDiskAccessGuidance` + `FullDiskAccessBanner`；含诚实文案 |
+| TASK-004-02 | 可选：跳转系统设置中完全磁盘访问页 | 已完成 | Ventura+ `PrivacySecurity.extension` URL，旧 pane 回退 |
+| TASK-004-03 | 回归：无拒绝错误时不得仅因体积 0 反复弹窗 | 已完成 | `FullDiskAccessGuidanceTests`；手工：关 FDA 账号扫受限路径 |
 
 ---
 

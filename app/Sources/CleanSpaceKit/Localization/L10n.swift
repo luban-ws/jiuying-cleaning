@@ -20,6 +20,18 @@ enum L10n {
         static var ok: String { tr("common.ok") }
     }
 
+    /// RFC 004：完全磁盘访问引导文案（规则页与磁盘页共用）。
+    enum FullDiskAccess {
+        static var bannerTitle: String { tr("fda.banner.title") }
+        static var bannerBody: String { tr("fda.banner.body") }
+        static var honestNote: String { tr("fda.banner.honest_note") }
+        static var openSettings: String { tr("fda.banner.open_settings") }
+        static var later: String { tr("fda.banner.later") }
+        static var dontAskAgain: String { tr("fda.banner.dont_ask_again") }
+        static var helpOpenSettings: String { tr("fda.banner.help.open_settings") }
+        static var helpDontAskAgain: String { tr("fda.banner.help.dont_ask_again") }
+    }
+
     enum Sidebar {
         static var rules: String { tr("sidebar.rules") }
         static var aiToolsSpace: String { tr("sidebar.ai_tools_space") }

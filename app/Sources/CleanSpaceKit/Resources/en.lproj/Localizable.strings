@@ -40,6 +40,15 @@
 "common.cancel" = "Cancel";
 "common.ok" = "OK";
 
+"fda.banner.title" = "Full Disk Access may be required";
+"fda.banner.body" = "CleanSpace hit a permission denial while reading a protected path. Grant Full Disk Access in System Settings so scans can see real sizes for Mail, Safari, and other protected folders.";
+"fda.banner.honest_note" = "Without Full Disk Access, some items may show 0 or appear unavailable — that does not mean there is nothing to clean.";
+"fda.banner.open_settings" = "Open Full Disk Access";
+"fda.banner.later" = "Later";
+"fda.banner.dont_ask_again" = "Don't ask again";
+"fda.banner.help.open_settings" = "Opens Privacy & Security → Full Disk Access in System Settings.";
+"fda.banner.help.dont_ask_again" = "Hide this guidance until you reset app preferences.";
+
 "sidebar.rules" = "Rules";
 "sidebar.ai_tools_space" = "AI tools · Space";
 "sidebar.performance" = "Performance";

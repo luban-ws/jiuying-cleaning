@@ -328,6 +328,8 @@ private struct VolumesWorkspaceView: View {
     @State private var selectedVolumeID: String?
     @State private var topFolders: [TopLevelFolderSize] = []
     @State private var scanning = false
+    /// RFC 004：顶层扫描遇到权限拒绝时展示引导。
+    @State private var showFullDiskAccessBanner = false
 
     private var selectedVolume: MountedVolume? {
         guard let id = selectedVolumeID else { return nil }
@@ -365,6 +367,21 @@ private struct VolumesWorkspaceView: View {
                     }
 
                     if let vol = selectedVolume {
+                        if showFullDiskAccessBanner {
+                            Section {
+                                FullDiskAccessBanner(
+                                    onOpenSettings: { FullDiskAccessGuidance.openFullDiskAccessSettings() },
+                                    onLater: { showFullDiskAccessBanner = false },
+                                    onDontAskAgain: {
+                                        FullDiskAccessGuidance.suppressGuidancePermanently()
+                                        showFullDiskAccessBanner = false
+                                    }
+                                )
+                            }
+                            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                            .listRowBackground(Color.clear)
+                        }
+
                         Section {
                             CSVolumeHeroPanel(
                                 volumeName: vol.name,
@@ -528,9 +545,13 @@ private struct VolumesWorkspaceView: View {
         scanning = true
         topFolders = []
         Task {
-            let rows = await VolumeScannerService.scanTopLevelFolders(on: vol.url)
+            let outcome = await VolumeScannerService.scanTopLevelFoldersWithAccessReport(on: vol.url)
+            let shouldShowBanner = FullDiskAccessGuidance.shouldPresentBanner(
+                deniedPaths: outcome.accessDenial.deniedPaths
+            )
             await MainActor.run {
-                topFolders = rows
+                topFolders = outcome.folders
+                showFullDiskAccessBanner = shouldShowBanner
                 scanning = false
             }
         }
