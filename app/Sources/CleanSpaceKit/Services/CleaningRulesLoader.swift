@@ -39,9 +39,33 @@ final class CleaningRulesLoader {
     /// 若存在则加载用户规则，否则返回空数组
     static func loadUserRules() -> [CleaningRule] {
         guard let url = userRulesURL, FileManager.default.fileExists(atPath: url.path) else { return [] }
-        guard let data = try? Data(contentsOf: url),
-              let rules = try? JSONDecoder().decode([CleaningRule].self, from: data) else { return [] }
-        return rules
+        return loadUserRules(from: url).acceptedRules
+    }
+
+    /// 从指定文件加载并校验用户规则；非法条按条拒绝，解析失败拒绝整文件。
+    static func loadUserRules(
+        from url: URL,
+        policy: UserRuleValidationPolicy = .init()
+    ) -> UserRulesValidationReport {
+        do {
+            let data = try Data(contentsOf: url)
+            let rules = try JSONDecoder().decode([CleaningRule].self, from: data)
+            return UserRuleValidator.validate(rules, policy: policy)
+        } catch let error as DecodingError {
+            return UserRulesValidationReport(
+                acceptedRules: [],
+                errors: [
+                    UserRuleValidationIssue(ruleId: "", reason: .fileDecodeFailed, detail: String(describing: error)),
+                ]
+            )
+        } catch {
+            return UserRulesValidationReport(
+                acceptedRules: [],
+                errors: [
+                    UserRuleValidationIssue(ruleId: "", reason: .fileReadFailed, detail: error.localizedDescription),
+                ]
+            )
+        }
     }
 
     /// 合并内置 + 用户规则（用户规则 id 若与内置重复则覆盖）

@@ -33,7 +33,7 @@
 | 2 | [002](docs/rfc/002-builtin-rules-catalog-parity.md) | 内置规则与 RFC 001 目录对齐 | 已完成 | 对照矩阵固定：[appendix-002](docs/rfc/appendix-002-rfc001-rules-matrix.md)；补全 `cleaning-rules.json` |
 | 3 | [003](docs/rfc/003-chromium-profile-discovery.md) | Chromium 多 Profile 路径解析 | 已完成 | 依赖 002 浏览器规则基线 |
 | 4 | [004](docs/rfc/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 已完成 | 主触发须 errno/API；`FullDiskAccessBanner`；手工关 FDA 账号可复验 |
-| 5 | [009](docs/rfc/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 草案 | **实施上先于 005/006**：单一校验模块、argv 白名单；加载/保存/导入共用 |
+| 5 | [009](docs/rfc/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 已完成 | 校验模块 + 用户规则加载器接线 + 单测 + 白名单文档已落地；`exclude`/`minSizeBytes` 推迟到 Phase 2；005/006 保存/导入复用同入口 |
 | 6 | [005](docs/rfc/005-user-rules-yaml-and-settings-editor.md) | 用户规则 YAML 与设置内编辑器 | 草案 | 调用 009；JSON 必选、YAML 可选；保存后内存重载 |
 | 7 | [006](docs/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
 | 8 | [007](docs/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |

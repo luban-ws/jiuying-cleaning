@@ -1,11 +1,13 @@
 # RFC 009：用户规则安全边界与路径/命令约束
 
-**状态**：草案  
+**状态**：已完成  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
 **依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 安全与校验。
 
 **调用方（依赖本 RFC，而非反向依赖）**：[RFC 005](./005-user-rules-yaml-and-settings-editor.md)（保存/加载）、[RFC 006](./006-rules-import-and-export.md)（导入）、内置与用户规则统一加载器。
+
+**实现进度**：`UserRuleValidator` + `CleaningRulesLoader.loadUserRules(from:policy:)` + `UserRuleValidatorTests` + [argv 白名单文档](../user-rule-command-whitelist.md)（TASK-009-01/02/03 核心）；保存/导入接线随 RFC 005/006 复用同一入口；`exclude` / `minSizeBytes` 明确推迟到后续 Phase 2，不属于本次完成口径。
 
 ---
 
@@ -33,9 +35,9 @@
   2. **固定子命令表**：在 argv[0] 已白名单前提下，**仅允许**第二段及后续为文档化子命令前缀（如 `docker system prune` 的允许 token 序列），用 **token 级比对** 而非整条 shell 正则。
   **不在白名单**：**禁止保存**用户规则与导入（不采用「标记 high 仅二次确认即可任意命令」的宽松模式，以降低 RCE 面）。内置规则中的命令类项不受本「用户规则」条限制，但须单独 code review。
 
-**可选（同一 RFC 内子阶段）**
+**可选（明确推迟）**
 
-- Schema 扩展：`exclude` 子路径列表；或 `minSizeBytes` 仅清理超过阈值的直接子项（实现复杂度较高时可标为 Phase 2）。
+- Schema 扩展：`exclude` 子路径列表；或 `minSizeBytes` 仅清理超过阈值的直接子项。当前完成口径不扩展 schema，避免把用户规则安全基线和扫描/清理语义绑在一起；后续如需要，另开 Phase 2 任务并补扫描、预览、清理一致性测试。
 
 **不在本 RFC 内**
 
