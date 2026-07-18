@@ -3,7 +3,7 @@
 **状态**：已完成  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
-**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) § 多配置/多 profile
+**依赖**：[RFC 001](../001-ccleaner-style-cleaning-spec.md) § 多配置/多 profile
 
 ---
 

@@ -31,7 +31,7 @@
 ### 1. 身份与状态管理
 我使用 RFC 来跟踪重要工作和设计变更。所有的重大架构决策必须先通过 RFC。
 
-*   **命名格式**: `docs/rfc/NNNN-<short-name>.md`
+*   **命名格式**: `.spec/rfc/NNNN-<short-name>.md`
 *   **编号规则**: 4 位数字，严格递增 (如 `0001`)。
 *   **状态流转**:
     `Draft` (草案) -> `Proposed` (提案) -> `Accepted` (通过) -> `Implemented` (已落实) -> `Deprecated/Rejected` (废弃/拒绝)

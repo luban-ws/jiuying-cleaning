@@ -19,7 +19,7 @@
 ## 2. 浏览器 (browser)
 
 > [!NOTE]
-> Chromium 多 Profile 的目录动态解析展开由 [RFC 003](./003-chromium-profile-discovery.md) 处理，此处矩阵为通用模板映射（如 `Default` 配置或通配符表示的通用路径，不在矩阵中按各 profile 展开占行）。
+> Chromium 多 Profile 的目录动态解析展开由 [RFC 003](./completed/003-chromium-profile-discovery.md) 处理，此处矩阵为通用模板映射（如 `Default` 配置或通配符表示的通用路径，不在矩阵中按各 profile 展开占行）。
 
 ### 2.1 Google Chrome
 | RFC 001 项 | 规则 ID | 清理类型 | 风险等级 | 默认路径/命令 | 状态 | 备注 |

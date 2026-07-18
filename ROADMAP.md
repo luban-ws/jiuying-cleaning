@@ -6,7 +6,7 @@
 - 变更范围、状态或完成度时：**必须**同时更新本表、**`TASK_TRACKING.md`**、对应 RFC 头部 `**状态**`，不得只改代码或只改 RFC。
 - 认领/关闭工作项时：**必须**在 **`TASK_TRACKING.md`** 中更新对应 **ID** 的状态与备注。
 
-本文件与 **`TASK_TRACKING.md`**、**`docs/rfc/`** 下的 RFC 正文配合使用：
+本文件与 **`TASK_TRACKING.md`**、**`.spec/rfc/`** 下的 RFC 正文配合使用：
 
 - **路线图（本文件）**：RFC 的**优先级顺序**、**生命周期状态**、阶段划分。
 - **任务跟踪**：可执行的细项、负责人占位、与 PR/提交的对应关系。
@@ -20,7 +20,7 @@
 | **评审中** | 可评审；待结论。 |
 | **已批准** | 范围冻结，可按任务跟踪实施。 |
 | **实施中** | 已有代码落地，尚未达到 RFC 验收口径。 |
-| **已完成** | 达到当前 RFC 约定的验收范围（可移入 `docs/rfc/completed/` 若日后启用归档目录）。 |
+| **已完成** | 达到当前 RFC 约定的验收范围（可移入 `.spec/rfc/completed/` 若日后启用归档目录）。 |
 | **已搁置** | 明确不做或无限期推迟（需简短原因）。 |
 
 ## RFC 顺序与状态（权威表）
@@ -29,16 +29,16 @@
 
 | 顺序 | RFC | 标题 | 路线图状态 | 备注 |
 |------|-----|------|------------|------|
-| 1 | [001](docs/rfc/001-ccleaner-style-cleaning-spec.md) | CCleaner 式清理规范（路径、规则、安全边界） | 实施中 | 规范母本；缺口拆至 002–009 |
-| 2 | [002](docs/rfc/002-builtin-rules-catalog-parity.md) | 内置规则与 RFC 001 目录对齐 | 已完成 | 对照矩阵固定：[appendix-002](docs/rfc/appendix-002-rfc001-rules-matrix.md)；补全 `cleaning-rules.json` |
-| 3 | [003](docs/rfc/003-chromium-profile-discovery.md) | Chromium 多 Profile 路径解析 | 已完成 | 依赖 002 浏览器规则基线 |
-| 4 | [004](docs/rfc/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 已完成 | 主触发须 errno/API；`FullDiskAccessBanner`；手工关 FDA 账号可复验 |
-| 5 | [009](docs/rfc/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 已完成 | 校验模块 + 用户规则加载器接线 + 单测 + 白名单文档已落地；`exclude`/`minSizeBytes` 推迟到 Phase 2；005/006 保存/导入复用同入口 |
-| 6 | [005](docs/rfc/005-user-rules-yaml-and-settings-editor.md) | 用户规则 YAML 与设置内编辑器 | 草案 | 调用 009；JSON 必选、YAML 可选；保存后内存重载 |
-| 7 | [006](docs/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
-| 8 | [007](docs/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
-| 9 | [008](docs/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
-| 10 | [010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
+| 1 | [001](.spec/rfc/001-ccleaner-style-cleaning-spec.md) | CCleaner 式清理规范（路径、规则、安全边界） | 实施中 | 规范母本；缺口拆至 002–009 |
+| 2 | [002](.spec/rfc/completed/002-builtin-rules-catalog-parity.md) | 内置规则与 RFC 001 目录对齐 | 已完成 | 对照矩阵固定：[appendix-002](.spec/rfc/appendix-002-rfc001-rules-matrix.md)；补全 `cleaning-rules.json` |
+| 3 | [003](.spec/rfc/completed/003-chromium-profile-discovery.md) | Chromium 多 Profile 路径解析 | 已完成 | 依赖 002 浏览器规则基线 |
+| 4 | [004](.spec/rfc/completed/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 已完成 | 主触发须 errno/API；`FullDiskAccessBanner`；手工关 FDA 账号可复验 |
+| 5 | [009](.spec/rfc/completed/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 已完成 | 校验模块 + 用户规则加载器接线 + 单测 + 白名单文档已落地；`exclude`/`minSizeBytes` 推迟到 Phase 2；005/006 保存/导入复用同入口 |
+| 6 | [005](.spec/rfc/005-user-rules-yaml-and-settings-editor.md) | 用户规则 YAML 与设置内编辑器 | 草案 | 调用 009；JSON 必选、YAML 可选；保存后内存重载 |
+| 7 | [006](.spec/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
+| 8 | [007](.spec/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
+| 9 | [008](.spec/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
+| 10 | [010](.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
 
 ## 阶段概览（与 RFC 001 对齐）
 
@@ -52,5 +52,5 @@
 ## 维护约定
 
 1. 变更 RFC 范围或状态时：**同时**更新本表、对应 RFC 头部 `**状态**：…`，并在 **`TASK_TRACKING.md`** 中增删或勾选任务（**不得遗漏**）。
-2. 完成某一 RFC 的约定交付后：将路线图状态改为 **已完成**，任务表对应项标为完成，并考虑将 RFC 文件移至 `docs/rfc/completed/`（若目录已创建）。
+2. 完成某一 RFC 的约定交付后：将路线图状态改为 **已完成**，任务表对应项标为完成，并考虑将 RFC 文件移至 `.spec/rfc/completed/`（若目录已创建）。
 3. **顺序列**表示建议实施先后；与 RFC 数字编号无关时**以本表顺序为准**（例如 009 列为 5，优先于 005/006）。

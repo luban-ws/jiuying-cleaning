@@ -3,7 +3,7 @@
 **状态**：草案  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
-**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 长期能力、用户规则存放与合并；[RFC 009](./009-user-rule-safety-and-exclusions.md)（校验器由 009 定义，本 RFC **调用**该校验，不复制安全策略）。
+**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 长期能力、用户规则存放与合并；[RFC 009](./completed/009-user-rule-safety-and-exclusions.md)（校验器由 009 定义，本 RFC **调用**该校验，不复制安全策略）。
 
 ---
 
@@ -26,13 +26,13 @@ v1 已支持 `user-cleaning-rules.json` 与内置合并。RFC 001「后续」提
 
 - 用户规则文件（固定目录 `~/Library/Application Support/CleanSpace/`）：**`user-cleaning-rules.json` 为必选实现**；**`user-cleaning-rules.yaml` 为可选**。**定案加载顺序**：若仅存在其一，则加载该文件；若二者均存在，先载入 JSON 全部条目，再载入 YAML；**同一 `id` 以 YAML 中定义覆盖 JSON**（仅 YAML 出现的 `id` 则追加）。实现须在 `AGENTS.md` 或开发者文档中写明该顺序。
 - 设置（或独立窗口）中列表展示用户规则；编辑后写回并 **定案：保存成功后立即触发与启动时相同的规则加载路径，使当前会话内列表与合并结果更新**（无需重启）。若某平台版本存在技术阻碍，须在首版实现 PR 中说明并 **临时** 退化为「下次启动生效」，且须在矩阵/ROADMAP 标明为技术债并在同一 RFC 周期内收回。
-- **校验**：保存与加载路径均须调用 [RFC 009](./009-user-rule-safety-and-exclusions.md) 规定的**单一校验模块**（`type` / `paths` / `command` 等与 001 schema 及安全策略一致）；错误时阻止保存并指出字段。
+- **校验**：保存与加载路径均须调用 [RFC 009](./completed/009-user-rule-safety-and-exclusions.md) 规定的**单一校验模块**（`type` / `paths` / `command` 等与 001 schema 及安全策略一致）；错误时阻止保存并指出字段。
 - **`disableBuiltinIds`**（001 已提及）**定案于本 RFC**：语义与字段名以 RFC 001 为准；009 仅校验其形式（若属于用户规则 schema 一部分），**不**另起冲突定义。
 
 **不在本 RFC 内**
 
 - 导入/导出文件选择器见 [RFC 006](./006-rules-import-and-export.md)。
-- 用户命令白名单见 [RFC 009](./009-user-rule-safety-and-exclusions.md)。
+- 用户命令白名单见 [RFC 009](./completed/009-user-rule-safety-and-exclusions.md)。
 
 ---
 

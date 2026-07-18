@@ -1,6 +1,6 @@
 # RFC 009 — argv 白名单与子命令扩展
 
-加载 / 保存 / 导入用户规则时，命令校验由 `UserRuleValidator` 统一执行（见 [RFC 009](rfc/009-user-rule-safety-and-exclusions.md)）。
+加载 / 保存 / 导入用户规则时，命令校验由 `UserRuleValidator` 统一执行（见 [RFC 009](../.spec/rfc/completed/009-user-rule-safety-and-exclusions.md)）。
 
 ## 当前 argv[0] 白名单
 

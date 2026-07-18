@@ -3,7 +3,7 @@
 **状态**：已完成  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
-**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 风险与权限
+**依赖**：[RFC 001](../001-ccleaner-style-cleaning-spec.md) 风险与权限
 
 ---
 

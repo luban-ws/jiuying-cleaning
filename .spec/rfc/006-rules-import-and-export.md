@@ -3,7 +3,7 @@
 **状态**：草案  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
-**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 共享与复用；[RFC 005](./005-user-rules-yaml-and-settings-editor.md)（导出对象以用户规则为主）；[RFC 009](./009-user-rule-safety-and-exclusions.md)（导入前**必须**通过 009 校验）。**推荐交付顺序**：009 与用户规则加载路径就绪后，再默认开放「从文件导入」以降低恶意/错误规则扩散风险。
+**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md) 共享与复用；[RFC 005](./005-user-rules-yaml-and-settings-editor.md)（导出对象以用户规则为主）；[RFC 009](./completed/009-user-rule-safety-and-exclusions.md)（导入前**必须**通过 009 校验）。**推荐交付顺序**：009 与用户规则加载路径就绪后，再默认开放「从文件导入」以降低恶意/错误规则扩散风险。
 
 ---
 

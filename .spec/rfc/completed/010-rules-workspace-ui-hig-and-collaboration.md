@@ -271,7 +271,7 @@ flowchart LR
 
 | 类型 | 路径 |
 |------|------|
-| Apple HIG / SwiftUI 索引 | [docs/macos-swiftui-references.md](../macos-swiftui-references.md) |
+| Apple HIG / SwiftUI 索引 | [docs/macos-swiftui-references.md](../../../docs/macos-swiftui-references.md) |
 | 协作 | `AGENTS.md`，`docs/persona/paul-hudson.md` |
 
 **后续可选**：应用菜单/快捷键（仍遵守 D1）；单卡合并概览+流程等视觉优化 — 须 **先改本文第二部分** 再改代码。

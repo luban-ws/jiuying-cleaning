@@ -20,4 +20,4 @@
 ## 与本工程的关系
 
 - 最低系统以 `Package.swift` 的 `platforms` 与 `Support/Info.plist` 的 `LSMinimumSystemVersion` 为准。
-- **规则清理详情区**的详细 UI 设计以 **[RFC 010 第二部分](rfc/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)** 为准。
+- **规则清理详情区**的详细 UI 设计以 **[RFC 010 第二部分](../.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)** 为准。
