@@ -84,4 +84,23 @@ import Testing
         )
         #expect(sorted.first?.riskLevel == .high)
     }
+
+    @Test("RulesUnifiedTableLayout minimumWidth behaves deterministically")
+    func tableLayoutMinimumWidth() {
+        let minW1 = RulesUnifiedTableLayout.minimumWidth(
+            showCategoryColumn: true,
+            showTypeColumn: true,
+            compactItemColumn: false
+        )
+        // 48 (clean) + 180 (item) + 120 (size) + 56 (risk) + 72 (type) + 88 (category) + 24 = 588
+        #expect(minW1 == 588)
+
+        let minW2 = RulesUnifiedTableLayout.minimumWidth(
+            showCategoryColumn: false,
+            showTypeColumn: false,
+            compactItemColumn: true
+        )
+        // 48 (clean) + 220 (compact item) + 120 (size) + 56 (risk) + 0 + 0 + 24 = 468
+        #expect(minW2 == 468)
+    }
 }

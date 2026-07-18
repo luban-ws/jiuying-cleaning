@@ -201,96 +201,98 @@ struct RulesWorkspaceView: View {
 
     private var selectableBody: some View {
         SelectableWorkspaceScaffold {
-            VStack(spacing: 0) {
-                workspaceHeaderSection
+            GeometryReader { windowProxy in
+                VStack(spacing: 0) {
+                    workspaceHeaderSection
 
-                if showChart && hasDirScanResults {
-                    CSChartCard(title: L10n.Rules.chartCardTitle) {
-                        RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
-                            .frame(minHeight: 260)
-                    }
-                    .padding(.horizontal, CS.detailHorizontalPadding)
-                    .padding(.top, 12)
-                    .padding(.bottom, 4)
-                }
-
-                RulesFilterToolbar(
-                    filter: $filter,
-                    sortKey: $sortKey,
-                    categories: categoryOptions,
-                    visibleCount: visibleRules.count,
-                    totalCount: rules.count,
-                    selectedInViewCount: selectedInViewCount,
-                    onSelectAllVisible: { selectAllVisible() },
-                    onSelectNone: { selectedRuleIds.subtract(visibleRules.map(\.id)) },
-                    onSelectAll: { selectedRuleIds = Set(rules.map(\.id)) }
-                )
-
-                Divider()
-
-                RulesWorkspaceTableInspectorLayout(
-                    presentation: presentation,
-                    tableMinWidth: RulesUnifiedTableLayout.minimumWidth(
-                        showCategoryColumn: showCategoryColumn,
-                        showTypeColumn: presentation != .performance,
-                        compactItemColumn: presentation == .performance
-                    )
-                ) {
-                    Group {
-                        if visibleRules.isEmpty {
-                            ContentUnavailableView(
-                                L10n.Rules.filterNoResultsTitle,
-                                systemImage: "line.3.horizontal.decrease.circle",
-                                description: Text(L10n.Rules.filterNoResultsDescription)
-                            )
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        } else {
-                            RulesUnifiedTable(
-                                rules: visibleRules,
-                                scannedSizes: scannedSizes,
-                                scannedProcessCounts: scannedProcessCounts,
-                                selectedRuleIds: $selectedRuleIds,
-                                tableSelection: $tableSelection,
-                                formatBytes: formatBytesOptional,
-                                showCategoryColumn: showCategoryColumn,
-                                showTypeColumn: presentation != .performance,
-                                compactItemColumn: presentation == .performance,
-                                fillsAvailableHeight: true
-                            )
+                    if showChart && hasDirScanResults {
+                        CSChartCard(title: L10n.Rules.chartCardTitle) {
+                            RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
+                                .frame(minHeight: 260)
                         }
+                        .padding(.horizontal, CS.detailHorizontalPadding)
+                        .padding(.top, 12)
+                        .padding(.bottom, 4)
                     }
-                } inspector: {
-                    RulesInspectorPanel(
-                        rule: focusedRule,
-                        isIncluded: inspectorIncludeBinding,
-                        scannedBytes: focusedRule.flatMap { scannedSizes[$0.id] },
-                        scannedProcessCount: focusedRule.flatMap { scannedProcessCounts[$0.id] },
-                        formatBytes: formatBytesOptional,
-                        presentation: presentation
+
+                    RulesFilterToolbar(
+                        filter: $filter,
+                        sortKey: $sortKey,
+                        categories: categoryOptions,
+                        visibleCount: visibleRules.count,
+                        totalCount: rules.count,
+                        selectedInViewCount: selectedInViewCount,
+                        onSelectAllVisible: { selectAllVisible() },
+                        onSelectNone: { selectedRuleIds.subtract(visibleRules.map(\.id)) },
+                        onSelectAll: { selectedRuleIds = Set(rules.map(\.id)) }
+                    )
+
+                    Divider()
+
+                    RulesWorkspaceTableInspectorLayout(
+                        presentation: presentation,
+                        tableMinWidth: RulesUnifiedTableLayout.minimumWidth(
+                            showCategoryColumn: showCategoryColumn,
+                            showTypeColumn: presentation != .performance,
+                            compactItemColumn: presentation == .performance
+                        )
+                    ) {
+                        Group {
+                            if visibleRules.isEmpty {
+                                ContentUnavailableView(
+                                    L10n.Rules.filterNoResultsTitle,
+                                    systemImage: "line.3.horizontal.decrease.circle",
+                                    description: Text(L10n.Rules.filterNoResultsDescription)
+                                )
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            } else {
+                                RulesUnifiedTable(
+                                    rules: visibleRules,
+                                    scannedSizes: scannedSizes,
+                                    scannedProcessCounts: scannedProcessCounts,
+                                    selectedRuleIds: $selectedRuleIds,
+                                    tableSelection: $tableSelection,
+                                    formatBytes: formatBytesOptional,
+                                    showCategoryColumn: showCategoryColumn,
+                                    showTypeColumn: presentation != .performance,
+                                    compactItemColumn: presentation == .performance,
+                                    fillsAvailableHeight: true
+                                )
+                            }
+                        }
+                    } inspector: {
+                        RulesInspectorPanel(
+                            rule: focusedRule,
+                            isIncluded: inspectorIncludeBinding,
+                            scannedBytes: focusedRule.flatMap { scannedSizes[$0.id] },
+                            scannedProcessCount: focusedRule.flatMap { scannedProcessCounts[$0.id] },
+                            formatBytes: formatBytesOptional,
+                            presentation: presentation
+                        )
+                    }
+                    .frame(minHeight: 0, maxHeight: .infinity)
+                    .layoutPriority(1)
+                }
+                .frame(width: windowProxy.size.width, height: windowProxy.size.height, alignment: .top)
+                .clipped()
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    RulesCommandBar(
+                        recoverableBytes: selectedRecoverableBytes,
+                        selectedProcessCount: selectedProcessCount,
+                        selectedCount: selectedRuleIds.count,
+                        selectedPathRuleCount: selectedPathRules.count,
+                        selectedCommandRuleCount: selectedCommandRules.count,
+                        sizedSelectedPathCount: sizedSelectedPathCount,
+                        analyzedSelectedCount: analyzedSelectedCount,
+                        rulesNonEmpty: !rules.isEmpty,
+                        isScanning: isScanning,
+                        isCleaning: isCleaning,
+                        presentation: presentation,
+                        onAnalyze: { scanAll() },
+                        onPreview: { showDryRunSheet = true },
+                        onRunClean: { prepareAndConfirmClean() }
                     )
                 }
-                .frame(minHeight: 0, maxHeight: .infinity)
-                .layoutPriority(1)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .clipped()
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                RulesCommandBar(
-                    recoverableBytes: selectedRecoverableBytes,
-                    selectedProcessCount: selectedProcessCount,
-                    selectedCount: selectedRuleIds.count,
-                    selectedPathRuleCount: selectedPathRules.count,
-                    selectedCommandRuleCount: selectedCommandRules.count,
-                    sizedSelectedPathCount: sizedSelectedPathCount,
-                    analyzedSelectedCount: analyzedSelectedCount,
-                    rulesNonEmpty: !rules.isEmpty,
-                    isScanning: isScanning,
-                    isCleaning: isCleaning,
-                    presentation: presentation,
-                    onAnalyze: { scanAll() },
-                    onPreview: { showDryRunSheet = true },
-                    onRunClean: { prepareAndConfirmClean() }
-                )
             }
         }
     }
