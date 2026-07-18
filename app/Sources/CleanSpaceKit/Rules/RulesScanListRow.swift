@@ -22,6 +22,7 @@ struct RulesScanListRow: View {
     @Binding var isIncluded: Bool
     /// `nil` 表示尚未扫描到该规则。
     let scannedBytes: Int64?
+    let scannedProcessCount: Int?
     let formatBytes: (Int64?) -> String
 
     var body: some View {
@@ -42,18 +43,26 @@ struct RulesScanListRow: View {
 
                 HStack(spacing: 10) {
                     Group {
-                        if rule.type == .command {
-                            Text(rule.estimate ?? L10n.Rules.estimateCommand)
+                        if rule.displaysScannedProcessCount {
+                            Text(scannedProcessCount.map { L10n.Performance.listProcessCount($0) }
+                                ?? (rule.estimate ?? L10n.Performance.listAnalyzeHint))
                                 .font(.caption)
-                                .foregroundStyle(.tertiary)
+                                .monospacedDigit()
+                                .foregroundStyle(scannedProcessCount == nil ? .tertiary : .secondary)
                                 .multilineTextAlignment(.trailing)
-                        } else {
+                                .help(L10n.Performance.listHelpScanColumn)
+                        } else if rule.displaysScannedByteSize {
                             Text(formatBytes(scannedBytes))
                                 .font(.caption)
                                 .monospacedDigit()
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.trailing)
                                 .help(L10n.Rules.listHelpScanColumn)
+                        } else {
+                            Text(rule.estimate ?? L10n.Rules.estimateCommand)
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                     .frame(width: RulesScanListLayoutMetrics.scanColumnWidth, alignment: .trailing)

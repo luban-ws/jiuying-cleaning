@@ -34,8 +34,8 @@
 ### 界面（macOS）
 
 - **最低系统 macOS 15**（Sequoia），与 `Package.swift` 的 `platforms: [.macOS(.v15)]`、`swift-tools-version: 6.0` 及 `Support/Info.plist` 的 `LSMinimumSystemVersion`（`15.0`）一致。
-- 窗口与工具栏参考：`docs/design/macos-swiftui-references.md`；设计参照 [Apple HIG — macOS](https://developer.apple.com/design/human-interface-guidelines) 与系统「设置」类应用：优先 `NavigationSplitView`、**unified** 工具栏、系统 **Material**、`.help()`，避免大块纯色底与重阴影卡片。
-- **「规则清理」主界面**（操作入口、工具栏、扫描列表与表格式块）的约定见 **[RFC 010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md)**。
+- 窗口与工具栏参考：`docs/macos-swiftui-references.md`；设计参照 [Apple HIG — macOS](https://developer.apple.com/design/human-interface-guidelines) 与系统「设置」类应用：优先 `NavigationSplitView`、**unified** 工具栏、系统 **Material**、`.help()`，避免大块纯色底与重阴影卡片。
+- **「规则清理」主界面**（扫描列表、预览、确认与清理的 **详细 UI 设计**）只认 **[RFC 010 第二部分](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)**。
 
 ### 代码结构
 
@@ -146,4 +146,4 @@
 
 ---
 
-**与本仓库日常最相关的 Persona（Swift/macOS）：** **Paul Hudson（SwiftUI 实战）** 与 **Jon Postel（RFC）**、**Margaret Hamilton（钩子与合规）**、**Kent Beck（测试）**；细节另见 `.cursor/rules` 与 `docs/design/`。
+**与本仓库日常最相关的 Persona（Swift/macOS）：** **Paul Hudson（SwiftUI 实战）** 与 **Jon Postel（RFC）**、**Margaret Hamilton（钩子与合规）**、**Kent Beck（测试）**；细节另见 `.cursor/rules` 与 `docs/macos-swiftui-references.md`。

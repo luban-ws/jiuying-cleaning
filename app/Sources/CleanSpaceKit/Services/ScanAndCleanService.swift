@@ -12,18 +12,60 @@ private func expandingTilde(in path: String) -> String {
     (path as NSString).expandingTildeInPath
 }
 
+/// 检查基础路径是否形如 profile 路径，若是则展开为所有发现的 profiles。
+private func expandBasePaths(base: String) -> [String] {
+    let baseURL = URL(fileURLWithPath: base).standardized
+    let lastComponent = baseURL.lastPathComponent
+    
+    let isProfileShape = lastComponent == "Default" ||
+                         lastComponent == "Guest Profile" ||
+                         lastComponent == "System Profile" ||
+                         (lastComponent.hasPrefix("Profile ") && Int(lastComponent.dropFirst("Profile ".count)) != nil)
+    
+    if isProfileShape {
+        let appRootURL = baseURL.deletingLastPathComponent()
+        let discoveredProfiles = ChromiumProfileDiscoverer.discoverProfiles(in: appRootURL.path)
+        if !discoveredProfiles.isEmpty {
+            return discoveredProfiles.map { appRootURL.appendingPathComponent($0).path }
+        }
+    }
+    
+    return [base]
+}
+
 /// 对单条 dir 规则，解析出所有要扫描/删除的绝对路径（`dir` + `paths`；`command` 规则返回空数组）。
 func resolvePaths(for rule: CleaningRule) -> [String] {
     guard rule.type == .dir, let paths = rule.paths else { return [] }
     var result: [String] = []
     for p in paths {
-        let base = expandingTilde(in: p.base)
-        for d in p.dirs {
-            if d == "*" {
-                guard let contents = try? FileManager.default.contentsOfDirectory(atPath: base) else { continue }
-                result.append(contentsOf: contents.map { (base as NSString).appendingPathComponent($0) })
-            } else {
-                result.append((base as NSString).appendingPathComponent(d))
+        let originalBase = expandingTilde(in: p.base)
+        let bases = expandBasePaths(base: originalBase)
+        for base in bases {
+            for d in p.dirs {
+                if d == "*" {
+                    guard let contents = try? FileManager.default.contentsOfDirectory(atPath: base) else { continue }
+                    result.append(contentsOf: contents.map { (base as NSString).appendingPathComponent($0) })
+                } else if d.contains("*") {
+                    let parts = d.components(separatedBy: "/")
+                    var currentPaths = [base]
+                    for part in parts {
+                        var nextPaths: [String] = []
+                        for curr in currentPaths {
+                            if part == "*" {
+                                if let contents = try? FileManager.default.contentsOfDirectory(atPath: curr) {
+                                    nextPaths.append(contentsOf: contents.map { (curr as NSString).appendingPathComponent($0) })
+                                }
+                            } else {
+                                let nextPath = (curr as NSString).appendingPathComponent(part)
+                                nextPaths.append(nextPath)
+                            }
+                        }
+                        currentPaths = nextPaths
+                    }
+                    result.append(contentsOf: currentPaths)
+                } else {
+                    result.append((base as NSString).appendingPathComponent(d))
+                }
             }
         }
     }
@@ -34,11 +76,16 @@ func resolvePaths(for rule: CleaningRule) -> [String] {
 enum RuleDryRunPayload: Sendable {
     case directory(targets: [(path: String, exists: Bool)])
     case commandLine(String)
+    case processes([(pid: Int32, commandLine: String)])
     case noCommand
 }
 
 /// 不读文件体积、不删文件；供「预览」面板展示即将清理的对象。
+/// MCP 进程列表须在后台加载，不可在 SwiftUI `body` 中同步调用（会阻塞主线程并触发 AttributeGraph 崩溃）。
 func ruleDryRunPayload(for rule: CleaningRule) -> RuleDryRunPayload {
+    if rule.id == McpLeakedProcessCleaner.ruleId {
+        return .noCommand
+    }
     switch rule.type {
     case .dir:
         let paths = resolvePaths(for: rule)
@@ -67,14 +114,24 @@ func directorySizeBytes(url: URL, enumeratorOptions: FileManager.DirectoryEnumer
 
 /// 扫描单条规则占用（dir 为实际字节，command 返回 nil 表示用 estimate）
 func scanRule(_ rule: CleaningRule) -> Int64? {
+    if rule.id == McpLeakedProcessCleaner.ruleId {
+        return McpLeakedProcessCleaner.scanTotalRSSBytes()
+    }
     switch rule.type {
     case .dir:
         let urls = resolvePaths(for: rule).map { URL(fileURLWithPath: $0) }
         var total: Int64 = 0
         for url in urls {
             var isDir: ObjCBool = false
-            guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue else { continue }
-            total += directorySizeBytes(url: url)
+            guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else { continue }
+            if isDir.boolValue {
+                total += directorySizeBytes(url: url)
+            } else {
+                if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+                   let size = attrs[.size] as? Int64 {
+                    total += size
+                }
+            }
         }
         return total
     case .command:
@@ -84,6 +141,9 @@ func scanRule(_ rule: CleaningRule) -> Int64? {
 
 /// 执行单条规则清理
 func cleanRule(_ rule: CleaningRule) -> (success: Bool, message: String) {
+    if rule.id == McpLeakedProcessCleaner.ruleId {
+        return McpLeakedProcessCleaner.cleanOutcome()
+    }
     let fm = FileManager.default
     switch rule.type {
     case .dir:

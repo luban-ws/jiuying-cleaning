@@ -7,6 +7,7 @@
   "scripts": {
     "build:app": "./design/generate-app-icon.sh && cd app && swift build",
     "run:app": "bash scripts/run-app.sh",
+    "app:dev": "bash scripts/dev-app.sh",
     "bundle:app": "./scripts/bundle-mac-app.sh release",
     "test": "cd app && swift test",
     "test:app": "pnpm run test",

@@ -1,70 +1,222 @@
-# RFC 010：规则工作区 UI（HIG）与协作索引（AGENTS / Persona）
+# RFC 010：规则工作区 — 基于规则的扫描列表、预览、确认与清理（详细 UI 设计）
 
-**状态**：已批准（设计原则冻结；**主要实现已落地**；后续微调仍须符合本文与 `AGENTS.md`）  
+**状态**：已完成（**本文含规范性 UI 细稿**；主验收已落地；可选应用菜单共享动作见 TASK-010-05）  
 **创建日期**：2026-04-12  
 **作者**：CleanSpace  
 
----
-
-## 摘要
-
-规定 **「规则清理」主界面** 在 macOS 上的交互与视觉原则：避免 **unified 工具栏与正文重复** 的冗余操作入口；扫描列表与浏览器 **Table** 列宽与无障碍一致；进度反馈与 **主操作卡** 同区。  
-同步记录 **根目录 `AGENTS.md`** 的合并结构、**Swift/SwiftUI 向 Persona（Paul Hudson 风格）** 与 **`/swiftui` 快捷指令**，便于人机协作一致。
+**权威说明**：规则清理详情列的 **布局、组件、尺寸、模态与无障碍** 仅以 **本文第二部分** 为准。Apple 官方对照链接见 `docs/macos-swiftui-references.md`（非 UI 细稿）。修改规则页 UI 规范时 **只改本 RFC**。
 
 ---
 
-## 背景与问题
+## 第一部分：摘要、决策与协作
 
-1. **工具栏与内容重复**：详情区已有「分析 / 预览 / 清理」大卡，再在窗口右上角放三个同名图标，在 **unified 标题栏** 上显得拥挤，且与系统「设置」类应用 **轻量顶栏** 习惯不一致。
-2. **扫描列表可读性**：分组 `Form` 中的规则行与 `BrowserRulesTableBlock` 的「大小 / 风险」列若宽度不一致，扫读困难；指针与 **VoiceOver** 缺少对「大小列含义」的说明。
-3. **协作文档发散**：`AGENTS.md` 曾拼接「工程基线」与「Persona 百科」，编号重复、难检索；缺少 **与本仓库（Swift/macOS）强相关** 的 SwiftUI 专家索引。
-4. **决策未入 RFC**：上述 UI 与文档变更若只留在 PR 描述中，后续迭代容易回退或重复争论。
+### 1.1 摘要
+
+- **平台**：macOS 15+（Sequoia）；详情区对齐系统「设置」类应用：`NavigationSplitView`、grouped `Form`、`Material`、`.help()`。
+- **单一主操作面**：分析 / 预览 / 运行清理仅在 **`CSRulesCleanWorkflowCard`**；规则主列表页 **无** 重复 `primaryAction` 工具栏三按钮。
+- **行为语义**：**「分析」** 对 **全部已加载规则** 扫描（更新大小列与图表数据）；**「预览」「运行清理」** 仅针对 **已勾选** 规则。
+- **协作**：`AGENTS.md` 基线 + Persona；`/swiftui` 与 `docs/persona/paul-hudson.md`。
+
+### 1.2 与 RFC 001 的边界
+
+| RFC 001 | 本 RFC 010 |
+|---------|------------|
+| 可清理路径、风险、安全边界 | **如何**在界面呈现勾选、扫描、预览、确认与结果 |
+| 「删什么」 | 「在哪点、什么顺序、什么控件」 |
+
+### 1.3 冻结的产品决策（交互语义）
+
+| ID | 决策 |
+|----|------|
+| D1 | 规则主列表页 **不得** 使用与流程卡三动作重复的 `ToolbarItemGroup(placement: .primaryAction)`。 |
+| D2 | 根 `NavigationSplitView` 详情侧可保留 `toolbarBackground` / `toolbarBackgroundVisibility`。 |
+| D3 | 预览 Sheet 可使用 `confirmationAction`（如「完成」）。 |
+| D4 | **分析** = 全量规则扫描，**不**依赖勾选。 |
+| D5 | **预览 / 运行清理** = 仅勾选集。 |
+| D6 | 详情区垂直顺序见 **第二部分 §2.3**；变更顺序须同步本文与实现。 |
+| D7 | 运行清理前 **确认 Alert**；完成后 **结果 Alert**。 |
+
+### 1.4 协作索引（AGENTS / Persona）
+
+- `AGENTS.md`：黄金法则、工程基线、Persona 表、快捷指令（含 `/swiftui`）。
+- `docs/persona/paul-hudson.md`：SwiftUI 实现协作参考。
 
 ---
 
-## 目标
+<a id="detailed-ui-spec"></a>
 
-1. **单一主操作面**：规则页的核心动作以 **`CSRulesCleanWorkflowCard`** 为权威入口；**不在**该页 `NavigationStack` 上放置与三按钮重复的 `primaryAction` 工具栏组。
-2. **进度可见且不割裂**：扫描 / 清理进行中时，在 **同一操作卡** 内展示 `ProgressView` + 文案，而非仅依赖工具栏 `status`。
-3. **列表与表格对齐**：抽取 **`RulesScanListLayoutMetrics`**，使 Form 行与 `Table` 的「大小 / 风险」列宽一致；浏览器表使用 **`inset` + 交替行背景**（在部署目标支持的前提下）提升可读性。
-4. **无障碍与 L10n**：`.help` 与 `accessibilityHint` 文案走 **`L10n` + 双语 `Localizable.strings`**；单元测试**不断言**本地化后的展示句（沿用仓库基线）。
-5. **协作可发现**：`AGENTS.md` 保留 **工程基线 + Persona 表 + 快捷指令**；增加 **Paul Hudson（Swift/SwiftUI）** 与 **`/swiftui`**，并在文末标明与本仓库日常最相关的角色。
+## 第二部分：详细 UI 设计（规范性）
 
----
+本节为 **规则基于扫描列表、预览、确认与清理** 的完整界面规格；与 `CleanSpaceKit` 实现对照验收。
 
-## 方案
+### 2.1 范围
 
-### 1. 规则页工具栏策略
+| 包含 | 不包含 |
+|------|--------|
+| 侧栏「规则清理」**详情列** 布局与组件 | 「磁盘」「Docker」工作区 |
+| 预览 Sheet、确认/结果 **Alert** 结构 | 像素级 Figma；独立品牌色体系 |
+| **布局常量名**（与代码一致） | — |
 
-- **移除** `RulesWorkspaceView` 上重复三按钮的 `.toolbar { ToolbarItemGroup(placement: .primaryAction) }`。
-- **保留** 根 `NavigationSplitView` 详情侧对 `toolbarBackground` / `toolbarBackgroundVisibility` 的全局设置（与窗口材质一致），**不**因本 RFC 删除。
-- **其他场景**：预览 Sheet 的「完成」等 **confirmationAction** 仍可使用工具栏；本 RFC 仅约束 **规则主列表页** 的重复主流程按钮。
+### 2.2 信息架构
 
-### 2. 主操作卡与进度
+```
+NavigationSplitView
+├── Sidebar：… / 规则清理 / …
+└── Detail
+    └── NavigationStack
+        ├── navigationTitle：规则清理（L10n）
+        ├── navigationSubtitle（可选）：已选 n / 共 m 条
+        └── DetailScaffold → grouped Form（§2.3～§2.8）
+```
 
-- 在 **`CSRulesCleanWorkflowCard`** 中，当 `isScanning || isCleaning` 时，在按钮行 **上方** 展示横向 `ProgressView` + `L10n.Rules.scanning` / `cleaning`。
-- 按钮的 **disabled** 逻辑与既有行为一致；`.help` 仍挂在各 `Button` 上。
+- **内容最大宽**：`CS.detailContentMaxWidth` = **840 pt**，水平居中。
+- **边距**：水平 `CS.detailHorizontalPadding` = **24 pt**；垂直 `CS.detailVerticalPadding` = **20 pt**（`contentMargins`）。
+- **工具栏**：规则主列表页 **禁止** 与流程卡重复的 primaryAction 三图标（D1）。
 
-### 2.1 阅读顺序（如何使用）
+### 2.3 详情区纵向结构（自上而下）
 
-- **Form 自上而下**：`CSRulesOverviewPanel` → **`rules.flow.section_title` + `rules.flow.steps`**（分步说明）→ `CSRulesCleanWorkflowCard` →（可选）图表 → 各分类规则列表。
-- 目的：用户先看到计数与步骤，再看到大按钮，最后滚动勾选列表；避免旧版「说明夹在列表与按钮之间」造成的跳跃。
+**唯一权威顺序**；对应 `RulesWorkspaceView` 内 `Form` Section 顺序。
 
-### 2.2 附图（Mermaid）
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 2.3.1 概览卡 CSRulesOverviewPanel                            │
+├─────────────────────────────────────────────────────────────┤
+│ 2.3.2 分步说明 Section（rules.flow.section_title / steps）   │
+├─────────────────────────────────────────────────────────────┤
+│ 2.3.3 流程卡 CSRulesCleanWorkflowCard（扫描·预览·清理）      │
+├─────────────────────────────────────────────────────────────┤
+│ 2.3.4 图表区（可选：存在路径类正扫描体积时）                  │
+├─────────────────────────────────────────────────────────────┤
+│ 2.3.5 按分类：RulesScanListRow 或 BrowserRulesTableBlock     │
+└─────────────────────────────────────────────────────────────┘
+```
 
-下列图在支持 Mermaid 的渲染器（如 GitHub、部分 IDE 预览）中可见；**语义以正文为准**，图仅作沟通辅助。
+### 2.4 视觉与材质 Token
 
-**图 A — 详情区纵向区块顺序（规则页）**
+| Token | 值 / 说明 |
+|-------|-----------|
+| `CS.cornerHero` | **16 pt**，`continuous` |
+| `CS.cornerPanel` | **14 pt** |
+| `CS.cornerSmall` | **10 pt** |
+| 概览 / 流程卡 | `Material.regular`，内边距 **18 pt** |
+| 图表卡 | `Material.regular`，内边距 **16 pt** |
+| 卡片描边 | `Color.primary` **6%～8%** opacity，**1 pt** |
+| 强调 | `Color.accentColor` |
+| 破坏性主按钮 | `borderedProminent` + `.tint(.red)` |
+| 字体角色 | 标题 `headline`；说明 `subheadline` + `secondary`；辅助 `caption` / `tertiary` |
+
+### 2.5 组件规格
+
+#### 2.5.1 概览卡（CSRulesOverviewPanel）
+
+| 元素 | 规格 |
+|------|------|
+| 图标 | `checklist.checked`，`largeTitle`，hierarchical |
+| 标题 | `L10n.Rules.overviewTitle`，`headline` |
+| 副文 | `L10n.Rules.overviewBlurb`，`subheadline`，`secondary` |
+| 芯片 | 三枚：总数 / 已选 / 已测有体积条数；胶囊底；有数据或已选可用 accent 浅底 |
+
+#### 2.5.2 分步说明 Section
+
+| 元素 | 规格 |
+|------|------|
+| Header | `L10n.Rules.flowSectionTitle`，`subheadline.weight(.semibold)` |
+| Body | `L10n.Rules.flowSteps`，`subheadline`，`secondary`，多行左对齐；可选 `textSelection(.enabled)` |
+
+#### 2.5.3 流程卡（CSRulesCleanWorkflowCard）— **扫描 / 预览 / 清理主控**
+
+| 区域 | 规格 |
+|------|------|
+| 标题区 | `actionTitle` `headline`；`actionBlurb` `subheadline` `secondary` |
+| 可回收体积 | 标签 `actionRecoverableLabel` `caption` `secondary`；数值 **30 pt semibold rounded**，`monospacedDigit`；占位或需分析时 `secondary`，有可强调体积时 `accentColor` |
+| 辅文 | `caption` `tertiary`（选中数、路径类/命令类计数） |
+| **扫描/清理进行中** | 主按钮行 **上方**：`ProgressView` `.small` + `L10n.Rules.scanning` / `cleaning`，`subheadline` `secondary`；`accessibilityElement(children: .combine)` |
+| **主按钮行（三等分）** | **分析**：`borderedProminent` `large`，`Label`+gauge 图标，`.help(helpScan)`；**预览**：`bordered` `large`，`.help(helpDryRun)`；**运行清理**：`borderedProminent` `large` **red**，`.help(helpClean)` |
+| 次操作 | 全选 / 全不选：`plain` + accent，`subheadline.medium` |
+
+**启用规则**：
+
+- **分析**：`rulesNonEmpty` 且 **非** `isScanning`。
+- **预览**：`selectedCount > 0` 且 **非** `isCleaning`。
+- **运行清理**：`selectedCount > 0` 且 **非** `isCleaning`。
+
+#### 2.5.4 图表区（CSChartCard + RulesScanChartBlock）
+
+| 元素 | 规格 |
+|------|------|
+| 标题 | `Label` + `chart.pie.fill`，`headline`，`titleAndIcon` |
+| 图体最小高度 | **260 pt** |
+
+#### 2.5.5 扫描列表行（RulesScanListRow）— **非浏览器分类**
+
+| 区 | 规格 |
+|----|------|
+| 交互 | `Toggle`，`toggleStyle(.checkbox)` |
+| 主列 | 规则名 `body`；警告 `caption` `secondary`，多行 |
+| **大小列** | 固定 **108 pt**（`RulesScanListLayoutMetrics.scanColumnWidth`），`caption`，`monospacedDigit`；路径规则 `.help` = `L10n.Rules.listHelpScanColumn` |
+| **风险列** | 固定 **56 pt**（`riskColumnWidth`），`RuleRiskChip` |
+| `listRowInsets` | 约 **上下 6**、**左 4 右 8**（全表一致） |
+
+#### 2.5.6 浏览器分类表（BrowserRulesTableBlock）
+
+| 列 | 宽度 / 行为 |
+|----|-------------|
+| Clean | **52 pt**；Toggle `labelsHidden`；`accessibilityLabel` = 规则名；`accessibilityHint` = `L10n.Rules.listA11yToggleHint` |
+| Item | min **160** / ideal **220** |
+| Size | **108 pt**；路径格 `.help` 同 2.5.5 |
+| Risk | **56 pt** |
+| 样式 | `tableStyle(.inset(alternatesRowBackgrounds: true))` |
+| 最小高度 | `min(380, max(120, 52 + rowCount × 32))` pt |
+
+### 2.6 模态：预览（演练）与确认/结果
+
+#### 2.6.1 预览 Sheet（RulesDryRunSheet）
+
+- `NavigationStack` + grouped `Form`；`navigationTitle` = `L10n.Rules.dryRunSheetTitle`。
+- 内容：免责声明 + 按规则分 Section 列出路径或命令（等宽可选中）。
+- 工具栏：**仅** `confirmationAction` 完成按钮（`dismiss`）。
+- **最小尺寸**：`minWidth` **440**，`minHeight` **380**（可按内容微调，须保持可读）。
+
+#### 2.6.2 确认清理 Alert
+
+- `isPresented` 绑定「运行清理」前置状态。
+- 标题：`L10n.Rules.alertConfirmTitle`。
+- 按钮：**取消**（`Common.cancel`）+ **运行清理**（destructive，执行 `performClean`）。
+- **message**：动态（低风险条数 / 含中高风险提示），来自既有 `L10n` 逻辑。
+
+#### 2.6.3 结果 Alert
+
+- 标题：`L10n.Rules.alertResultTitle`。
+- 按钮：`Common.ok`。
+- **message**：多行清理结果（每规则一行格式由 `L10n` 定义）。
+
+### 2.7 空状态
+
+- `ContentUnavailableView`：`rules.empty.title` / `rules.empty.description`，`doc.text`。
+- 最小高度约 **280 pt**，置于 `DetailScaffold` 内居中。
+
+### 2.8 无障碍（验收清单）
+
+- [ ] 流程卡三主按钮均有 `.help`（`L10n.Rules.helpScan` / `helpDryRun` / `helpClean`）。
+- [ ] 列表与表：Toggle `accessibilityHint` = `listA11yToggleHint`；表内无标签 Toggle 须有 `accessibilityLabel`（规则名）。
+- [ ] 扫描/清理进度行 VoiceOver 可理解（合并或显式标签，须实测）。
+- [ ] 用户可见字符串 **仅** `L10n` + `en` / `zh-Hans` `Localizable.strings`。
+
+### 2.9 流程图（Mermaid）
+
+**与 §2.3～§2.6 冲突时以表格为准。**
+
+**图 A — 详情区纵向区块**
 
 ```mermaid
 flowchart TD
   subgraph Detail["详情区 · NavigationStack · grouped Form"]
-    O[概览卡\n芯片: 总数 / 已选 / 已测大小条数]
-    F[分步说明\nL10n rules.flow.*]
-    W[流程卡\n分析 · 预览 · 运行清理\n进度与禁用态同卡]
-    C{存在路径类\n正扫描体积?}
-    G[可选 · 分类占用图]
-    L[按分类 · 列表或浏览器表]
+    O[2.3.1 概览卡]
+    F[2.3.2 分步说明]
+    W[2.3.3 流程卡]
+    C{路径类有正扫描体积?}
+    G[2.3.4 图表]
+    L[2.3.5 列表或浏览器表]
     O --> F --> W --> C
     C -->|是| G --> L
     C -->|否| L
@@ -72,95 +224,57 @@ flowchart TD
   S[侧栏 · 规则清理] --> Detail
 ```
 
-**图 B — 用户任务流（与实现一致）**
-
-说明：**「分析」对当前加载的全部规则执行扫描**（不依赖是否勾选）；**预览 / 运行清理** 仅作用于 **已勾选** 规则。
+**图 B — 扫描 → 勾选 → 预览 → 确认 → 清理 → 结果**
 
 ```mermaid
 flowchart LR
-  subgraph Scan["完成一次扫描"]
-    A1[点「分析」] --> A2[流程卡显示\n正在分析]
-    A2 --> A3[逐条规则 scanRule]
-    A3 --> A4[大小列 / 图表数据更新]
+  subgraph Scan["扫描（全量）"]
+    A1[分析] --> A2[流程卡进度]
+    A2 --> A3[scanRule 逐条]
+    A3 --> A4[大小列与图表]
   end
-  subgraph Clean["可选 · 清理路径"]
-    B1[勾选规则] --> B2[可选 · 预览 Sheet]
-    B2 --> B3[点「运行清理」]
+  subgraph Clean["清理路径（仅勾选）"]
+    B1[勾选规则] --> B2[可选 预览 Sheet]
+    B2 --> B3[运行清理]
     B3 --> B4[确认 Alert]
-    B4 --> B5[执行清理 · 结果 Alert]
+    B4 --> B5[执行清理]
+    B5 --> B6[结果 Alert]
   end
-  Scan -.->|之后| B1
+  Scan -.->|可交错| B1
 ```
 
-### 3. 扫描列表行与浏览器表
+### 2.10 实现映射
 
-- 新增 **`RulesScanListRow`**（独立源文件），封装 `Toggle` + 名称/警告 + 固定列宽的大小与 **`RuleRiskChip`**。
-- **`RulesScanListLayoutMetrics`**：`scanColumnWidth`、`riskColumnWidth` 与 `BrowserRulesTableBlock` 共用。
-- 新增 L10n 键：`rules.list.help.scan_column`、`rules.list.a11y.toggle_hint`（en + zh-Hans）。
-- 浏览器表：`Toggle` 增加 `accessibilityLabel`（规则名）与上述 `accessibilityHint`；大小列对路径规则附加 `.help`。
+| 规格对象 | 代码路径 |
+|----------|----------|
+| `DetailScaffold` / `CS` | `AppChrome.swift` |
+| `RulesWorkspaceView` Form | `ContentView.swift` |
+| 概览 / 流程卡 | `WorkspaceChrome.swift` |
+| 列表行 | `Rules/RulesScanListRow.swift` |
+| 浏览器表 | `Rules/BrowserRulesTableBlock.swift` |
+| 文案 | `Localization/L10n.swift`，`Resources/*/Localizable.strings` |
 
-### 4. AGENTS.md 与 Persona
-
-- **结构**：黄金法则与工作流 → **项目基线（CleanSpace）** → Persona 分组表 → 快捷指令表。
-- **Paul Hudson**：`docs/persona/paul-hudson.md`，`AGENTS.md` 中 **Apple 平台与 SwiftUI** 表与 **`/swiftui`** 指令。
-- **维护**：Persona 为可选隐喻；**硬约束**仍以 RFC、`AGENTS` 基线与钩子脚本为准。
-
----
-
-## 多角色审查摘要（模拟评审）
-
-以下按仓库 **Persona 索引** 中四人视角，对「已落地变更 + 本 RFC」作一次性设计审查记录，**非**逐行代码审计。
-
-### Linus Torvalds（质量 / 品味）
-
-- **好评**：去掉工具栏里那三个重复图标是正确方向——「别用两套 UI 说同一件事」。进度放在按钮上面，用户不用猜系统在干嘛。
-- **挑剔**：别为了「架构美」再套一层抽象；`RulesScanListRow` 单独文件可以，再拆微组件就要问是否真有必要。
-- **底线**：合并冲突或回滚时别悄悄把工具栏三按钮加回来又不更新 RFC。
-
-### Martin Fowler（架构 / 流程）
-
-- **好评**：把 **产品决策**（单一操作面、进度归属）写进 RFC，和 **001** 管「清什么」分工清楚；`AGENTS` 合并后读者先看到基线再看到 Persona，路径合理。
-- **建议**：后续若加「菜单栏命令 / 快捷键」触发同一套 action，应在 RFC 或 TASK 里 **显式挂勾**，避免第三套入口再次分裂。
-
-### Kent Beck（测试 / 验收）
-
-- **好评**：现有测试仍跑 **`swift test`**；项目规则要求不断言翻译句，本改动新增的 L10n 由 **`LocalizationFormatTests`** 类测试覆盖格式/非空即可。
-- **建议**：若未来做 UI 回归，优先 **行为与 id**（例如勾选集、扫描字典键），而非像素级截图；与本 RFC「验收」一节一致。
-
-### Paul Hudson（Swift / SwiftUI 实战）
-
-- **好评**：macOS 上 **Form + Table** 混用时固定列宽、**`.help`**、**`tableStyle(.inset(alternatesRowBackgrounds:))`** 都贴近桌面扫读习惯；进度与 **`borderedProminent`** 按钮同卡，符合「先看见状态再点」的流程。
-- **提醒**：重表格区域仍须遵守 **`DetailScaffold` 不包 `ScrollView`** 的注释，避免 `Table`/`Chart` 高度被压扁；新改动若动外层滚动结构要先跑真机窗口。
+**变更流程**：改布局、尺寸或顺序 → **先改本文第二部分** 与 Mermaid；改「分析是否全量」等语义 → 同步 **§1.3 冻结决策**。
 
 ---
 
-## 验收标准
+## 第三部分：验收标准
 
-1. **规则主列表页**无「分析 / 预览 / 清理」的 **primaryAction** 工具栏图标组；三动作仅通过 **`CSRulesCleanWorkflowCard`**（及系统菜单若日后新增）触发。
-2. **`isScanning` / `isCleaning`** 为真时，操作卡内可见 **进度 + 文案**。
-3. **`RulesScanListRow` + `BrowserRulesTableBlock`** 共用 **`RulesScanListLayoutMetrics`**；浏览器表 Toggle 具备 **可访问性标签/提示**；新 L10n 键 **en + zh-Hans** 齐备。
-4. **`AGENTS.md`** 含 **Paul Hudson** 与 **`/swiftui`**，且工程基线章节完整。
-5. **`cd app && swift build && swift test`** 通过；**`scripts/check-swift-ui-l10n.sh`**（若安装 `rg`）通过。
+1. 实现与 **第二部分** 无冲突（顺序、列宽、按钮启用、Sheet/Alert、§2.8 清单）。
+2. 满足 **§1.3 D1–D7**。
+3. `cd app && swift build && swift test` 通过；`scripts/check-swift-ui-l10n.sh`（若安装 `rg`）通过。
+4. `AGENTS.md` 指向本 RFC；含 Paul Hudson 与 `/swiftui`。
 
 ---
 
-## 相关文件（实现映射）
+## 第四部分：相关文件与后续可选
 
-| 区域 | 路径 |
+| 类型 | 路径 |
 |------|------|
-| 规则页主体 | `app/Sources/CleanSpaceKit/ContentView.swift`（`RulesWorkspaceView`） |
-| 操作卡 | `app/Sources/CleanSpaceKit/WorkspaceChrome.swift`（`CSRulesCleanWorkflowCard`） |
-| 扫描行 | `app/Sources/CleanSpaceKit/Rules/RulesScanListRow.swift` |
-| 浏览器表 | `app/Sources/CleanSpaceKit/Rules/BrowserRulesTableBlock.swift` |
-| 文案 | `app/Sources/CleanSpaceKit/Localization/L10n.swift`，`Resources/*/Localizable.strings` |
-| 协作索引 | `AGENTS.md`，`docs/persona/paul-hudson.md` |
+| Apple HIG / SwiftUI 索引 | [docs/macos-swiftui-references.md](../macos-swiftui-references.md) |
+| 协作 | `AGENTS.md`，`docs/persona/paul-hudson.md` |
 
----
-
-## 后续可选（非本 RFC 阻塞）
-
-- 在 **应用菜单** 中暴露「分析 / 预览 / 清理」命令（与操作卡共享同一套 closure），满足键盘用户而不恢复拥挤工具栏。
-- 为 `RulesScanListRow` 增加仅测 **布局常量** 或 **绑定逻辑** 的轻量单元测试（若团队认为值回票价）。
+**后续可选**：应用菜单/快捷键（仍遵守 D1）；单卡合并概览+流程等视觉优化 — 须 **先改本文第二部分** 再改代码。
 
 ---
 
@@ -168,5 +282,7 @@ flowchart LR
 
 | 日期 | 说明 |
 |------|------|
-| 2026-04-12 | 初版：UI 原则、实现映射、四角色审查摘要 |
-| 2026-04-12 | 增补 §2.2：Mermaid 纵向布局图 + 扫描/清理任务流图 |
+| 2026-04-12 | 多轮迭代（工具栏、列表、L10n、Mermaid、Persona 等） |
+| 2026-04-12 | 曾误拆「RFC 仅决策 / design 仅细稿」引发双源 |
+| 2026-04-12 | **纠正**：**详细 UI 设计全部并入本文第二部分**；RFC 为单一权威 |
+| 2026-04-12 | 删除 `docs/design/`；HIG 索引迁至 `docs/macos-swiftui-references.md` |

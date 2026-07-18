@@ -39,6 +39,9 @@ rm -rf "${APP_DIR}"
 mkdir -p "${APP_DIR}/Contents/MacOS" "${APP_DIR}/Contents/Resources"
 cp "${EXEC_SRC}" "${APP_DIR}/Contents/MacOS/CleanSpace"
 cp "${INFO_PLIST}" "${APP_DIR}/Contents/Info.plist"
+if [[ -f "${SUPPORT_DIR}/AppIcon.icns" ]]; then
+  cp "${SUPPORT_DIR}/AppIcon.icns" "${APP_DIR}/Contents/Resources/"
+fi
 cp -R "${RES_SRC}" "${APP_DIR}/Contents/Resources/"
 
 chmod +x "${APP_DIR}/Contents/MacOS/CleanSpace"

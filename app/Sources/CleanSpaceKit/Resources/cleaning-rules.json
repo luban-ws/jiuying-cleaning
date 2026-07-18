@@ -10,6 +10,17 @@
     ]
   },
   {
+    "id": "user-caches",
+    "category": "system",
+    "name": "用户缓存",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "部分缓存能加速应用；清理后首次打开相关应用可能较慢。",
+    "paths": [
+      { "base": "~/Library/Caches", "dirs": ["*"] }
+    ]
+  },
+  {
     "id": "xcode-derived-data",
     "category": "system",
     "name": "Xcode DerivedData",
@@ -18,6 +29,16 @@
     "warning": "清理后下次编译会稍慢。",
     "paths": [
       { "base": "~/Library/Developer/Xcode/DerivedData", "dirs": ["*"] }
+    ]
+  },
+  {
+    "id": "xcode-archives",
+    "category": "system",
+    "name": "Xcode 归档 (Archives)",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Developer/Xcode/Archives", "dirs": ["*"] }
     ]
   },
   {
@@ -40,6 +61,157 @@
     "warning": "将清除网站登录状态与浏览历史。",
     "paths": [
       { "base": "~/Library/Application Support/Google/Chrome/Default", "dirs": ["Cookies", "History", "Local Storage"] }
+    ]
+  },
+  {
+    "id": "safari-cache",
+    "category": "browser",
+    "name": "Safari 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/com.apple.Safari", "dirs": ["*"] }
+    ]
+  },
+  {
+    "id": "safari-local-storage",
+    "category": "browser",
+    "name": "Safari 本地存储与数据库",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站本地存储与数据库，可能重置站点数据。",
+    "paths": [
+      { "base": "~/Library/Safari", "dirs": ["LocalStorage", "Databases"] }
+    ]
+  },
+  {
+    "id": "safari-history",
+    "category": "browser",
+    "name": "Safari 历史记录",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除浏览器历史记录。",
+    "paths": [
+      { "base": "~/Library/Safari", "dirs": ["History.db", "History.db-wal", "History.db-shm"] }
+    ]
+  },
+  {
+    "id": "firefox-cache",
+    "category": "browser",
+    "name": "Firefox 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/Firefox", "dirs": ["*"] }
+    ]
+  },
+  {
+    "id": "firefox-cookies-history",
+    "category": "browser",
+    "name": "Firefox Cookie 与历史",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站登录状态与历史记录。",
+    "paths": [
+      { "base": "~/Library/Application Support/Firefox/Profiles", "dirs": ["*/cookies.sqlite", "*/places.sqlite"] }
+    ]
+  },
+  {
+    "id": "firefox-crash-reports",
+    "category": "browser",
+    "name": "Firefox 崩溃报告",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Application Support/Firefox", "dirs": ["Crash Reports"] }
+    ]
+  },
+  {
+    "id": "edge-cache",
+    "category": "browser",
+    "name": "Edge 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/Microsoft Edge", "dirs": ["*"] },
+      { "base": "~/Library/Application Support/Microsoft Edge", "dirs": ["Default/Application Cache", "Default/Code Cache", "Default/GPUCache"] }
+    ]
+  },
+  {
+    "id": "edge-cookies-history",
+    "category": "browser",
+    "name": "Edge Cookie 与历史",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站登录状态与浏览历史。",
+    "paths": [
+      { "base": "~/Library/Application Support/Microsoft Edge/Default", "dirs": ["Cookies", "History", "Local Storage"] }
+    ]
+  },
+  {
+    "id": "arc-cache",
+    "category": "browser",
+    "name": "Arc 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/Arc", "dirs": ["*"] },
+      { "base": "~/Library/Application Support/Arc", "dirs": ["Default/Application Cache", "Default/Code Cache", "Default/GPUCache"] }
+    ]
+  },
+  {
+    "id": "arc-cookies-history",
+    "category": "browser",
+    "name": "Arc Cookie 与历史",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站登录状态与浏览历史。",
+    "paths": [
+      { "base": "~/Library/Application Support/Arc/Default", "dirs": ["Cookies", "History", "Local Storage"] }
+    ]
+  },
+  {
+    "id": "brave-cache",
+    "category": "browser",
+    "name": "Brave 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/BraveSoftware/Brave-Browser", "dirs": ["*"] },
+      { "base": "~/Library/Application Support/BraveSoftware/Brave-Browser", "dirs": ["Default/Application Cache", "Default/Code Cache", "Default/GPUCache"] }
+    ]
+  },
+  {
+    "id": "brave-cookies-history",
+    "category": "browser",
+    "name": "Brave Cookie 与历史",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站登录状态与浏览历史。",
+    "paths": [
+      { "base": "~/Library/Application Support/BraveSoftware/Brave-Browser/Default", "dirs": ["Cookies", "History", "Local Storage"] }
+    ]
+  },
+  {
+    "id": "opera-cache",
+    "category": "browser",
+    "name": "Opera 缓存",
+    "type": "dir",
+    "risk": "low",
+    "paths": [
+      { "base": "~/Library/Caches/com.operasoftware.Opera", "dirs": ["*"] },
+      { "base": "~/Library/Application Support/com.operasoftware.Opera", "dirs": ["Default/Application Cache", "Default/Code Cache", "Default/GPUCache"] }
+    ]
+  },
+  {
+    "id": "opera-cookies-history",
+    "category": "browser",
+    "name": "Opera Cookie 与历史",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将清除网站登录状态与浏览历史。",
+    "paths": [
+      { "base": "~/Library/Application Support/com.operasoftware.Opera/Default", "dirs": ["Cookies", "History", "Local Storage"] }
     ]
   },
   {
@@ -110,6 +282,31 @@
     "estimate": "依虚拟机可回收空间而定"
   },
   {
+    "id": "docker-desktop-residues",
+    "category": "docker",
+    "name": "Docker Desktop 数据残留",
+    "type": "dir",
+    "risk": "medium",
+    "warning": "将删除 Docker Desktop 在本机的配置、数据与缓存，将导致 Docker 彻底重置。",
+    "hiddenFromRulesList": true,
+    "paths": [
+      { "base": "~/Library/Group Containers", "dirs": ["group.com.docker"] },
+      { "base": "~", "dirs": [".docker"] },
+      { "base": "~/Library/Application Support", "dirs": ["Docker Desktop"] },
+      { "base": "~/Library/Caches", "dirs": ["Docker Desktop"] },
+      { "base": "~/Library/Containers", "dirs": ["com.docker.docker"] }
+    ]
+  },
+  {
+    "id": "mcp-leaked-processes",
+    "category": "performance",
+    "name": "泄漏的 MCP 进程（npm exec）",
+    "type": "command",
+    "risk": "medium",
+    "warning": "将结束重复启动的 chrome-devtools、Playwright、Obsidian 等 MCP 服务，减轻 CPU/内存压力；进行中的 AI 会话可能需重连。保留 typescript-language-server 等 white list 进程。",
+    "estimate": "依泄漏进程数量与内存而定"
+  },
+  {
     "id": "cursor-cache",
     "category": "ai-tools",
     "name": "Cursor 缓存与扩展缓存",
@@ -119,6 +316,18 @@
     "paths": [
       { "base": "~/Library/Application Support/Cursor", "dirs": ["Cache", "CachedData", "CachedExtensions", "Code Cache", "GPUCache", "logs"] },
       { "base": "~/Library/Caches/Cursor", "dirs": ["*"] }
+    ]
+  },
+  {
+    "id": "antigravity-cache",
+    "category": "ai-tools",
+    "name": "Antigravity 缓存与扩展缓存",
+    "type": "dir",
+    "risk": "low",
+    "warning": "清理后可能需要重新下载模型或扩展。",
+    "paths": [
+      { "base": "~/Library/Application Support/Google Antigravity", "dirs": ["Cache", "CachedData", "CachedExtensions", "Code Cache", "GPUCache", "logs"] },
+      { "base": "~/Library/Caches/Google Antigravity", "dirs": ["*"] }
     ]
   }
 ]

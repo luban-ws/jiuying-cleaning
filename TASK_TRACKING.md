@@ -30,7 +30,7 @@
 | TASK-001-04 | Docker 辅助：Desktop 目录体积、`docker system df`、预设命令流 | 已完成 | `DockerSpecialCleanService` 等 |
 | TASK-001-05 | 磁盘视图：卷选择、已用/可用、顶层目录扫描与「未由扫描计入」对账说明 | 已完成 | `VolumeScannerService`、`VolumeDiskAccounting` |
 | TASK-001-06 | 单元测试：规则 JSON 解码、卷对账纯函数 | 已完成 | `CleanSpaceTests` |
-| TASK-001-07 | 内置规则覆盖 RFC 所列浏览器/系统/Docker/AI 路径 | 进行中 | 跟踪改挂 **[RFC 002](docs/rfc/002-builtin-rules-catalog-parity.md)** |
+| TASK-001-07 | 内置规则覆盖 RFC 所列浏览器/系统/Docker/AI 路径 | 已完成 | 跟踪改挂 **[RFC 002](docs/rfc/002-builtin-rules-catalog-parity.md)** |
 | TASK-001-08 | 清理预演 / 仅列出将删除项 | 已完成 | 规则页「预览」已实现；增强项另议 |
 | TASK-001-09 | 完全磁盘访问等权限引导 | 待办 | 跟踪改挂 **[RFC 004](docs/rfc/004-full-disk-access-onboarding.md)** |
 | TASK-001-10 | 用户规则 YAML 与「自定义规则」设置页 | 待办 | 跟踪改挂 **[RFC 005](docs/rfc/005-user-rules-yaml-and-settings-editor.md)** |
@@ -43,9 +43,9 @@
 
 | ID | 任务 | 状态 | 备注 |
 |----|------|------|------|
-| TASK-002-01 | 维护 [`appendix-002-rfc001-rules-matrix.md`](docs/rfc/appendix-002-rfc001-rules-matrix.md)（RFC 001 ↔ `id`）；每 PR 补行或更新状态 | 待办 | **唯一**矩阵路径，见 RFC 002 |
-| TASK-002-02 | 按矩阵补全 Safari / Firefox / Edge / Arc / Brave / Opera 等缺项规则 | 待办 | 与 003 衔接 Chromium 多 profile |
-| TASK-002-03 | 规则 JSON 解码测试：新增合法片段 + **故意损坏片段**失败路径 | 待办 | RFC 002 验收 |
+| TASK-002-01 | 维护 [`appendix-002-rfc001-rules-matrix.md`](docs/rfc/appendix-002-rfc001-rules-matrix.md)（RFC 001 ↔ `id`）；每 PR 补行或更新状态 | 已完成 | **唯一**矩阵路径，见 RFC 002 |
+| TASK-002-02 | 按矩阵补全 Safari / Firefox / Edge / Arc / Brave / Opera 等缺项规则 | 已完成 | 与 003 衔接 Chromium 多 profile |
+| TASK-002-03 | 规则 JSON 解码测试：新增合法片段 + **故意损坏片段**失败路径 | 已完成 | RFC 002 验收 |
 
 ---
 
@@ -53,8 +53,8 @@
 
 | ID | 任务 | 状态 | 备注 |
 |----|------|------|------|
-| TASK-003-01 | 设计并实现 profile 发现与路径展开，与扫描/清理/预览一致 | 待办 | 见 RFC 003 正文 |
-| TASK-003-02 | 临时目录夹具单测：多 profile、**零 profile**、非目录子项、**逃逸 symlink** | 待办 | RFC 003 验收 |
+| TASK-003-01 | 设计并实现 profile 发现与路径展开，与扫描/清理/预览一致 | 已完成 | 见 RFC 003 正文 |
+| TASK-003-02 | 临时目录夹具单测：多 profile、**零 profile**、非目录子项、**逃逸 symlink** | 已完成 | RFC 003 验收 |
 
 ---
 

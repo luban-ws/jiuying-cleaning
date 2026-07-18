@@ -1,6 +1,6 @@
-/* CleanSpace — 简体中文 */
+/* Cleaner — 简体中文 */
 
-"app.name" = "CleanSpace";
+"app.name" = "Cleaner";
 
 "menu.show_main_window" = "显示主窗口";
 "menu.bar.open_format" = "打开 %@";
@@ -11,7 +11,7 @@
 "menubar.tab.manager" = "工作台";
 "menubar.disk.boot_title" = "启动磁盘";
 "menubar.disk.unavailable" = "无法读取磁盘空间。";
-"menubar.manager.intro" = "请打开主窗口以选择卷、扫描目录，或使用规则与 Docker 预设进行清理。";
+"menubar.manager.intro" = "请打开主窗口：磁盘空间、规则清理、AI 工具缓存、性能优化或 Docker 预设。";
 
 "metrics.menu_bar.accessibility" = "处理器、内存与网络占用";
 "metrics.menu_bar.help_live_format" = "实时：CPU %@，内存 %@，网络 %@。点击查看详情与通知阈值。";
@@ -41,11 +41,23 @@
 "common.ok" = "好";
 
 "sidebar.rules" = "规则清理";
+"sidebar.ai_tools_space" = "AI 工具 · 空间";
+"sidebar.performance" = "性能";
 "sidebar.docker" = "Docker";
 "sidebar.volumes" = "磁盘";
-"sidebar.volumes.blurb" = "空间图表与顶层目录";
-"sidebar.rules.blurb" = "扫描占用后安全清理";
-"sidebar.docker.blurb" = "预设与 Desktop 数据";
+"sidebar.volumes.blurb" = "查看可用空间与大文件夹";
+"sidebar.rules.blurb" = "安全清理缓存、日志与应用数据";
+"sidebar.ai_tools_space.blurb" = "回收编辑器与 AI 工具占用";
+"sidebar.performance.blurb" = "释放卡住的进程占用的 CPU 与内存";
+"sidebar.docker.blurb" = "清理镜像、容器与 Desktop 数据";
+"sidebar.space_group" = "空间";
+"sidebar.resources_group" = "资源";
+"sidebar.monitor" = "监控";
+"sidebar.monitor.blurb" = "CPU、内存与网络实时";
+
+"monitor.nav_title" = "系统监控";
+"monitor.nav_subtitle" = "CPU、内存与网络实时数据";
+"monitor.intro" = "与菜单栏共用实时采样。若 CPU、内存或网络偏高，可前往「性能」或「规则」页面处理。";
 
 "rules.empty.title" = "没有规则";
 "rules.empty.description" = "请检查应用包中的 cleaning-rules.json。";
@@ -68,6 +80,7 @@
 "rules.estimate.command" = "命令";
 "rules.risk.medium" = "中";
 "rules.risk.high" = "高";
+"rules.risk.low" = "低";
 "rules.confirm.clean_risky" = "所选包含中/高风险项，确认后将执行。";
 "rules.confirm.clean_safe_format" = "确认清理 %lld 项？";
 "rules.clean.status.success" = "成功";
@@ -78,19 +91,50 @@
 "rules.help.clean" = "删除已勾选规则对应的数据；中/高风险项会先要求确认。";
 "rules.action.title" = "清理流程";
 "rules.action.blurb" = "按「分析 → 预览 → 运行清理」顺序操作。按钮可悬停查看说明；进行中时进度显示在此处。";
-"rules.action.recoverable_label" = "可回收（路径类规则）";
-"rules.action.metric.placeholder" = "—";
-"rules.action.metric.tap_analyze" = "点击「分析」测算";
-"rules.action.caption.none" = "尚未勾选任何规则。";
+"rules.action.recoverable_label" = "预计可释放";
+"rules.action.metric.placeholder" = "请在下方选择项目";
+"rules.action.metric.tap_analyze" = "点击「分析」测算大小";
+"rules.action.caption.none" = "在列表中勾选一行或多行以继续。";
 "rules.action.caption.counts_format" = "已选 %1$lld 条 · 路径类 %2$lld · 命令类 %3$lld";
 "rules.action.select_all" = "全选";
 "rules.action.select_none" = "全不选";
+"rules.action.select_filtered" = "选中当前列表";
+"rules.filter.search_placeholder" = "搜索规则…";
+"rules.filter.category_label" = "分类";
+"rules.filter.all_categories" = "全部分类";
+"rules.filter.sort_label" = "排序";
+"rules.filter.visible_format" = "显示 %1$lld 条 · 共 %2$lld 条";
+"rules.filter.selected_in_view_format" = "当前列表已选 %lld 条";
+"rules.sort.name" = "名称";
+"rules.sort.category" = "分类";
+"rules.sort.impact" = "影响";
+"rules.sort.risk" = "风险";
+"rules.table.category" = "分类";
+"rules.table.type" = "类型";
+"rules.table.type.path" = "路径";
+"rules.table.type.command" = "命令";
+"rules.inspector.empty.title" = "未选择";
+"rules.inspector.empty.description" = "点选表格行，查看路径、命令与影响后再操作。";
+"rules.inspector.empty.description.performance" = "点选表格行，查看进程影响后再决定是否优化。";
+"rules.inspector.include" = "纳入清理";
+"rules.inspector.paths.title" = "路径";
+"rules.inspector.command.title" = "命令";
+"rules.inspector.title" = "详情";
+"rules.workspace.guide.storage" = "勾选要清理的项目 → 分析查看大小 → 预览确认后再清理。";
+"rules.workspace.guide.ai_tools" = "勾选 AI 工具缓存 → 分析查看占用 → 预览确认后再清理。";
+"rules.workspace.guide.performance" = "勾选性能项 → 分析查看影响 → 预览确认后再加速。";
+"rules.filter.section_title" = "查找与选择";
+"rules.filter.no_results.title" = "没有匹配项";
+"rules.filter.no_results.description" = "试试其他关键词，或重置分类筛选。";
+"rules.command_bar.accessibility" = "清理操作";
 "rules.dry_run" = "预览";
 "rules.dry_run.sheet_title" = "预览（演练）";
 "rules.dry_run.help" = "列出已勾选规则将删除的路径或将执行的命令，不会改动磁盘。";
 "rules.dry_run.disclaimer" = "此为演练：在点击「清理」并确认之前，不会删除任何文件。";
 "rules.dry_run.path_missing" = "路径不存在（若清理时仍不存在将跳过）。";
 "rules.dry_run.no_paths" = "此规则未解析出任何路径。";
+"rules.dry_run.process_line_format" = "PID %d：%@";
+"rules.dry_run.loading_processes" = "正在列举进程…";
 
 "rules.browser.table.clean" = "清理";
 "rules.browser.table.item" = "项目";
@@ -218,7 +262,29 @@
 "category.system" = "系统";
 "category.browser" = "浏览器";
 "category.docker" = "Docker";
-"category.ai_tools" = "AI 工具";
+"category.ai_tools_space" = "AI 工具 · 空间";
+"category.performance" = "性能";
+
+"performance.nav_title" = "性能";
+"performance.overview.title" = "概览";
+"performance.overview.blurb" = "先分析进程负载再执行优化。本页与磁盘清理分离。";
+"performance.overview.chip.analyzed_format" = "已分析 %lld 项";
+"performance.flow.section_title" = "使用步骤";
+"performance.flow.steps" = "1. 勾选要处理的性能项。\n2. 点「分析」统计泄漏的 MCP 进程数与内存。\n3. 点「预览」查看 PID，此时尚未结束进程。\n4. 点「优化」对匹配进程发送 SIGTERM。";
+"performance.action.title" = "性能优化";
+"performance.action.blurb" = "分析 → 预览 → 优化。针对 CPU/内存减负，非磁盘空间。";
+"performance.action.impact_label" = "预估影响";
+"performance.action.metric.placeholder" = "请选择项目";
+"performance.action.metric.tap_analyze" = "请先分析";
+"performance.action.metric.impact_format" = "%lld 个进程 · %@";
+"performance.action.caption.none" = "尚未选择项目。";
+"performance.action.caption.selected_format" = "已选 %lld 项待优化";
+"performance.scanning" = "正在分析…";
+"performance.boosting" = "正在优化…";
+"performance.boost" = "优化";
+"performance.list.analyze_hint" = "分析";
+"performance.list.help.scan_column" = "分析后显示泄漏的 MCP 进程数量。";
+"performance.list.process_count_format" = "%lld 个进程";
 "category.custom" = "自定义";
 
 "clean.deleted_format" = "已删除 %lld 项";
@@ -226,3 +292,7 @@
 "clean.missing_command" = "缺少 command";
 "clean.executed" = "已执行";
 "clean.exit_code_format" = "退出码 %d：%@";
+"clean.mcp.none_found" = "未发现泄漏的 MCP 进程";
+"clean.mcp.killed_format" = "已结束 %lld 个泄漏的 MCP 进程";
+"clean.mcp.partial_format" = "已结束 %lld 个进程，%lld 个未能结束";
+"clean.mcp.kill_failed" = "无法结束匹配的 MCP 进程";

@@ -21,7 +21,7 @@ pnpm install
 
 ## 使用流程（规则清理界面）
 
-面向最终用户时，侧栏进入 **「规则清理」** 后，窗口内自上而下为：**概览**（计数芯片）→ **「本页怎么用」**（分步说明）→ **流程卡**（分析 / 预览 / 运行清理）→ 按分类的规则列表（及可选图表）。推荐顺序与界面文案一致：**先勾选 → 分析 → 预览（可选）→ 运行清理并确认**。细节与交互约定见 **[RFC 010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md)**。
+面向最终用户时，侧栏进入 **「规则清理」** 后，窗口内自上而下为：**概览**（计数芯片）→ **「本页怎么用」**（分步说明）→ **流程卡**（分析 / 预览 / 运行清理）→ 按分类的规则列表（及可选图表）。推荐顺序与界面文案一致：**先勾选 → 分析 → 预览（可选）→ 运行清理并确认**。**规则清理界面（扫描列表、预览、确认、清理）的详细设计**见 **[RFC 010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)**（锚点 `detailed-ui-spec`）。
 
 ## 常用命令
 
@@ -71,6 +71,7 @@ Release 产物示例路径：
 | `design/` | 应用图标矢量源 `icon.svg` 与 `generate-app-icon.sh` |
 | `scripts/bundle-mac-app.sh` | 将 `swift build` 产物组装为 `.app` |
 | `docs/rfc/` | 能力范围与规则格式等说明 |
+| `docs/macos-swiftui-references.md` | Apple HIG / SwiftUI 官方对照索引（规则 UI 细稿只在 [RFC 010#detailed-ui-spec](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)） |
 | `ROADMAP.md` | RFC **顺序与路线图状态**（与 RFC 正文、`TASK_TRACKING.md` 同步） |
 | `TASK_TRACKING.md` | RFC 落地的**细项任务**与完成状态 |
 | `.husky/` | `pre-commit` / `pre-push` 等 Git 钩子 |

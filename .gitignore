@@ -24,6 +24,13 @@ DerivedData/
 # Local env / secrets (keep examples committed if you add them)
 .env
 .env.*.local
+logs/security/
+*.security-key
+
+# Codegraph runtime (index DB covered under .codegraph/.gitignore)
+.codegraph/daemon.pid
+.codegraph/daemon.sock
+.codegraph/daemon.log
 
 # Tooling / editors (uncomment if you do not commit shared IDE settings)
 # .vscode/

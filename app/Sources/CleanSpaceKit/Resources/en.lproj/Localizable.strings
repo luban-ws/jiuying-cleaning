@@ -1,6 +1,6 @@
-/* CleanSpace — English (development language) */
+/* Cleaner — English (development language) */
 
-"app.name" = "CleanSpace";
+"app.name" = "Cleaner";
 
 "menu.show_main_window" = "Show Main Window";
 "menu.bar.open_format" = "Open %@";
@@ -11,7 +11,7 @@
 "menubar.tab.manager" = "Workspace";
 "menubar.disk.boot_title" = "Boot volume";
 "menubar.disk.unavailable" = "Could not read disk space.";
-"menubar.manager.intro" = "Use the main window to pick volumes, scan folders, and run rules or Docker presets.";
+"menubar.manager.intro" = "Use the main window for disk space, rules, AI tool caches, performance boosts, or Docker presets.";
 
 "metrics.menu_bar.accessibility" = "CPU, memory, and network usage";
 "metrics.menu_bar.help_live_format" = "Live: CPU %@, memory %@, network %@. Click for details and alert thresholds.";
@@ -41,11 +41,23 @@
 "common.ok" = "OK";
 
 "sidebar.rules" = "Rules";
+"sidebar.ai_tools_space" = "AI tools · Space";
+"sidebar.performance" = "Performance";
 "sidebar.docker" = "Docker";
 "sidebar.volumes" = "Volumes";
-"sidebar.volumes.blurb" = "Charts, space & top folders";
-"sidebar.rules.blurb" = "Scan paths, then clean safely";
-"sidebar.docker.blurb" = "Presets & Docker Desktop data";
+"sidebar.volumes.blurb" = "See free space and large folders";
+"sidebar.rules.blurb" = "Clean caches, logs, and app data safely";
+"sidebar.ai_tools_space.blurb" = "Reclaim editor and AI tool disk usage";
+"sidebar.performance.blurb" = "Free CPU and memory from stuck processes";
+"sidebar.docker.blurb" = "Prune images, containers, and Desktop data";
+"sidebar.space_group" = "Space";
+"sidebar.resources_group" = "Resources";
+"sidebar.monitor" = "Monitor";
+"sidebar.monitor.blurb" = "CPU, memory & network live";
+
+"monitor.nav_title" = "System Monitor";
+"monitor.nav_subtitle" = "Live CPU, memory, and network";
+"monitor.intro" = "Live CPU, memory, and network from the menu bar sampler. When something looks high, open Performance or Rules to take action.";
 
 "rules.empty.title" = "No rules";
 "rules.empty.description" = "Check that cleaning-rules.json is present in the app bundle.";
@@ -68,6 +80,7 @@
 "rules.estimate.command" = "Command";
 "rules.risk.medium" = "Med";
 "rules.risk.high" = "High";
+"rules.risk.low" = "Low";
 "rules.confirm.clean_risky" = "Selection includes medium/high risk. Continue?";
 "rules.confirm.clean_safe_format" = "Clean %lld selected items?";
 "rules.clean.status.success" = "OK";
@@ -78,19 +91,50 @@
 "rules.help.clean" = "Delete data for selected rules. Medium or high risk rules ask for confirmation first.";
 "rules.action.title" = "Cleaning";
 "rules.action.blurb" = "Analyze → Preview → Run Clean. Hover buttons for details; progress appears here while working.";
-"rules.action.recoverable_label" = "Recoverable (path rules)";
-"rules.action.metric.placeholder" = "—";
-"rules.action.metric.tap_analyze" = "Tap Analyze";
-"rules.action.caption.none" = "No rules selected.";
+"rules.action.recoverable_label" = "You can free";
+"rules.action.metric.placeholder" = "Choose items below";
+"rules.action.metric.tap_analyze" = "Tap Analyze to measure";
+"rules.action.caption.none" = "Select rows in the list to continue.";
 "rules.action.caption.counts_format" = "%1$lld selected · %2$lld path · %3$lld command";
 "rules.action.select_all" = "Select All";
 "rules.action.select_none" = "Select None";
+"rules.action.select_filtered" = "Select Shown";
+"rules.filter.search_placeholder" = "Search rules…";
+"rules.filter.category_label" = "Category";
+"rules.filter.all_categories" = "All categories";
+"rules.filter.sort_label" = "Sort";
+"rules.filter.visible_format" = "%1$lld shown · %2$lld total";
+"rules.filter.selected_in_view_format" = "%lld selected in view";
+"rules.sort.name" = "Name";
+"rules.sort.category" = "Category";
+"rules.sort.impact" = "Impact";
+"rules.sort.risk" = "Risk";
+"rules.table.category" = "Category";
+"rules.table.type" = "Type";
+"rules.table.type.path" = "Path";
+"rules.table.type.command" = "Cmd";
+"rules.inspector.empty.title" = "No selection";
+"rules.inspector.empty.description" = "Select a row to review paths, commands, and impact before you continue.";
+"rules.inspector.empty.description.performance" = "Select a row to review process impact before you boost.";
+"rules.inspector.include" = "Include in clean-up";
+"rules.inspector.paths.title" = "Paths";
+"rules.inspector.command.title" = "Command";
+"rules.inspector.title" = "Details";
+"rules.workspace.guide.storage" = "Choose what to clean, run Analyze to see sizes, then Preview before you confirm.";
+"rules.workspace.guide.ai_tools" = "Select AI tool caches to remove, Analyze to check size, then Preview before cleaning.";
+"rules.workspace.guide.performance" = "Select performance actions, Analyze to see impact, then Preview before boosting.";
+"rules.filter.section_title" = "Find & select";
+"rules.filter.no_results.title" = "No matching items";
+"rules.filter.no_results.description" = "Try a different search or reset the category filter.";
+"rules.command_bar.accessibility" = "Cleaning actions";
 "rules.dry_run" = "Preview";
 "rules.dry_run.sheet_title" = "Preview selection";
 "rules.dry_run.help" = "Show paths or shell commands for checked rules. Nothing is deleted.";
 "rules.dry_run.disclaimer" = "This is a dry run. No files are removed until you click Clean and confirm.";
 "rules.dry_run.path_missing" = "Path not found (clean will skip if still missing).";
 "rules.dry_run.no_paths" = "No paths resolved for this rule.";
+"rules.dry_run.process_line_format" = "PID %d: %@";
+"rules.dry_run.loading_processes" = "Listing processes…";
 
 "rules.browser.table.clean" = "Clean";
 "rules.browser.table.item" = "Item";
@@ -218,7 +262,29 @@
 "category.system" = "System";
 "category.browser" = "Browsers";
 "category.docker" = "Docker";
-"category.ai_tools" = "AI tools";
+"category.ai_tools_space" = "AI tools · Space";
+"category.performance" = "Performance";
+
+"performance.nav_title" = "Performance";
+"performance.overview.title" = "At a glance";
+"performance.overview.blurb" = "Analyze process load before boosting. This page is separate from disk cleanup.";
+"performance.overview.chip.analyzed_format" = "%lld analyzed";
+"performance.flow.section_title" = "How to use this page";
+"performance.flow.steps" = "1. Select performance actions with checkboxes.\n2. Tap Analyze to count leaked MCP processes and memory.\n3. Tap Preview to review PIDs—nothing is stopped yet.\n4. Tap Boost to send SIGTERM to matched processes.";
+"performance.action.title" = "Performance";
+"performance.action.blurb" = "Analyze → Preview → Boost. Targets CPU/memory relief, not disk space.";
+"performance.action.impact_label" = "Estimated impact";
+"performance.action.metric.placeholder" = "Select items";
+"performance.action.metric.tap_analyze" = "Tap Analyze";
+"performance.action.metric.impact_format" = "%lld processes · %@";
+"performance.action.caption.none" = "No items selected.";
+"performance.action.caption.selected_format" = "%lld selected for boost";
+"performance.scanning" = "Analyzing…";
+"performance.boosting" = "Boosting…";
+"performance.boost" = "Boost";
+"performance.list.analyze_hint" = "Analyze";
+"performance.list.help.scan_column" = "Leaked MCP process count after Analyze.";
+"performance.list.process_count_format" = "%lld processes";
 "category.custom" = "Custom";
 
 "clean.deleted_format" = "Removed %lld item(s)";
@@ -226,3 +292,7 @@
 "clean.missing_command" = "Missing command";
 "clean.executed" = "Done";
 "clean.exit_code_format" = "Exit %d: %@";
+"clean.mcp.none_found" = "No leaked MCP processes found";
+"clean.mcp.killed_format" = "Terminated %lld leaked MCP process(es)";
+"clean.mcp.partial_format" = "Terminated %lld process(es); %lld could not be stopped";
+"clean.mcp.kill_failed" = "Could not terminate matched MCP processes";

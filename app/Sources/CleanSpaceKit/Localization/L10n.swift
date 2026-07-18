@@ -22,12 +22,61 @@ enum L10n {
 
     enum Sidebar {
         static var rules: String { tr("sidebar.rules") }
+        static var aiToolsSpace: String { tr("sidebar.ai_tools_space") }
+        static var performance: String { tr("sidebar.performance") }
         static var docker: String { tr("sidebar.docker") }
         static var volumes: String { tr("sidebar.volumes") }
         /// 侧栏第二行：各分区一句话说明（类似 App Store / 系统设置侧栏副文案）。
         static var volumesBlurb: String { tr("sidebar.volumes.blurb") }
         static var rulesBlurb: String { tr("sidebar.rules.blurb") }
+        static var aiToolsSpaceBlurb: String { tr("sidebar.ai_tools_space.blurb") }
+        static var performanceBlurb: String { tr("sidebar.performance.blurb") }
         static var dockerBlurb: String { tr("sidebar.docker.blurb") }
+        static var spaceGroup: String { tr("sidebar.space_group") }
+        static var resourcesGroup: String { tr("sidebar.resources_group") }
+        static var monitor: String { tr("sidebar.monitor") }
+        static var monitorBlurb: String { tr("sidebar.monitor.blurb") }
+    }
+
+    enum Monitor {
+        static var navTitle: String { tr("monitor.nav_title") }
+        static var navSubtitle: String { tr("monitor.nav_subtitle") }
+        static var intro: String { tr("monitor.intro") }
+    }
+
+    enum Performance {
+        static var navTitle: String { tr("performance.nav_title") }
+        static var overviewTitle: String { tr("performance.overview.title") }
+        static var overviewBlurb: String { tr("performance.overview.blurb") }
+        static func overviewChipAnalyzed(_ n: Int) -> String {
+            String(format: tr("performance.overview.chip.analyzed_format"), n)
+        }
+        static var flowSectionTitle: String { tr("performance.flow.section_title") }
+        static var flowSteps: String { tr("performance.flow.steps") }
+        static var actionTitle: String { tr("performance.action.title") }
+        static var actionBlurb: String { tr("performance.action.blurb") }
+        static var actionImpactLabel: String { tr("performance.action.impact_label") }
+        static var actionMetricPlaceholder: String { tr("performance.action.metric.placeholder") }
+        static var actionMetricTapAnalyze: String { tr("performance.action.metric.tap_analyze") }
+        static func actionMetricImpact(processes: Int, memoryBytes: Int64) -> String {
+            String(
+                format: tr("performance.action.metric.impact_format"),
+                processes,
+                SpaceFormat.bytes(memoryBytes)
+            )
+        }
+        static var actionCaptionNone: String { tr("performance.action.caption.none") }
+        static func actionCaptionSelected(_ count: Int) -> String {
+            String(format: tr("performance.action.caption.selected_format"), count)
+        }
+        static var scanning: String { tr("performance.scanning") }
+        static var boosting: String { tr("performance.boosting") }
+        static var boost: String { tr("performance.boost") }
+        static var listAnalyzeHint: String { tr("performance.list.analyze_hint") }
+        static var listHelpScanColumn: String { tr("performance.list.help.scan_column") }
+        static func listProcessCount(_ count: Int) -> String {
+            String(format: tr("performance.list.process_count_format"), count)
+        }
     }
 
     enum Rules {
@@ -64,6 +113,7 @@ enum L10n {
         static var estimateCommand: String { tr("rules.estimate.command") }
         static var riskMedium: String { tr("rules.risk.medium") }
         static var riskHigh: String { tr("rules.risk.high") }
+        static var riskLow: String { tr("rules.risk.low") }
         static func confirmCleanRisky() -> String { tr("rules.confirm.clean_risky") }
         static func confirmCleanSafe(_ count: Int) -> String {
             String(format: tr("rules.confirm.clean_safe_format"), count)
@@ -83,6 +133,10 @@ enum L10n {
         static var dryRunDisclaimer: String { tr("rules.dry_run.disclaimer") }
         static var dryRunPathMissing: String { tr("rules.dry_run.path_missing") }
         static var dryRunNoPaths: String { tr("rules.dry_run.no_paths") }
+        static func dryRunProcessLine(pid: Int32, command: String) -> String {
+            String(format: tr("rules.dry_run.process_line_format"), pid, command)
+        }
+        static var dryRunLoadingProcesses: String { tr("rules.dry_run.loading_processes") }
 
         /// 主内容区清理流程卡（分析 → 预览 → 运行清理，与常见清理工具主流程一致）。
         static var actionTitle: String { tr("rules.action.title") }
@@ -96,6 +150,45 @@ enum L10n {
         }
         static var actionSelectAll: String { tr("rules.action.select_all") }
         static var actionSelectNone: String { tr("rules.action.select_none") }
+        static var actionSelectFiltered: String { tr("rules.action.select_filtered") }
+
+        static var filterSearchPlaceholder: String { tr("rules.filter.search_placeholder") }
+        static var filterCategoryLabel: String { tr("rules.filter.category_label") }
+        static var filterAllCategories: String { tr("rules.filter.all_categories") }
+        static var filterSortLabel: String { tr("rules.filter.sort_label") }
+        static func filterVisibleFormat(visible: Int, total: Int) -> String {
+            String(format: tr("rules.filter.visible_format"), visible, total)
+        }
+        static func filterSelectedInViewFormat(_ count: Int) -> String {
+            String(format: tr("rules.filter.selected_in_view_format"), count)
+        }
+
+        static var sortName: String { tr("rules.sort.name") }
+        static var sortCategory: String { tr("rules.sort.category") }
+        static var sortImpact: String { tr("rules.sort.impact") }
+        static var sortRisk: String { tr("rules.sort.risk") }
+
+        static var tableCategory: String { tr("rules.table.category") }
+        static var tableType: String { tr("rules.table.type") }
+        static var tableTypePath: String { tr("rules.table.type.path") }
+        static var tableTypeCommand: String { tr("rules.table.type.command") }
+
+        static var inspectorEmptyTitle: String { tr("rules.inspector.empty.title") }
+        static var inspectorEmptyDescription: String { tr("rules.inspector.empty.description") }
+        static var inspectorEmptyDescriptionPerformance: String { tr("rules.inspector.empty.description.performance") }
+        static var inspectorInclude: String { tr("rules.inspector.include") }
+        static var inspectorPathsTitle: String { tr("rules.inspector.paths.title") }
+        static var inspectorCommandTitle: String { tr("rules.inspector.command.title") }
+        static var inspectorTitle: String { tr("rules.inspector.title") }
+
+        static var workspaceGuideStorage: String { tr("rules.workspace.guide.storage") }
+        static var workspaceGuideAiTools: String { tr("rules.workspace.guide.ai_tools") }
+        static var workspaceGuidePerformance: String { tr("rules.workspace.guide.performance") }
+
+        static var filterSectionTitle: String { tr("rules.filter.section_title") }
+        static var filterNoResultsTitle: String { tr("rules.filter.no_results.title") }
+        static var filterNoResultsDescription: String { tr("rules.filter.no_results.description") }
+        static var commandBarAccessibility: String { tr("rules.command_bar.accessibility") }
 
         /// 浏览器类规则表格列标题
         static var browserTableClean: String { tr("rules.browser.table.clean") }
@@ -224,7 +317,8 @@ enum L10n {
         static var system: String { tr("category.system") }
         static var browser: String { tr("category.browser") }
         static var docker: String { tr("category.docker") }
-        static var aiTools: String { tr("category.ai_tools") }
+        static var aiToolsSpace: String { tr("category.ai_tools_space") }
+        static var performance: String { tr("category.performance") }
         static var custom: String { tr("category.custom") }
     }
 
@@ -236,6 +330,14 @@ enum L10n {
         static func exitCode(_ code: Int32, _ output: String) -> String {
             String(format: tr("clean.exit_code_format"), code, output)
         }
+        static var mcpNoneFound: String { tr("clean.mcp.none_found") }
+        static func mcpKilled(_ count: Int) -> String {
+            String(format: tr("clean.mcp.killed_format"), count)
+        }
+        static func mcpPartial(killed: Int, failed: Int) -> String {
+            String(format: tr("clean.mcp.partial_format"), killed, failed)
+        }
+        static var mcpKillFailed: String { tr("clean.mcp.kill_failed") }
     }
 
     enum DockerService {

@@ -18,6 +18,8 @@ enum CS {
     static let cornerPanel: CGFloat = 14
     /// 首屏大卡片（卷摘要、预设宫格等）
     static let cornerHero: CGFloat = 16
+    /// 可扫选工作区（规则表 + 检查器）使用更宽详情列。
+    static let selectableWorkspaceMaxWidth: CGFloat = 1120
 }
 
 // MARK: - 详情区：居中限宽（背景交给窗口与 NavigationStack，避免整块涂灰）
@@ -33,8 +35,22 @@ struct DetailScaffold<Content: View>: View {
             .contentMargins(.horizontal, CS.detailHorizontalPadding, for: .scrollContent)
             .contentMargins(.vertical, CS.detailVerticalPadding, for: .scrollContent)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .clipped()
             // 详情区不使用 `WindowDragGesture`：与工具栏 `Menu` 的外点取消、下拉锚定同属窗口级事件，同层 `simultaneousGesture` 在部分系统上易抢手势。
             // 侧栏仍保留拖拽；窗口还可通过标题栏/工具栏空白区拖动（unified 样式下由系统提供）。
+    }
+}
+
+/// 规则 / 监控等需要宽表格 + 分栏的工作区。
+struct SelectableWorkspaceScaffold<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        content()
+            .frame(maxWidth: CS.selectableWorkspaceMaxWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .clipped()
     }
 }
 

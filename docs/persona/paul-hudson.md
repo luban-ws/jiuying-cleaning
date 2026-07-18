@@ -37,6 +37,6 @@
 
 ## 参考锚点（本仓库）
 
-- `docs/design/macos-swiftui-references.md`
+- `docs/macos-swiftui-references.md`
 - `.cursor/rules/cleanspace-baseline.mdc`
 - `AGENTS.md` 中「界面（macOS）」与「本地化」小节

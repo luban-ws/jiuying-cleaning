@@ -82,11 +82,32 @@ struct CSVolumeHeroPanel: View {
     }
 }
 
+/// 规则工作区呈现：Space（磁盘）与 Performance（进程/负载）文案与指标分离。
+enum RulesWorkspacePresentation: Equatable {
+    case storage
+    case performance
+}
+
 // MARK: - 规则：概览卡（选中 / 已扫描 一目了然）
 struct CSRulesOverviewPanel: View {
     let totalRules: Int
     let selectedCount: Int
     let scannedWithSizeCount: Int
+    var presentation: RulesWorkspacePresentation = .storage
+
+    private var title: String {
+        presentation == .performance ? L10n.Performance.overviewTitle : L10n.Rules.overviewTitle
+    }
+
+    private var blurb: String {
+        presentation == .performance ? L10n.Performance.overviewBlurb : L10n.Rules.overviewBlurb
+    }
+
+    private var scannedChip: String {
+        presentation == .performance
+            ? L10n.Performance.overviewChipAnalyzed(scannedWithSizeCount)
+            : L10n.Rules.overviewChipScanned(scannedWithSizeCount)
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
@@ -97,9 +118,9 @@ struct CSRulesOverviewPanel: View {
                 .frame(width: 44, alignment: .center)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(L10n.Rules.overviewTitle)
+                Text(title)
                     .font(.headline)
-                Text(L10n.Rules.overviewBlurb)
+                Text(blurb)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -107,7 +128,7 @@ struct CSRulesOverviewPanel: View {
                 HStack(spacing: 8) {
                     overviewChip(text: L10n.Rules.overviewChipTotal(totalRules), prominent: false)
                     overviewChip(text: L10n.Rules.overviewChipSelected(selectedCount), prominent: selectedCount > 0)
-                    overviewChip(text: L10n.Rules.overviewChipScanned(scannedWithSizeCount), prominent: scannedWithSizeCount > 0)
+                    overviewChip(text: scannedChip, prominent: scannedWithSizeCount > 0)
                 }
                 .padding(.top, 4)
             }
@@ -141,13 +162,16 @@ struct CSRulesOverviewPanel: View {
 /// 大字号可回收体积 + 横向主按钮，避免操作只藏在工具栏里。
 struct CSRulesCleanWorkflowCard: View {
     let recoverableBytes: Int64
+    let selectedProcessCount: Int
     let selectedCount: Int
     let selectedPathRuleCount: Int
     let selectedCommandRuleCount: Int
     let sizedSelectedPathCount: Int
+    let analyzedSelectedCount: Int
     let rulesNonEmpty: Bool
     let isScanning: Bool
     let isCleaning: Bool
+    var presentation: RulesWorkspacePresentation = .storage
     let onAnalyze: () -> Void
     let onPreview: () -> Void
     let onRunClean: () -> Void
@@ -155,26 +179,54 @@ struct CSRulesCleanWorkflowCard: View {
     let onSelectNone: () -> Void
 
     private var needsAnalyze: Bool {
-        selectedPathRuleCount > 0 && sizedSelectedPathCount < selectedPathRuleCount
+        switch presentation {
+        case .storage:
+            return selectedPathRuleCount > 0 && sizedSelectedPathCount < selectedPathRuleCount
+        case .performance:
+            return selectedCount > 0 && analyzedSelectedCount < selectedCount
+        }
     }
 
     private var metricText: String {
         if selectedCount == 0 {
-            return L10n.Rules.actionMetricPlaceholder
+            return presentation == .performance
+                ? L10n.Performance.actionMetricPlaceholder
+                : L10n.Rules.actionMetricPlaceholder
         }
         if needsAnalyze {
-            return L10n.Rules.actionMetricTapAnalyze
+            return presentation == .performance
+                ? L10n.Performance.actionMetricTapAnalyze
+                : L10n.Rules.actionMetricTapAnalyze
         }
-        return SpaceFormat.bytes(recoverableBytes)
+        switch presentation {
+        case .storage:
+            return SpaceFormat.bytes(recoverableBytes)
+        case .performance:
+            return L10n.Performance.actionMetricImpact(
+                processes: selectedProcessCount,
+                memoryBytes: recoverableBytes
+            )
+        }
     }
 
     private var metricAccent: Bool {
-        selectedCount > 0 && !needsAnalyze && recoverableBytes > 0
+        guard selectedCount > 0, !needsAnalyze else { return false }
+        switch presentation {
+        case .storage:
+            return recoverableBytes > 0
+        case .performance:
+            return selectedProcessCount > 0 || recoverableBytes > 0
+        }
     }
 
     private var captionText: String {
         if selectedCount == 0 {
-            return L10n.Rules.actionCaptionNone
+            return presentation == .performance
+                ? L10n.Performance.actionCaptionNone
+                : L10n.Rules.actionCaptionNone
+        }
+        if presentation == .performance {
+            return L10n.Performance.actionCaptionSelected(selectedCount)
         }
         return L10n.Rules.actionCaptionCounts(
             selected: selectedCount,
@@ -183,19 +235,41 @@ struct CSRulesCleanWorkflowCard: View {
         )
     }
 
+    private var actionTitle: String {
+        presentation == .performance ? L10n.Performance.actionTitle : L10n.Rules.actionTitle
+    }
+
+    private var actionBlurb: String {
+        presentation == .performance ? L10n.Performance.actionBlurb : L10n.Rules.actionBlurb
+    }
+
+    private var metricLabel: String {
+        presentation == .performance
+            ? L10n.Performance.actionImpactLabel
+            : L10n.Rules.actionRecoverableLabel
+    }
+
+    private var scanningLabel: String {
+        presentation == .performance ? L10n.Performance.scanning : L10n.Rules.scanning
+    }
+
+    private var cleaningLabel: String {
+        presentation == .performance ? L10n.Performance.boosting : L10n.Rules.cleaning
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(L10n.Rules.actionTitle)
+                Text(actionTitle)
                     .font(.headline)
-                Text(L10n.Rules.actionBlurb)
+                Text(actionBlurb)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.Rules.actionRecoverableLabel)
+                Text(metricLabel)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text(metricText)
@@ -214,7 +288,7 @@ struct CSRulesCleanWorkflowCard: View {
                 HStack(spacing: 10) {
                     ProgressView()
                         .controlSize(.small)
-                    Text(isScanning ? L10n.Rules.scanning : L10n.Rules.cleaning)
+                    Text(isScanning ? scanningLabel : cleaningLabel)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer(minLength: 0)
@@ -242,7 +316,10 @@ struct CSRulesCleanWorkflowCard: View {
                 .disabled(selectedCount == 0 || isCleaning)
 
                 Button(action: onRunClean) {
-                    Label(L10n.Rules.clean, systemImage: "trash")
+                    Label(
+                        presentation == .performance ? L10n.Performance.boost : L10n.Rules.clean,
+                        systemImage: presentation == .performance ? "bolt.fill" : "trash"
+                    )
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)

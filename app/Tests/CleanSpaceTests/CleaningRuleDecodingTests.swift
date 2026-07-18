@@ -68,4 +68,47 @@ final class CleaningRuleDecodingTests: XCTestCase {
         let rule = try JSONDecoder().decode(CleaningRule.self, from: json)
         XCTAssertEqual(rule.riskLevel, .low)
     }
+
+    /// 校验 hiddenFromRulesList 新增属性可被正确解码
+    func testDecodeRuleWithHiddenField() throws {
+        let json = """
+        {
+          "id": "docker-desktop-residues",
+          "category": "docker",
+          "name": "Docker Residues",
+          "type": "dir",
+          "hiddenFromRulesList": true,
+          "paths": [{ "base": "/tmp", "dirs": ["*"] }]
+        }
+        """.data(using: .utf8)!
+        let rule = try JSONDecoder().decode(CleaningRule.self, from: json)
+        XCTAssertEqual(rule.id, "docker-desktop-residues")
+        XCTAssertTrue(rule.hiddenFromRulesList ?? false)
+    }
+
+    /// 故意损坏的 JSON 片段解码失败路径校验
+    func testDecodeCorruptedJson() {
+        // Case 1: 缺少必填字段 id
+        let jsonMissingId = """
+        {
+          "category": "system",
+          "name": "Missing ID",
+          "type": "dir",
+          "paths": [{ "base": "/tmp", "dirs": ["*"] }]
+        }
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try JSONDecoder().decode(CleaningRule.self, from: jsonMissingId))
+
+        // Case 2: 未知/非法的 type 枚举值
+        let jsonInvalidType = """
+        {
+          "id": "invalid-type",
+          "category": "system",
+          "name": "Invalid Type",
+          "type": "unsupported-type-value",
+          "paths": [{ "base": "/tmp", "dirs": ["*"] }]
+        }
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try JSONDecoder().decode(CleaningRule.self, from: jsonInvalidType))
+    }
 }

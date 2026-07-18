@@ -30,15 +30,15 @@
 | 顺序 | RFC | 标题 | 路线图状态 | 备注 |
 |------|-----|------|------------|------|
 | 1 | [001](docs/rfc/001-ccleaner-style-cleaning-spec.md) | CCleaner 式清理规范（路径、规则、安全边界） | 实施中 | 规范母本；缺口拆至 002–009 |
-| 2 | [002](docs/rfc/002-builtin-rules-catalog-parity.md) | 内置规则与 RFC 001 目录对齐 | 草案 | 对照矩阵固定：[appendix-002](docs/rfc/appendix-002-rfc001-rules-matrix.md)；补全 `cleaning-rules.json` |
-| 3 | [003](docs/rfc/003-chromium-profile-discovery.md) | Chromium 多 Profile 路径解析 | 草案 | 依赖 002 浏览器规则基线 |
+| 2 | [002](docs/rfc/002-builtin-rules-catalog-parity.md) | 内置规则与 RFC 001 目录对齐 | 已完成 | 对照矩阵固定：[appendix-002](docs/rfc/appendix-002-rfc001-rules-matrix.md)；补全 `cleaning-rules.json` |
+| 3 | [003](docs/rfc/003-chromium-profile-discovery.md) | Chromium 多 Profile 路径解析 | 已完成 | 依赖 002 浏览器规则基线 |
 | 4 | [004](docs/rfc/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 草案 | 权限 UX；主触发须 errno/API，禁止仅靠「体积为 0」 |
 | 5 | [009](docs/rfc/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 草案 | **实施上先于 005/006**：单一校验模块、argv 白名单；加载/保存/导入共用 |
 | 6 | [005](docs/rfc/005-user-rules-yaml-and-settings-editor.md) | 用户规则 YAML 与设置内编辑器 | 草案 | 调用 009；JSON 必选、YAML 可选；保存后内存重载 |
 | 7 | [006](docs/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
 | 8 | [007](docs/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
 | 9 | [008](docs/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
-| 10 | [010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区 UI（HIG）与协作索引（AGENTS / Persona） | 实施中 | 跨阶段体验与文档；主要实现已落地 |
+| 10 | [010](docs/rfc/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
 
 ## 阶段概览（与 RFC 001 对齐）
 

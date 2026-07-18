@@ -1,0 +1,206 @@
+//
+//  RulesUnifiedTable.swift
+//  CleanSpaceKit
+//
+//  统一规则表：所有分类共用 Table + 勾选列，支持扫读与批量选择。
+//
+
+import SwiftUI
+
+enum RulesUnifiedTableLayout {
+    static let cleanColumnWidth: CGFloat = 48
+    static let itemColumnMinWidth: CGFloat = 180
+    static let itemColumnCompactMinWidth: CGFloat = 220
+    static let categoryColumnMinWidth: CGFloat = 88
+    static let typeColumnWidth: CGFloat = 72
+    static let sizeColumnWidth: CGFloat = RulesScanListLayoutMetrics.scanColumnWidth + 12
+    static let riskColumnWidth: CGFloat = RulesScanListLayoutMetrics.riskColumnWidth
+    static let rowStride: CGFloat = 36
+
+    /// 所有列宽之和，避免 HSplitView 左侧过窄时表头/首列被裁切。
+    static func minimumWidth(
+        showCategoryColumn: Bool,
+        showTypeColumn: Bool,
+        compactItemColumn: Bool
+    ) -> CGFloat {
+        let itemWidth = compactItemColumn ? itemColumnCompactMinWidth : itemColumnMinWidth
+        var total = cleanColumnWidth + itemWidth + sizeColumnWidth + riskColumnWidth
+        if showTypeColumn { total += typeColumnWidth }
+        if showCategoryColumn { total += categoryColumnMinWidth }
+        return total + 24
+    }
+
+    /// 随规则行数增长的最小高度；不设固定上限，避免 macOS Table 表头被顶裁切。
+    static func preferredMinHeight(ruleCount: Int, compactItemColumn: Bool, rules: [CleaningRule]) -> CGFloat {
+        let rows = max(ruleCount, 1)
+        if compactItemColumn {
+            return min(380, max(128, 64 + CGFloat(rows) * rowStride))
+        }
+        let body = rules.reduce(CGFloat(0)) { partial, rule in
+            partial + (rule.warning?.isEmpty == false ? 52 : rowStride)
+        }
+        let content = rules.isEmpty ? rowStride : body
+        return min(420, max(128, 64 + content))
+    }
+}
+
+/// 全工作区规则表（浏览器 / 系统 / 性能等同列展示）。
+struct RulesUnifiedTable: View {
+    let rules: [CleaningRule]
+    let scannedSizes: [String: Int64]
+    let scannedProcessCounts: [String: Int]
+    @Binding var selectedRuleIds: Set<String>
+    @Binding var tableSelection: Set<String>
+    let formatBytes: (Int64?) -> String
+    var showCategoryColumn: Bool = true
+    /// 性能页仅进程类规则，可隐藏「类型」列以留出项目列宽度。
+    var showTypeColumn: Bool = true
+    /// 性能页等长说明规则：表格只显示标题，详情在右侧检查器。
+    var compactItemColumn: Bool = false
+    /// 为 false 时表格高度随内容收缩，避免少量行时出现大片空行。
+    var fillsAvailableHeight: Bool = true
+
+    private var itemColumnMin: CGFloat {
+        compactItemColumn
+            ? RulesUnifiedTableLayout.itemColumnCompactMinWidth
+            : RulesUnifiedTableLayout.itemColumnMinWidth
+    }
+
+    var body: some View {
+        Table(rules, selection: $tableSelection) {
+            TableColumn(L10n.Rules.browserTableClean) { rule in
+                Toggle(
+                    "",
+                    isOn: Binding(
+                        get: { selectedRuleIds.contains(rule.id) },
+                        set: { checked in
+                            if checked { selectedRuleIds.insert(rule.id) }
+                            else { selectedRuleIds.remove(rule.id) }
+                        }
+                    )
+                )
+                .labelsHidden()
+                .toggleStyle(.checkbox)
+                .accessibilityLabel(rule.name)
+                .accessibilityHint(L10n.Rules.listA11yToggleHint)
+            }
+            .width(RulesUnifiedTableLayout.cleanColumnWidth)
+
+            TableColumn(L10n.Rules.browserTableItem) { rule in
+                Text(rule.name)
+                    .font(.body)
+                    .lineLimit(compactItemColumn ? 2 : 3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .width(min: itemColumnMin, ideal: itemColumnMin + 80)
+
+            if showCategoryColumn {
+                TableColumn(L10n.Rules.tableCategory) { rule in
+                    Text(CleaningRule.categoryDisplayName(rule.category))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                .width(min: RulesUnifiedTableLayout.categoryColumnMinWidth, ideal: 110)
+            }
+
+            if showTypeColumn {
+                TableColumn(L10n.Rules.tableType) { rule in
+                    Text(ruleTypeLabel(rule))
+                        .font(.caption2.weight(.medium))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.primary.opacity(0.06))
+                        .clipShape(Capsule(style: .continuous))
+                }
+                .width(RulesUnifiedTableLayout.typeColumnWidth)
+            }
+
+            TableColumn(L10n.Rules.browserTableSize) { rule in
+                impactCell(for: rule)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .width(RulesUnifiedTableLayout.sizeColumnWidth)
+
+            TableColumn(L10n.Rules.browserTableRisk) { rule in
+                RuleRiskChip(risk: rule.riskLevel)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .width(RulesUnifiedTableLayout.riskColumnWidth)
+        }
+        .tableStyle(.inset(alternatesRowBackgrounds: true))
+        .modifier(RulesUnifiedTableFrameModifier(
+            showCategoryColumn: showCategoryColumn,
+            showTypeColumn: showTypeColumn,
+            compactItemColumn: compactItemColumn,
+            fillsAvailableHeight: fillsAvailableHeight,
+            ruleCount: rules.count,
+            rules: rules
+        ))
+        .onChange(of: tableSelection) { previous, current in
+            for id in current.subtracting(previous) {
+                selectedRuleIds.insert(id)
+            }
+            for id in previous.subtracting(current) {
+                selectedRuleIds.remove(id)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func impactCell(for rule: CleaningRule) -> some View {
+        if rule.displaysScannedProcessCount {
+            Text(scannedProcessCounts[rule.id].map { L10n.Performance.listProcessCount($0) }
+                ?? L10n.Performance.listAnalyzeHint)
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(scannedProcessCounts[rule.id] == nil ? .tertiary : .secondary)
+                .help(L10n.Performance.listHelpScanColumn)
+        } else if rule.displaysScannedByteSize {
+            Text(formatBytes(scannedSizes[rule.id]))
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .help(L10n.Rules.listHelpScanColumn)
+        } else {
+            Text(rule.estimate ?? L10n.Rules.estimateCommand)
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+        }
+    }
+
+    private func ruleTypeLabel(_ rule: CleaningRule) -> String {
+        switch rule.type {
+        case .dir: return L10n.Rules.tableTypePath
+        case .command: return L10n.Rules.tableTypeCommand
+        }
+    }
+}
+
+/// 表格外框：性能页等内容少时不拉伸高度，避免空行占位。
+private struct RulesUnifiedTableFrameModifier: ViewModifier {
+    let showCategoryColumn: Bool
+    let showTypeColumn: Bool
+    let compactItemColumn: Bool
+    let fillsAvailableHeight: Bool
+    let ruleCount: Int
+    let rules: [CleaningRule]
+
+    func body(content: Content) -> some View {
+        let minW = RulesUnifiedTableLayout.minimumWidth(
+            showCategoryColumn: showCategoryColumn,
+            showTypeColumn: showTypeColumn,
+            compactItemColumn: compactItemColumn
+        )
+        let minH = RulesUnifiedTableLayout.preferredMinHeight(
+            ruleCount: ruleCount,
+            compactItemColumn: compactItemColumn,
+            rules: rules
+        )
+        if fillsAvailableHeight {
+            content.frame(minWidth: minW, maxWidth: .infinity, minHeight: 120, maxHeight: .infinity, alignment: .topLeading)
+        } else {
+            content.frame(minWidth: minW, maxWidth: .infinity, minHeight: minH, alignment: .topLeading)
+        }
+    }
+}

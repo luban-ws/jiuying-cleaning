@@ -14,7 +14,13 @@ struct RuleRiskChip: View {
     var body: some View {
         switch risk {
         case .low:
-            EmptyView()
+            Text(L10n.Rules.riskLow)
+                .font(.caption2.weight(.medium))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .foregroundStyle(.secondary)
+                .background(Color.primary.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         case .medium:
             Text(L10n.Rules.riskMedium)
                 .font(.caption2.weight(.medium))
@@ -74,16 +80,16 @@ struct BrowserRulesTableBlock: View {
 
             TableColumn(L10n.Rules.browserTableSize) { rule in
                 Group {
-                    if rule.type == .command {
-                        Text(rule.estimate ?? L10n.Rules.estimateCommand)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    } else {
+                    if rule.displaysScannedByteSize {
                         Text(formatBytes(scannedSizes[rule.id]))
                             .font(.caption)
                             .monospacedDigit()
                             .foregroundStyle(.secondary)
                             .help(L10n.Rules.listHelpScanColumn)
+                    } else {
+                        Text(rule.estimate ?? L10n.Rules.estimateCommand)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
