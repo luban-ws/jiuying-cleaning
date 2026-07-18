@@ -10,6 +10,13 @@ import SwiftUI
 struct SystemMonitorWorkspaceView: View {
     @ObservedObject private var metrics = SystemMetricsController.shared
 
+    /// 窄窗 1 列 → 中等 2 列 → 宽屏 3 列，避免固定三列挤压环形图。
+    private var monitorGridColumns: [GridItem] {
+        [
+            GridItem(.adaptive(minimum: 240, maximum: 420), spacing: 16),
+        ]
+    }
+
     var body: some View {
         SelectableWorkspaceScaffold {
             ScrollView {
@@ -22,11 +29,7 @@ struct SystemMonitorWorkspaceView: View {
                     .padding(.top, 16)
 
                     LazyVGrid(
-                        columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16),
-                        ],
+                        columns: monitorGridColumns,
                         spacing: 16
                     ) {
                         monitorCard(

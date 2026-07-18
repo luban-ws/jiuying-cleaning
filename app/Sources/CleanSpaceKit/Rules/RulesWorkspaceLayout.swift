@@ -244,8 +244,9 @@ private struct RulesInspectorPanelLayoutModifier: ViewModifier {
                 .frame(minWidth: 240, idealWidth: 280, maxWidth: 320)
                 .frame(maxHeight: .infinity)
         case .stacked:
+            // 窄窗：可伸缩高度，避免硬顶 200pt 裁切长路径/警告。
             content
-                .frame(maxWidth: .infinity, minHeight: 200, maxHeight: 200)
+                .frame(maxWidth: .infinity, minHeight: 180, idealHeight: 240, maxHeight: 320)
         }
     }
 }
@@ -475,7 +476,7 @@ struct RulesCommandBar: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(metricText)
-                .font(.title2.weight(.semibold))
+                .font(.system(size: 30, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(metricAccent ? Color.accentColor : .secondary)
                 .lineLimit(presentation == .performance ? 2 : 1)

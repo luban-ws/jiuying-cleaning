@@ -207,16 +207,6 @@ struct RulesWorkspaceView: View {
                 VStack(spacing: 0) {
                     workspaceHeaderSection
 
-                    if showChart && hasDirScanResults {
-                        CSChartCard(title: L10n.Rules.chartCardTitle) {
-                            RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
-                                .frame(minHeight: 260)
-                        }
-                        .padding(.horizontal, CS.detailHorizontalPadding)
-                        .padding(.top, 12)
-                        .padding(.bottom, 4)
-                    }
-
                     RulesFilterToolbar(
                         filter: $filter,
                         sortKey: $sortKey,
@@ -274,6 +264,17 @@ struct RulesWorkspaceView: View {
                     }
                     .frame(minHeight: 0, maxHeight: .infinity)
                     .layoutPriority(1)
+
+                    // 图表置于表下方（筛选 → 表 → 图），避免压住主扫读区。
+                    if showChart && hasDirScanResults {
+                        CSChartCard(title: L10n.Rules.chartCardTitle) {
+                            RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
+                                .frame(minHeight: 260)
+                        }
+                        .padding(.horizontal, CS.detailHorizontalPadding)
+                        .padding(.top, 12)
+                        .padding(.bottom, 8)
+                    }
                 }
                 .frame(width: windowProxy.size.width, height: windowProxy.size.height, alignment: .top)
                 .clipped()

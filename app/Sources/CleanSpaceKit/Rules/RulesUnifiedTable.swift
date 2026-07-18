@@ -8,12 +8,14 @@
 import SwiftUI
 
 enum RulesUnifiedTableLayout {
-    static let cleanColumnWidth: CGFloat = 48
+    /// 与 RFC 010 §2.5.6 Clean 列、BrowserRulesTableBlock 对齐。
+    static let cleanColumnWidth: CGFloat = 52
     static let itemColumnMinWidth: CGFloat = 180
     static let itemColumnCompactMinWidth: CGFloat = 220
     static let categoryColumnMinWidth: CGFloat = 88
     static let typeColumnWidth: CGFloat = 72
-    static let sizeColumnWidth: CGFloat = RulesScanListLayoutMetrics.scanColumnWidth + 12
+    /// 与 `RulesScanListLayoutMetrics.scanColumnWidth`（RFC §2.5.5 Size = 108）对齐。
+    static let sizeColumnWidth: CGFloat = RulesScanListLayoutMetrics.scanColumnWidth
     static let riskColumnWidth: CGFloat = RulesScanListLayoutMetrics.riskColumnWidth
     static let rowStride: CGFloat = 36
 

@@ -35,10 +35,11 @@
 | 4 | [004](.spec/rfc/completed/004-full-disk-access-onboarding.md) | 完全磁盘访问与受限路径引导 | 已完成 | 主触发须 errno/API；`FullDiskAccessBanner`；手工关 FDA 账号可复验 |
 | 5 | [009](.spec/rfc/completed/009-user-rule-safety-and-exclusions.md) | 用户规则安全边界与排除/阈值 | 已完成 | 校验模块 + 用户规则加载器接线 + 单测 + 白名单文档已落地；`exclude`/`minSizeBytes` 推迟到 Phase 2；005/006 保存/导入复用同入口 |
 | 6 | [005](.spec/rfc/005-user-rules-yaml-and-settings-editor.md) | 用户规则 YAML 与设置内编辑器 | 草案 | 调用 009；JSON 必选、YAML 可选；保存后内存重载 |
-| 7 | [006](.spec/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
-| 8 | [007](.spec/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
-| 9 | [008](.spec/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
-| 10 | [010](.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
+| 7 | [011](.spec/rfc/011-rules-studio-custom-rules-editor.md) | Rules Studio：自定义规则编辑器详细 UI | 草案 | RFC 005 UI 细稿；JSON 表单优先，YAML 延后 |
+| 8 | [006](.spec/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
+| 9 | [007](.spec/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
+| 10 | [008](.spec/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
+| 11 | [010](.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
 
 ## 阶段概览（与 RFC 001 对齐）
 

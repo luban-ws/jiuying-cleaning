@@ -92,15 +92,15 @@ import Testing
             showTypeColumn: true,
             compactItemColumn: false
         )
-        // 48 (clean) + 180 (item) + 120 (size) + 56 (risk) + 72 (type) + 88 (category) + 24 = 588
-        #expect(minW1 == 588)
+        // 52 (clean) + 180 (item) + 108 (size) + 56 (risk) + 72 (type) + 88 (category) + 24 = 580
+        #expect(minW1 == 580)
 
         let minW2 = RulesUnifiedTableLayout.minimumWidth(
             showCategoryColumn: false,
             showTypeColumn: false,
             compactItemColumn: true
         )
-        // 48 (clean) + 220 (compact item) + 120 (size) + 56 (risk) + 0 + 0 + 24 = 468
-        #expect(minW2 == 468)
+        // 52 (clean) + 220 (compact item) + 108 (size) + 56 (risk) + 0 + 0 + 24 = 460
+        #expect(minW2 == 460)
     }
 }
