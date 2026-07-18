@@ -32,7 +32,7 @@
 | TASK-001-06 | 单元测试：规则 JSON 解码、卷对账纯函数 | 已完成 | `CleanSpaceTests` |
 | TASK-001-07 | 内置规则覆盖 RFC 所列浏览器/系统/Docker/AI 路径 | 已完成 | 跟踪改挂 **[RFC 002](docs/rfc/002-builtin-rules-catalog-parity.md)** |
 | TASK-001-08 | 清理预演 / 仅列出将删除项 | 已完成 | 规则页「预览」已实现；增强项另议 |
-| TASK-001-09 | 完全磁盘访问等权限引导 | 进行中 | 跟踪改挂 **[RFC 004](docs/rfc/004-full-disk-access-onboarding.md)** |
+| TASK-001-09 | 完全磁盘访问等权限引导 | 已完成 | 跟踪改挂 **[RFC 004](docs/rfc/004-full-disk-access-onboarding.md)** |
 | TASK-001-10 | 用户规则 YAML 与「自定义规则」设置页 | 待办 | 跟踪改挂 **[RFC 005](docs/rfc/005-user-rules-yaml-and-settings-editor.md)** |
 | TASK-001-11 | 规则导入/导出 | 待办 | 跟踪改挂 **[RFC 006](docs/rfc/006-rules-import-and-export.md)** |
 | TASK-001-12 | 操作审计（撤销另开 RFC） | 待办 | 跟踪改挂 **[RFC 007](docs/rfc/007-post-clean-audit-log.md)** |
