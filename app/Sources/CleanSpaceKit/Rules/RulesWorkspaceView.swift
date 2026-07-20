@@ -192,7 +192,8 @@ struct RulesWorkspaceView: View {
             if let msg = statusMessage { Text(msg) }
         }
         .alert(L10n.Rules.alertResultTitle, isPresented: $showCleanResult) {
-            Button(L10n.Common.ok, role: .cancel) { }
+            // RFC 010 §2.6.3：结果 Alert 的 OK 不得使用 role: .cancel。
+            Button(L10n.Common.ok) { }
         } message: {
             if let msg = statusMessage { Text(msg) }
         }
@@ -203,106 +204,111 @@ struct RulesWorkspaceView: View {
 
     private var selectableBody: some View {
         SelectableWorkspaceScaffold {
-            GeometryReader { windowProxy in
-                VStack(spacing: 0) {
-                    workspaceHeaderSection
+            VStack(spacing: 0) {
+                workspaceHeaderSection
 
-                    RulesFilterToolbar(
-                        filter: $filter,
-                        sortKey: $sortKey,
-                        categories: categoryOptions,
-                        visibleCount: visibleRules.count,
-                        totalCount: rules.count,
-                        selectedInViewCount: selectedInViewCount,
-                        onSelectAllVisible: { selectAllVisible() },
-                        onSelectNone: { selectedRuleIds.subtract(visibleRules.map(\.id)) },
-                        onSelectAll: { selectedRuleIds = Set(rules.map(\.id)) }
+                RulesFilterToolbar(
+                    filter: $filter,
+                    sortKey: $sortKey,
+                    categories: categoryOptions,
+                    visibleCount: visibleRules.count,
+                    totalCount: rules.count,
+                    selectedInViewCount: selectedInViewCount,
+                    onSelectAllVisible: { selectAllVisible() },
+                    onSelectNone: { selectedRuleIds.subtract(visibleRules.map(\.id)) },
+                    onSelectAll: { selectedRuleIds = Set(rules.map(\.id)) }
+                )
+
+                Divider()
+
+                RulesWorkspaceTableInspectorLayout(
+                    presentation: presentation,
+                    tableMinWidth: RulesUnifiedTableLayout.minimumWidth(
+                        showCategoryColumn: showCategoryColumn,
+                        showTypeColumn: presentation != .performance,
+                        compactItemColumn: presentation == .performance
                     )
-
-                    Divider()
-
-                    RulesWorkspaceTableInspectorLayout(
-                        presentation: presentation,
-                        tableMinWidth: RulesUnifiedTableLayout.minimumWidth(
-                            showCategoryColumn: showCategoryColumn,
-                            showTypeColumn: presentation != .performance,
-                            compactItemColumn: presentation == .performance
-                        )
-                    ) {
-                        Group {
-                            if visibleRules.isEmpty {
-                                ContentUnavailableView(
-                                    L10n.Rules.filterNoResultsTitle,
-                                    systemImage: "line.3.horizontal.decrease.circle",
-                                    description: Text(L10n.Rules.filterNoResultsDescription)
-                                )
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            } else {
-                                RulesUnifiedTable(
-                                    rules: visibleRules,
-                                    scannedSizes: scannedSizes,
-                                    scannedProcessCounts: scannedProcessCounts,
-                                    selectedRuleIds: $selectedRuleIds,
-                                    tableSelection: $tableSelection,
-                                    formatBytes: formatBytesOptional,
-                                    showCategoryColumn: showCategoryColumn,
-                                    showTypeColumn: presentation != .performance,
-                                    compactItemColumn: presentation == .performance,
-                                    fillsAvailableHeight: true
-                                )
-                            }
+                ) {
+                    Group {
+                        if visibleRules.isEmpty {
+                            ContentUnavailableView(
+                                L10n.Rules.filterNoResultsTitle,
+                                systemImage: "line.3.horizontal.decrease.circle",
+                                description: Text(L10n.Rules.filterNoResultsDescription)
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            RulesUnifiedTable(
+                                rules: visibleRules,
+                                scannedSizes: scannedSizes,
+                                scannedProcessCounts: scannedProcessCounts,
+                                selectedRuleIds: $selectedRuleIds,
+                                tableSelection: $tableSelection,
+                                formatBytes: formatBytesOptional,
+                                showCategoryColumn: showCategoryColumn,
+                                showTypeColumn: presentation != .performance,
+                                compactItemColumn: presentation == .performance,
+                                fillsAvailableHeight: true
+                            )
                         }
-                    } inspector: {
-                        RulesInspectorPanel(
-                            rule: focusedRule,
-                            isIncluded: inspectorIncludeBinding,
-                            scannedBytes: focusedRule.flatMap { scannedSizes[$0.id] },
-                            scannedProcessCount: focusedRule.flatMap { scannedProcessCounts[$0.id] },
-                            formatBytes: formatBytesOptional,
-                            presentation: presentation
-                        )
                     }
-                    .frame(minHeight: 0, maxHeight: .infinity)
-                    .layoutPriority(1)
-
-                    // 图表置于表下方（筛选 → 表 → 图），避免压住主扫读区。
-                    if showChart && hasDirScanResults {
-                        CSChartCard(title: L10n.Rules.chartCardTitle) {
-                            RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
-                                .frame(minHeight: 260)
-                        }
-                        .padding(.horizontal, CS.detailHorizontalPadding)
-                        .padding(.top, 12)
-                        .padding(.bottom, 8)
-                    }
+                } inspector: {
+                    RulesInspectorPanel(
+                        rule: focusedRule,
+                        isIncluded: inspectorIncludeBinding,
+                        scannedBytes: focusedRule.flatMap { scannedSizes[$0.id] },
+                        scannedProcessCount: focusedRule.flatMap { scannedProcessCounts[$0.id] },
+                        formatBytes: formatBytesOptional,
+                        presentation: presentation
+                    )
                 }
-                .frame(width: windowProxy.size.width, height: windowProxy.size.height, alignment: .top)
-                .clipped()
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    RulesCommandBar(
-                        recoverableBytes: selectedRecoverableBytes,
-                        selectedProcessCount: selectedProcessCount,
-                        selectedCount: selectedRuleIds.count,
-                        selectedPathRuleCount: selectedPathRules.count,
-                        selectedCommandRuleCount: selectedCommandRules.count,
-                        sizedSelectedPathCount: sizedSelectedPathCount,
-                        analyzedSelectedCount: analyzedSelectedCount,
-                        rulesNonEmpty: !rules.isEmpty,
-                        isScanning: isScanning,
-                        isCleaning: isCleaning,
-                        presentation: presentation,
-                        onAnalyze: { scanAll() },
-                        onPreview: { showDryRunSheet = true },
-                        onRunClean: { prepareAndConfirmClean() }
-                    )
+                .layoutPriority(1)
+
+                // 图表置于表下方（筛选 → 表 → 图），避免压住主扫读区。
+                if showChart && hasDirScanResults {
+                    CSChartCard(title: L10n.Rules.chartCardTitle) {
+                        RulesScanChartBlock(rules: rules, scannedSizes: scannedSizes)
+                            .frame(minHeight: 260)
+                    }
+                    .padding(.horizontal, CS.detailHorizontalPadding)
+                    .padding(.top, 12)
+                    .padding(.bottom, 8)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                RulesCommandBar(
+                    recoverableBytes: selectedRecoverableBytes,
+                    selectedProcessCount: selectedProcessCount,
+                    selectedCount: selectedRuleIds.count,
+                    selectedPathRuleCount: selectedPathRules.count,
+                    selectedCommandRuleCount: selectedCommandRules.count,
+                    sizedSelectedPathCount: sizedSelectedPathCount,
+                    analyzedSelectedCount: analyzedSelectedCount,
+                    rulesNonEmpty: !rules.isEmpty,
+                    isScanning: isScanning,
+                    isCleaning: isCleaning,
+                    presentation: presentation,
+                    onAnalyze: { scanAll() },
+                    onPreview: { showDryRunSheet = true },
+                    onRunClean: { prepareAndConfirmClean() }
+                )
+            }
+            .onAppear {
+                // RFC 010 D8：进页只设表行焦点，不得写入清理勾选集。
+                guard tableSelection.isEmpty else { return }
+                if scope == .performance {
+                    tableSelection = [McpLeakedProcessCleaner.ruleId]
+                } else if let firstRule = rules.first {
+                    tableSelection = [firstRule.id]
                 }
             }
         }
     }
 
-    /// 引导条 + 统计芯片（与表格/命令栏分离，避免挤占底部操作区）。
     private var workspaceHeaderSection: some View {
         VStack(alignment: .leading, spacing: 10) {
+            // RFC 010 §2.3.1 / §2.5.1：引导 + 统计芯片（性能页同结构，勿嵌 Monitor 式实时卡）。
             CSWorkspaceGuideBanner(text: workspaceGuideText, systemImage: workspaceGuideSymbol)
             if showFullDiskAccessBanner {
                 FullDiskAccessBanner(
@@ -332,7 +338,6 @@ struct RulesWorkspaceView: View {
         HStack(spacing: 8) {
             overviewChipViews
         }
-        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var overviewChipStack: some View {

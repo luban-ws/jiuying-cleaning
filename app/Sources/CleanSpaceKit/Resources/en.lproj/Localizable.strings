@@ -294,6 +294,12 @@
 "performance.list.analyze_hint" = "Analyze";
 "performance.list.help.scan_column" = "Leaked MCP process count after Analyze.";
 "performance.list.process_count_format" = "%lld processes";
+"performance.inspector.mcp.title" = "Detected leaked processes";
+"performance.inspector.mcp.loading" = "Fetching process list…";
+"performance.inspector.mcp.empty" = "No leaked processes found";
+"performance.inspector.mcp.load" = "Load process list";
+"performance.inspector.mcp.memory_format" = "Memory: %@";
+"performance.inspector.mcp.process_line_format" = "PID %d: %@";
 "category.custom" = "Custom";
 
 "clean.deleted_format" = "Removed %lld item(s)";

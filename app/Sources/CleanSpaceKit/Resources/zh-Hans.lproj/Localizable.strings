@@ -294,6 +294,12 @@
 "performance.list.analyze_hint" = "分析";
 "performance.list.help.scan_column" = "分析后显示泄漏的 MCP 进程数量。";
 "performance.list.process_count_format" = "%lld 个进程";
+"performance.inspector.mcp.title" = "检测到的泄漏进程";
+"performance.inspector.mcp.loading" = "正在获取进程列表…";
+"performance.inspector.mcp.empty" = "当前未发现泄漏进程";
+"performance.inspector.mcp.load" = "加载进程列表";
+"performance.inspector.mcp.memory_format" = "内存占用: %@";
+"performance.inspector.mcp.process_line_format" = "PID %d: %@";
 "category.custom" = "自定义";
 
 "clean.deleted_format" = "已删除 %lld 项";

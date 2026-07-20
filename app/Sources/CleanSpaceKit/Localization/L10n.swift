@@ -89,6 +89,17 @@ enum L10n {
         static func listProcessCount(_ count: Int) -> String {
             String(format: tr("performance.list.process_count_format"), count)
         }
+        /// 检查器：MCP 泄漏进程列表标题与状态文案。
+        static var inspectorMcpTitle: String { tr("performance.inspector.mcp.title") }
+        static var inspectorMcpLoading: String { tr("performance.inspector.mcp.loading") }
+        static var inspectorMcpEmpty: String { tr("performance.inspector.mcp.empty") }
+        static var inspectorMcpLoad: String { tr("performance.inspector.mcp.load") }
+        static func inspectorMcpMemory(_ bytesLabel: String) -> String {
+            String(format: tr("performance.inspector.mcp.memory_format"), bytesLabel)
+        }
+        static func inspectorMcpProcessLine(pid: Int32, command: String) -> String {
+            String(format: tr("performance.inspector.mcp.process_line_format"), pid, command)
+        }
     }
 
     enum Rules {

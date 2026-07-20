@@ -86,7 +86,7 @@ struct RulesUnifiedTable: View {
                 .accessibilityLabel(rule.name)
                 .accessibilityHint(L10n.Rules.listA11yToggleHint)
             }
-            .width(RulesUnifiedTableLayout.cleanColumnWidth)
+            .width(min: 44, ideal: RulesUnifiedTableLayout.cleanColumnWidth, max: 60)
 
             TableColumn(L10n.Rules.browserTableItem) { rule in
                 Text(rule.name)
@@ -103,7 +103,7 @@ struct RulesUnifiedTable: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                .width(min: RulesUnifiedTableLayout.categoryColumnMinWidth, ideal: 110)
+                .width(min: RulesUnifiedTableLayout.categoryColumnMinWidth, ideal: 110, max: 150)
             }
 
             if showTypeColumn {
@@ -115,20 +115,20 @@ struct RulesUnifiedTable: View {
                         .background(Color.primary.opacity(0.06))
                         .clipShape(Capsule(style: .continuous))
                 }
-                .width(RulesUnifiedTableLayout.typeColumnWidth)
+                .width(min: 60, ideal: RulesUnifiedTableLayout.typeColumnWidth, max: 90)
             }
 
             TableColumn(L10n.Rules.browserTableSize) { rule in
                 impactCell(for: rule)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .width(RulesUnifiedTableLayout.sizeColumnWidth)
+            .width(min: 80, ideal: RulesUnifiedTableLayout.sizeColumnWidth, max: 140)
 
             TableColumn(L10n.Rules.browserTableRisk) { rule in
                 RuleRiskChip(risk: rule.riskLevel)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .width(RulesUnifiedTableLayout.riskColumnWidth)
+            .width(min: 50, ideal: RulesUnifiedTableLayout.riskColumnWidth, max: 80)
         }
         .tableStyle(.inset(alternatesRowBackgrounds: true))
         .modifier(RulesUnifiedTableFrameModifier(
@@ -139,14 +139,6 @@ struct RulesUnifiedTable: View {
             ruleCount: rules.count,
             rules: rules
         ))
-        .onChange(of: tableSelection) { previous, current in
-            for id in current.subtracting(previous) {
-                selectedRuleIds.insert(id)
-            }
-            for id in previous.subtracting(current) {
-                selectedRuleIds.remove(id)
-            }
-        }
     }
 
     @ViewBuilder

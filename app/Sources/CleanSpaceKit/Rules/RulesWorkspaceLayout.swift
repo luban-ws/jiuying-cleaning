@@ -51,7 +51,6 @@ struct RulesFilterToolbar: View {
 
             visibleCountLabel
         }
-        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var filterControlsStack: some View {
@@ -110,7 +109,6 @@ struct RulesFilterToolbar: View {
                 Spacer(minLength: 8)
                 visibleCountLabel
             }
-            .fixedSize(horizontal: true, vertical: false)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 10) {
@@ -136,7 +134,6 @@ struct RulesFilterToolbar: View {
 
             Spacer(minLength: 0)
         }
-        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var selectionControlsStack: some View {
@@ -287,6 +284,7 @@ struct RulesInspectorPanel: View {
                         Divider()
                         Toggle(L10n.Rules.inspectorInclude, isOn: $isIncluded)
                             .toggleStyle(.checkbox)
+                            .accessibilityHint(L10n.Rules.listA11yToggleHint)
                     } else {
                         RulesInspectorEmptyState(presentation: presentation)
                     }
@@ -346,32 +344,107 @@ struct RulesInspectorPanel: View {
 
     @ViewBuilder
     private func inspectorPathsOrCommand(_ rule: CleaningRule) -> some View {
-        switch rule.type {
-        case .dir:
-            if let paths = rule.paths, !paths.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(L10n.Rules.inspectorPathsTitle)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    ForEach(Array(paths.enumerated()), id: \.offset) { _, block in
-                        Text("\(block.base) → \(block.dirs.joined(separator: ", "))")
+        if rule.id == McpLeakedProcessCleaner.ruleId {
+            RulesInspectorMcpProcessesView(scannedCount: scannedProcessCount)
+        } else {
+            switch rule.type {
+            case .dir:
+                if let paths = rule.paths, !paths.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(L10n.Rules.inspectorPathsTitle)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        ForEach(Array(paths.enumerated()), id: \.offset) { _, block in
+                            Text("\(block.base) → \(block.dirs.joined(separator: ", "))")
+                                .font(.caption.monospaced())
+                                .textSelection(.enabled)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            case .command:
+                if let cmd = rule.command {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(L10n.Rules.inspectorCommandTitle)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text(cmd)
                             .font(.caption.monospaced())
                             .textSelection(.enabled)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
-        case .command:
-            if let cmd = rule.command {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(L10n.Rules.inspectorCommandTitle)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Text(cmd)
-                        .font(.caption.monospaced())
-                        .textSelection(.enabled)
+        }
+    }
+}
+
+struct RulesInspectorMcpProcessesView: View {
+    let scannedCount: Int?
+    @State private var processes: [McpLeakedProcess]?
+    @State private var isLoading = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(L10n.Performance.inspectorMcpTitle)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            if isLoading {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text(L10n.Performance.inspectorMcpLoading)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            } else if let processes {
+                if processes.isEmpty {
+                    Text(L10n.Performance.inspectorMcpEmpty)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(processes, id: \.pid) { proc in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(L10n.Performance.inspectorMcpProcessLine(
+                                    pid: proc.pid,
+                                    command: proc.commandLine
+                                ))
+                                .font(.caption.monospaced())
+                                .lineLimit(2)
+                                .textSelection(.enabled)
+                                Text(L10n.Performance.inspectorMcpMemory(SpaceFormat.bytes(proc.rssBytes)))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 2)
+                        }
+                    }
+                }
+            } else {
+                Button(L10n.Performance.inspectorMcpLoad) {
+                    load()
+                }
+                .buttonStyle(.link)
+                .font(.caption)
+            }
+        }
+        .task {
+            load()
+        }
+        .onChange(of: scannedCount) { _, _ in
+            load()
+        }
+    }
+
+    private func load() {
+        isLoading = true
+        Task {
+            let list = await McpLeakedProcessCleaner.listLeakedProcessesInBackground()
+            await MainActor.run {
+                self.processes = list
+                self.isLoading = false
             }
         }
     }
@@ -467,7 +540,6 @@ struct RulesCommandBar: View {
 
             actionButtons
         }
-        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var metricBlock: some View {
@@ -516,7 +588,6 @@ struct RulesCommandBar: View {
             previewButton
             cleanButton
         }
-        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var actionButtonStack: some View {
@@ -537,7 +608,8 @@ struct RulesCommandBar: View {
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .help(L10n.Rules.helpScan)
-        .disabled(!rulesNonEmpty || isScanning)
+        // RFC 010 D9：分析在 isScanning / isCleaning 时均禁用。
+        .disabled(!rulesNonEmpty || isScanning || isCleaning)
         .keyboardShortcut("r", modifiers: [.command, .shift])
     }
 
@@ -548,7 +620,8 @@ struct RulesCommandBar: View {
         .buttonStyle(.bordered)
         .controlSize(.large)
         .help(L10n.Rules.helpDryRun)
-        .disabled(selectedCount == 0 || isCleaning)
+        // RFC 010 D9：预览在 isScanning / isCleaning 时均禁用。
+        .disabled(selectedCount == 0 || isScanning || isCleaning)
         .keyboardShortcut("p", modifiers: [.command, .shift])
     }
 
@@ -563,7 +636,8 @@ struct RulesCommandBar: View {
         .tint(.red)
         .controlSize(.large)
         .help(L10n.Rules.helpClean)
-        .disabled(selectedCount == 0 || isCleaning)
+        // RFC 010 D9：清理在 isScanning / isCleaning 时均禁用。
+        .disabled(selectedCount == 0 || isScanning || isCleaning)
     }
 
     private var needsAnalyze: Bool {

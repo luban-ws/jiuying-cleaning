@@ -12,12 +12,13 @@ import SwiftUI
 struct MetricsPopoverDonutWithCenterLabel: View {
     let percent: Double
     let accent: Color
+    var size: CGFloat = 80
 
     var body: some View {
         ZStack {
-            MetricsPopoverPercentDonut(percent: percent, accent: accent)
+            MetricsPopoverPercentDonut(percent: percent, accent: accent, size: size)
             Text(MetricsFormat.percent0(percent))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.system(size: size <= 40 ? 9 : 13, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.primary)
                 .minimumScaleFactor(0.85)
@@ -31,32 +32,28 @@ struct MetricsPopoverDonutWithCenterLabel: View {
 struct MetricsPopoverPercentDonut: View {
     let percent: Double
     let accent: Color
+    var size: CGFloat = 80
 
     private var clamped: Double { min(max(percent, 0), 100) }
-    private var free: Double { 100 - clamped }
+    private var lineWidth: CGFloat { size * 0.21 }
 
     var body: some View {
-        Chart {
-            SectorMark(
-                angle: .value(MetricsChartSeries.usedId, clamped),
-                innerRadius: .ratio(0.58),
-                angularInset: 1.2
-            )
-            .foregroundStyle(accent)
-            .cornerRadius(2)
-            SectorMark(
-                angle: .value(MetricsChartSeries.freeId, free),
-                innerRadius: .ratio(0.58),
-                angularInset: 1.2
-            )
-            .foregroundStyle(Color.primary.opacity(0.12))
-            .cornerRadius(2)
+        ZStack {
+            Circle()
+                .stroke(
+                    Color.primary.opacity(0.12),
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt)
+                )
+            Circle()
+                .trim(from: 0.0, to: CGFloat(clamped / 100.0))
+                .stroke(
+                    accent,
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt)
+                )
+                .rotationEffect(.degrees(-90))
         }
-        .chartLegend(.hidden)
-        .chartPlotStyle { plot in
-            plot.frame(width: MetricsChartLayout.donutSize, height: MetricsChartLayout.donutSize)
-        }
-        .frame(width: MetricsChartLayout.donutSize, height: MetricsChartLayout.donutSize)
+        .padding(lineWidth / 2)
+        .frame(width: size, height: size)
     }
 }
 
