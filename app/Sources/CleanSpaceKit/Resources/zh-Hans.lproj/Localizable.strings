@@ -300,6 +300,8 @@
 "performance.inspector.mcp.load" = "加载进程列表";
 "performance.inspector.mcp.memory_format" = "内存占用: %@";
 "performance.inspector.mcp.process_line_format" = "PID %d: %@";
+"performance.workspace.actions_section_title" = "优化操作";
+"performance.workspace.processes_section_title" = "泄漏进程";
 "category.custom" = "自定义";
 
 "clean.deleted_format" = "已删除 %lld 项";

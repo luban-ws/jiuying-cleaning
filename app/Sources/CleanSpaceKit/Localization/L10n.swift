@@ -100,6 +100,8 @@ enum L10n {
         static func inspectorMcpProcessLine(pid: Int32, command: String) -> String {
             String(format: tr("performance.inspector.mcp.process_line_format"), pid, command)
         }
+        static var workspaceActionsSectionTitle: String { tr("performance.workspace.actions_section_title") }
+        static var workspaceProcessesSectionTitle: String { tr("performance.workspace.processes_section_title") }
     }
 
     enum Rules {

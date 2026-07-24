@@ -300,6 +300,8 @@
 "performance.inspector.mcp.load" = "Load process list";
 "performance.inspector.mcp.memory_format" = "Memory: %@";
 "performance.inspector.mcp.process_line_format" = "PID %d: %@";
+"performance.workspace.actions_section_title" = "Actions";
+"performance.workspace.processes_section_title" = "Leaked processes";
 "category.custom" = "Custom";
 
 "clean.deleted_format" = "Removed %lld item(s)";

@@ -18,6 +18,8 @@ enum RulesUnifiedTableLayout {
     static let sizeColumnWidth: CGFloat = RulesScanListLayoutMetrics.scanColumnWidth
     static let riskColumnWidth: CGFloat = RulesScanListLayoutMetrics.riskColumnWidth
     static let rowStride: CGFloat = 36
+    /// macOS `Table(selection:)` 隐式行选列占用宽度（用于 minimumWidth 与列宽预算）。
+    static let selectionColumnWidth: CGFloat = 28
 
     /// 所有列宽之和，避免 HSplitView 左侧过窄时表头/首列被裁切。
     static func minimumWidth(
@@ -27,6 +29,8 @@ enum RulesUnifiedTableLayout {
     ) -> CGFloat {
         let itemWidth = compactItemColumn ? itemColumnCompactMinWidth : itemColumnMinWidth
         var total = cleanColumnWidth + itemWidth + sizeColumnWidth + riskColumnWidth
+        // 仅 `Table(selection:)` 需要为隐式行选列留白；性能紧凑 List 无此列。
+        if !compactItemColumn { total += selectionColumnWidth }
         if showTypeColumn { total += typeColumnWidth }
         if showCategoryColumn { total += categoryColumnMinWidth }
         return total + 24
@@ -69,6 +73,22 @@ struct RulesUnifiedTable: View {
     }
 
     var body: some View {
+        if compactItemColumn {
+            RulesCompactRulesList(
+                rules: rules,
+                scannedSizes: scannedSizes,
+                scannedProcessCounts: scannedProcessCounts,
+                selectedRuleIds: $selectedRuleIds,
+                tableSelection: $tableSelection,
+                formatBytes: formatBytes,
+                fillsAvailableHeight: fillsAvailableHeight
+            )
+        } else {
+            unifiedTableBody
+        }
+    }
+
+    private var unifiedTableBody: some View {
         Table(rules, selection: $tableSelection) {
             TableColumn(L10n.Rules.browserTableClean) { rule in
                 Toggle(
@@ -86,7 +106,7 @@ struct RulesUnifiedTable: View {
                 .accessibilityLabel(rule.name)
                 .accessibilityHint(L10n.Rules.listA11yToggleHint)
             }
-            .width(min: 44, ideal: RulesUnifiedTableLayout.cleanColumnWidth, max: 60)
+            .width(RulesUnifiedTableLayout.cleanColumnWidth)
 
             TableColumn(L10n.Rules.browserTableItem) { rule in
                 Text(rule.name)
@@ -94,7 +114,7 @@ struct RulesUnifiedTable: View {
                     .lineLimit(compactItemColumn ? 2 : 3)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .width(min: itemColumnMin, ideal: itemColumnMin + 80)
+            .width(min: itemColumnMin, ideal: itemColumnMin, max: .infinity)
 
             if showCategoryColumn {
                 TableColumn(L10n.Rules.tableCategory) { rule in
@@ -122,13 +142,13 @@ struct RulesUnifiedTable: View {
                 impactCell(for: rule)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .width(min: 80, ideal: RulesUnifiedTableLayout.sizeColumnWidth, max: 140)
+            .width(RulesUnifiedTableLayout.sizeColumnWidth)
 
             TableColumn(L10n.Rules.browserTableRisk) { rule in
                 RuleRiskChip(risk: rule.riskLevel)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .width(min: 50, ideal: RulesUnifiedTableLayout.riskColumnWidth, max: 80)
+            .width(RulesUnifiedTableLayout.riskColumnWidth)
         }
         .tableStyle(.inset(alternatesRowBackgrounds: true))
         .modifier(RulesUnifiedTableFrameModifier(
@@ -195,6 +215,123 @@ private struct RulesUnifiedTableFrameModifier: ViewModifier {
             content.frame(minWidth: minW, maxWidth: .infinity, minHeight: 120, maxHeight: .infinity, alignment: .topLeading)
         } else {
             content.frame(minWidth: minW, maxWidth: .infinity, minHeight: minH, alignment: .topLeading)
+        }
+    }
+}
+
+// MARK: - 性能页紧凑列表（规避 `Table(selection:)` 列宽裁切）
+/// 与 `RulesScanListRow` 列度量一致；行选仅驱动检查器（RFC 010 D8），勾选独立。
+private struct RulesCompactRulesList: View {
+    let rules: [CleaningRule]
+    let scannedSizes: [String: Int64]
+    let scannedProcessCounts: [String: Int]
+    @Binding var selectedRuleIds: Set<String>
+    @Binding var tableSelection: Set<String>
+    let formatBytes: (Int64?) -> String
+    let fillsAvailableHeight: Bool
+
+    private let rowHorizontalPadding: CGFloat = 12
+
+    var body: some View {
+        let minW = RulesUnifiedTableLayout.minimumWidth(
+            showCategoryColumn: false,
+            showTypeColumn: false,
+            compactItemColumn: true
+        )
+        let minH = RulesUnifiedTableLayout.preferredMinHeight(
+            ruleCount: rules.count,
+            compactItemColumn: true,
+            rules: rules
+        )
+
+        VStack(spacing: 0) {
+            compactHeader
+            Divider()
+            List(rules, selection: $tableSelection) { rule in
+                compactRow(rule)
+                    .tag(rule.id)
+            }
+            .listStyle(.inset(alternatesRowBackgrounds: true))
+        }
+        .frame(
+            minWidth: minW,
+            maxWidth: .infinity,
+            minHeight: fillsAvailableHeight ? 120 : minH,
+            maxHeight: fillsAvailableHeight ? .infinity : minH,
+            alignment: .topLeading
+        )
+    }
+
+    private var compactHeader: some View {
+        HStack(spacing: 12) {
+            Text(L10n.Rules.browserTableClean)
+                .frame(width: RulesUnifiedTableLayout.cleanColumnWidth, alignment: .leading)
+            Text(L10n.Rules.browserTableItem)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text(L10n.Rules.browserTableSize)
+                .frame(width: RulesScanListLayoutMetrics.scanColumnWidth, alignment: .trailing)
+            Text(L10n.Rules.browserTableRisk)
+                .frame(width: RulesScanListLayoutMetrics.riskColumnWidth, alignment: .trailing)
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, rowHorizontalPadding)
+        .padding(.vertical, 8)
+    }
+
+    @ViewBuilder
+    private func compactRow(_ rule: CleaningRule) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            Toggle(
+                "",
+                isOn: Binding(
+                    get: { selectedRuleIds.contains(rule.id) },
+                    set: { checked in
+                        if checked { selectedRuleIds.insert(rule.id) }
+                        else { selectedRuleIds.remove(rule.id) }
+                    }
+                )
+            )
+            .labelsHidden()
+            .toggleStyle(.checkbox)
+            .frame(width: RulesUnifiedTableLayout.cleanColumnWidth, alignment: .leading)
+            .accessibilityLabel(rule.name)
+            .accessibilityHint(L10n.Rules.listA11yToggleHint)
+
+            Text(rule.name)
+                .font(.body)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            impactCell(for: rule)
+                .frame(width: RulesScanListLayoutMetrics.scanColumnWidth, alignment: .trailing)
+
+            RuleRiskChip(risk: rule.riskLevel)
+                .frame(width: RulesScanListLayoutMetrics.riskColumnWidth, alignment: .trailing)
+        }
+        .padding(.vertical, 2)
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private func impactCell(for rule: CleaningRule) -> some View {
+        if rule.displaysScannedProcessCount {
+            Text(scannedProcessCounts[rule.id].map { L10n.Performance.listProcessCount($0) }
+                ?? L10n.Performance.listAnalyzeHint)
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(scannedProcessCounts[rule.id] == nil ? .tertiary : .secondary)
+                .help(L10n.Performance.listHelpScanColumn)
+        } else if rule.displaysScannedByteSize {
+            Text(formatBytes(scannedSizes[rule.id]))
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .help(L10n.Rules.listHelpScanColumn)
+        } else {
+            Text(rule.estimate ?? L10n.Rules.estimateCommand)
+                .font(.caption)
+                .foregroundStyle(.tertiary)
         }
     }
 }

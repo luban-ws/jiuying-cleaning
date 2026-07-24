@@ -168,6 +168,8 @@ struct RulesWorkspaceView: View {
                     )
                     .frame(maxWidth: .infinity, minHeight: 280)
                 }
+            } else if scope == .performance {
+                performanceBody
             } else {
                 selectableBody
             }
@@ -199,6 +201,35 @@ struct RulesWorkspaceView: View {
         }
         .sheet(isPresented: $showDryRunSheet) {
             RulesDryRunSheet(rules: rules.filter { selectedRuleIds.contains($0.id) })
+        }
+    }
+
+    private var performanceBody: some View {
+        SelectableWorkspaceScaffold {
+            ScrollView {
+                PerformanceRulesWorkspaceContent(
+                    rules: rules,
+                    scannedProcessCounts: scannedProcessCounts,
+                    totalRuleCount: rules.count,
+                    selectedCount: selectedRuleIds.count,
+                    analyzedCount: scannedMetricCount,
+                    guideText: workspaceGuideText,
+                    guideSymbol: workspaceGuideSymbol,
+                    selectedRuleIds: $selectedRuleIds,
+                    tableSelection: $tableSelection
+                )
+                .padding(.horizontal, CS.detailHorizontalPadding)
+                .padding(.top, 16)
+                .padding(.bottom, 20)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                rulesCommandBar
+            }
+            .onAppear {
+                guard tableSelection.isEmpty, let firstRule = rules.first else { return }
+                tableSelection = [firstRule.id]
+            }
         }
     }
 
@@ -248,7 +279,7 @@ struct RulesWorkspaceView: View {
                                 showCategoryColumn: showCategoryColumn,
                                 showTypeColumn: presentation != .performance,
                                 compactItemColumn: presentation == .performance,
-                                fillsAvailableHeight: true
+                                fillsAvailableHeight: presentation != .performance
                             )
                         }
                     }
@@ -277,33 +308,35 @@ struct RulesWorkspaceView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                RulesCommandBar(
-                    recoverableBytes: selectedRecoverableBytes,
-                    selectedProcessCount: selectedProcessCount,
-                    selectedCount: selectedRuleIds.count,
-                    selectedPathRuleCount: selectedPathRules.count,
-                    selectedCommandRuleCount: selectedCommandRules.count,
-                    sizedSelectedPathCount: sizedSelectedPathCount,
-                    analyzedSelectedCount: analyzedSelectedCount,
-                    rulesNonEmpty: !rules.isEmpty,
-                    isScanning: isScanning,
-                    isCleaning: isCleaning,
-                    presentation: presentation,
-                    onAnalyze: { scanAll() },
-                    onPreview: { showDryRunSheet = true },
-                    onRunClean: { prepareAndConfirmClean() }
-                )
+                rulesCommandBar
             }
             .onAppear {
                 // RFC 010 D8：进页只设表行焦点，不得写入清理勾选集。
                 guard tableSelection.isEmpty else { return }
-                if scope == .performance {
-                    tableSelection = [McpLeakedProcessCleaner.ruleId]
-                } else if let firstRule = rules.first {
+                if let firstRule = rules.first {
                     tableSelection = [firstRule.id]
                 }
             }
         }
+    }
+
+    private var rulesCommandBar: some View {
+        RulesCommandBar(
+            recoverableBytes: selectedRecoverableBytes,
+            selectedProcessCount: selectedProcessCount,
+            selectedCount: selectedRuleIds.count,
+            selectedPathRuleCount: selectedPathRules.count,
+            selectedCommandRuleCount: selectedCommandRules.count,
+            sizedSelectedPathCount: sizedSelectedPathCount,
+            analyzedSelectedCount: analyzedSelectedCount,
+            rulesNonEmpty: !rules.isEmpty,
+            isScanning: isScanning,
+            isCleaning: isCleaning,
+            presentation: presentation,
+            onAnalyze: { scanAll() },
+            onPreview: { showDryRunSheet = true },
+            onRunClean: { prepareAndConfirmClean() }
+        )
     }
 
     private var workspaceHeaderSection: some View {
