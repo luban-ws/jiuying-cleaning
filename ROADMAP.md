@@ -40,6 +40,7 @@
 | 9 | [007](.spec/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
 | 10 | [008](.spec/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
 | 11 | [010](.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
+| 12 | [012](.spec/rfc/012-ui-polishing-and-hig-compliance.md) | UI 抛光与 macOS HIG 自适应合规 | 实施中 | 针对沉浸式标题栏遮挡、网格自适应与矢量进度环的打磨细节 |
 
 ## 阶段概览（与 RFC 001 对齐）
 

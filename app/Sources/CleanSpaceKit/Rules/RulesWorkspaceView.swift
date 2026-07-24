@@ -307,7 +307,7 @@ struct RulesWorkspaceView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .safeAreaPadding(.top)
+            .padding(.top, 52)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 rulesCommandBar
             }

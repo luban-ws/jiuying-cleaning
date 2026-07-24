@@ -203,12 +203,10 @@ private struct DockerSpecialWorkspaceView: View {
                     .help(L10n.Docker.helpRefreshSizes)
                     .disabled(running)
                 }
-
                 Section {
                     LazyVGrid(
                         columns: [
-                            GridItem(.flexible(), spacing: 12),
-                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.adaptive(minimum: 220, maximum: 360), spacing: 12)
                         ],
                         spacing: 12
                     ) {

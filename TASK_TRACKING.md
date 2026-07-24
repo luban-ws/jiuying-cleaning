@@ -141,6 +141,15 @@
 | TASK-011-05 | 保存后 reload 通知与规则工作区刷新 | 待办 | 无需重启 |
 | TASK-011-06 | L10n、单测、手动验收记录 | 待办 | en + zh-Hans |
 
+## RFC 012 — UI 抛光与 macOS HIG 自适应合规
+
+| ID | 任务 | 状态 | 备注 |
+|----|------|------|------|
+| TASK-012-01 | 非滚动详情面板 Top 安全区自适应（RulesWorkspaceView VStack） | 已完成 | 挂载 `.safeAreaPadding(.top)` |
+| TASK-012-02 | 微型圆环占比图重构为纯 SwiftUI 矢量绘制（防止 SectorMark 剪裁） | 已完成 | 重构 `MetricsPopoverPercentDonut` |
+| TASK-012-03 | Docker 预设清除卡片 LazyVGrid 网格改为 adaptive 响应式网格 | 已完成 | ContentView.swift 中修改 |
+| TASK-012-04 | 全局 SwiftUI Checklist 静态审计与代码规范打磨 | 已完成 | 确保 @State 封装及 L10n 本地化 |
+
 ---
 
 ## 新增 RFC 时
