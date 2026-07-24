@@ -118,26 +118,28 @@ public struct ContentView: View {
             .navigationTitle(L10n.App.name)
             .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {
-            Group {
-                switch section {
-                case .volumes:
-                    VolumesWorkspaceView()
-                case .rules:
-                    RulesWorkspaceView(scope: .storageRules)
-                case .aiToolsSpace:
-                    RulesWorkspaceView(scope: .aiToolsSpace)
-                case .docker:
-                    DockerSpecialWorkspaceView()
-                case .performance:
-                    RulesWorkspaceView(scope: .performance)
-                case .monitor:
-                    SystemMonitorWorkspaceView()
+            NavigationStack {
+                Group {
+                    switch section {
+                    case .volumes:
+                        VolumesWorkspaceView()
+                    case .rules:
+                        RulesWorkspaceView(scope: .storageRules)
+                    case .aiToolsSpace:
+                        RulesWorkspaceView(scope: .aiToolsSpace)
+                    case .docker:
+                        DockerSpecialWorkspaceView()
+                    case .performance:
+                        RulesWorkspaceView(scope: .performance)
+                    case .monitor:
+                        SystemMonitorWorkspaceView()
+                    }
                 }
+                .id(section)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(nsColor: .windowBackgroundColor))
+                .clipped()
             }
-            .id(section)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(nsColor: .windowBackgroundColor))
-            .clipped()
             .toolbarBackground(.automatic, for: .windowToolbar)
             .toolbarBackgroundVisibility(.automatic, for: .windowToolbar)
         }
