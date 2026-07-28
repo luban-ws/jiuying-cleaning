@@ -1,3 +1,8 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
 # Dependencies（勿提交；pnpm 下 husky 等为符号链接，git 对 pathspec 会报 beyond symlink）
 node_modules/
 
