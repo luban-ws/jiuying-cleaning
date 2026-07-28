@@ -4,6 +4,33 @@ import XCTest
 
 @MainActor
 final class SingleInstanceCoordinatorTests: XCTestCase {
+    func testIdentifierPrefersBundleIdentifier() {
+        XCTAssertEqual(
+            SingleInstanceIdentifier.resolve(
+                bundleIdentifier: "me.systembug.cleaning",
+                environment: ["CLEANING_BUNDLE_IDENTIFIER": "me.systembug.cleaning.dev"]
+            ),
+            "me.systembug.cleaning"
+        )
+    }
+
+    func testIdentifierUsesDevelopmentEnvironmentForBareVeloxDev() {
+        XCTAssertEqual(
+            SingleInstanceIdentifier.resolve(
+                bundleIdentifier: nil,
+                environment: ["CLEANING_BUNDLE_IDENTIFIER": "me.systembug.cleaning.dev"]
+            ),
+            "me.systembug.cleaning.dev"
+        )
+    }
+
+    func testIdentifierFallsBackToProduction() {
+        XCTAssertEqual(
+            SingleInstanceIdentifier.resolve(bundleIdentifier: nil, environment: [:]),
+            "me.systembug.cleaning"
+        )
+    }
+
     func testSecondCoordinatorCannotBecomePrimaryAndRequestsWake() throws {
         let lockURL = makeLockURL()
         let primaryChannel = TestWakeChannel()

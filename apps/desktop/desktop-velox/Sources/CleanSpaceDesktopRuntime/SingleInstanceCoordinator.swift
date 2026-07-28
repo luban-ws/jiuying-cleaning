@@ -1,6 +1,25 @@
 import Darwin
 import Foundation
 
+enum SingleInstanceIdentifier {
+    static let production = "me.systembug.cleaning"
+    static let environmentKey = "CLEANING_BUNDLE_IDENTIFIER"
+
+    static func resolve(
+        bundleIdentifier: String?,
+        environment: [String: String]
+    ) -> String {
+        if let bundleIdentifier, !bundleIdentifier.isEmpty {
+            return bundleIdentifier
+        }
+        if let environmentIdentifier = environment[environmentKey],
+           !environmentIdentifier.isEmpty {
+            return environmentIdentifier
+        }
+        return production
+    }
+}
+
 enum SingleInstanceRole: Equatable {
     case primary
     case secondary
@@ -130,7 +149,10 @@ final class SingleInstanceCoordinator {
 
 extension SingleInstanceCoordinator {
     static func live() -> SingleInstanceCoordinator {
-        let identifier = Bundle.main.bundleIdentifier ?? "me.systembug.cleaning"
+        let identifier = SingleInstanceIdentifier.resolve(
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            environment: ProcessInfo.processInfo.environment
+        )
         let lockURL = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Caches", isDirectory: true)
             .appendingPathComponent(identifier, isDirectory: true)

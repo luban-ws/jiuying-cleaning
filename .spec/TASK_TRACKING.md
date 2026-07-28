@@ -182,6 +182,17 @@
 
 ---
 
+## RFC 015 — Velox Development / Production 应用隔离
+
+| ID | 任务 | 状态 | 备注 |
+|----|------|------|------|
+| TASK-015-01 | Development profile config 派生与 Node 单测 | 进行中 | canonical Production config 不得被交换 |
+| TASK-015-02 | pnpm → Velox CLI 命令与 bundle config 修正 | 待办 | 不新增 `.sh` |
+| TASK-015-03 | 运行时 config 加载与单实例身份解析 | 待办 | bundle ID → env → Production fallback |
+| TASK-015-04 | 双 bundle 构建、签名、并行运行与同 variant 单实例验收 | 待办 | `Cleaning Dev.app` + `Cleaning.app` |
+
+---
+
 ## 新增 RFC 时
 
 在 **`ROADMAP.md`** 追加一行并新开一节 `## RFC NNN — …`，复制上表头后填任务行。

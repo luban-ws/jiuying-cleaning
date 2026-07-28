@@ -596,47 +596,76 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
-  margin-top: var(--space-md);
-  padding: var(--space-md) var(--space-lg);
+  margin-top: var(--space-sm);
+  padding: 10px 14px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-elevated);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
 }
 
-.command-metric .metric-placeholder {
-  font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-text-muted);
+.command-bar-leading {
+  flex: 1;
+  min-width: 0;
 }
 
-.command-metric .label {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+.command-bar-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
 }
 
-.command-metric .metric {
-  margin: 2px 0;
-  font-size: 20px;
+.command-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.command-stat-value {
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;
-}
-
-.command-metric .caption {
-  margin: 0;
-  font-size: 12px;
   color: var(--color-text-muted);
 }
 
-.command-actions {
+.command-stat-value.emphasized {
+  color: var(--color-text);
+}
+
+.command-stat-label {
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.command-stat-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+.command-bar-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+.command-bar-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
   flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.command-bar-actions .btn {
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.btn.danger.command-cta-ready {
+  box-shadow: 0 0 0 1px var(--color-danger-border);
 }
 
 .chart-card h3 {
@@ -945,6 +974,15 @@ body {
   .rules-command-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .command-bar-actions {
+    justify-content: stretch;
+  }
+
+  .command-bar-actions .btn {
+    flex: 1;
+    min-width: 0;
   }
 
   .chart-layout {

@@ -9,26 +9,29 @@ type Props = {
 
 export function RulesCommandBar({ ws, t }: Props) {
   const disabled = ws.busy || ws.isScanning || ws.isCleaning;
-  const hasSelection = ws.selectedRuleIds.size > 0;
+  const selectedCount = ws.selectedRuleIds.size;
+  const hasSelection = selectedCount > 0;
+  const needsAnalyze = hasSelection && ws.analyzedSelectedCount < selectedCount;
 
-  const metric = (() => {
-    if (!hasSelection) return t("rules.action.metric.placeholder");
+  const impactLabel = ws.performance
+    ? t("performance.action.impact_label")
+    : t("rules.action.recoverable_label");
+
+  const impactValue = (() => {
+    if (!hasSelection) return "—";
     if (ws.performance) {
-      if (ws.analyzedSelectedCount === 0) return t("rules.action.metric.tap_analyze");
+      if (ws.analyzedSelectedCount === 0) return "—";
       return t("performance.list.process_count", { count: ws.selectedProcessCount });
     }
-    if (ws.selectedRecoverableBytes > 0) return formatBytes(ws.selectedRecoverableBytes);
-    if (ws.analyzedSelectedCount === 0) return t("rules.action.metric.tap_analyze");
+    if (ws.analyzedSelectedCount === 0) return "—";
     return formatBytes(ws.selectedRecoverableBytes);
   })();
 
-  const caption = hasSelection
-    ? t("rules.action.caption.counts", {
-        selected: ws.selectedRuleIds.size,
-        path: ws.selectedPathRules.length,
-        command: ws.selectedCommandRules.length,
-      })
-    : t("rules.action.caption.none");
+  const hint = !hasSelection
+    ? t("rules.action.bar.hint_select")
+    : needsAnalyze
+      ? t("rules.action.metric.tap_analyze")
+      : null;
 
   const cleanLabel = ws.performance ? t("performance.boost") : t("rules.clean");
   const scanLabel = ws.isScanning
@@ -41,16 +44,31 @@ export function RulesCommandBar({ ws, t }: Props) {
   const cleanBusyLabel = ws.performance ? t("performance.boosting") : t("rules.cleaning");
 
   return (
-    <footer className="rules-command-bar" aria-label="Cleaning actions">
-      <div className="command-metric">
-        <p className="muted label">
-          {ws.performance ? t("performance.action.impact_label") : t("rules.action.recoverable_label")}
-        </p>
-        <p className={`metric${hasSelection ? " mono" : " metric-placeholder"}`}>{metric}</p>
-        <p className="muted caption">{caption}</p>
+    <footer className="rules-command-bar" aria-label={t("rules.action.bar.aria")}>
+      <div className="command-bar-leading">
+        <div className="command-bar-stats">
+          <div className="command-stat" aria-label={t("rules.action.bar.selected_aria", { count: selectedCount })}>
+            <span className={`command-stat-value${hasSelection ? " emphasized" : ""}`}>{selectedCount}</span>
+            <span className="command-stat-label">{t("rules.action.bar.selected_label")}</span>
+          </div>
+          <span className="command-stat-sep" aria-hidden />
+          <div className="command-stat">
+            <span className={`command-stat-value${impactValue !== "—" ? " mono emphasized" : ""}`}>
+              {impactValue}
+            </span>
+            <span className="command-stat-label">{impactLabel}</span>
+          </div>
+        </div>
+        {hint ? <p className="command-bar-hint">{hint}</p> : null}
       </div>
-      <div className="command-actions">
-        <button type="button" className="btn" disabled={disabled || ws.rules.length === 0} onClick={() => void ws.scanAll()}>
+
+      <div className="command-bar-actions">
+        <button
+          type="button"
+          className={`btn${needsAnalyze || !hasSelection ? "" : " ghost"}`}
+          disabled={disabled || ws.rules.length === 0}
+          onClick={() => void ws.scanAll()}
+        >
           {scanLabel}
         </button>
         <button
@@ -63,7 +81,7 @@ export function RulesCommandBar({ ws, t }: Props) {
         </button>
         <button
           type="button"
-          className="btn danger"
+          className={`btn danger${hasSelection && !needsAnalyze ? " command-cta-ready" : ""}`}
           disabled={disabled || !hasSelection}
           onClick={ws.openCleanConfirm}
         >

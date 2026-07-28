@@ -5,8 +5,15 @@
   "type": "module",
   "description": "CleanSpace desktop — Velox + React + Swift",
   "scripts": {
-    "dev": "bash scripts/dev.sh",
-    "build": "bash scripts/build.sh"
+    "velox:cli:build": "cd desktop-velox/.build/checkouts/velox && swift build --product velox",
+    "velox": "cd desktop-velox && .build/checkouts/velox/.build/debug/velox",
+    "dev": "node scripts/run-velox-profile.mjs dev",
+    "build": "pnpm run build:app",
+    "build:app": "VELOX_BUNDLE_CONFIGURATION=release pnpm run velox build --bundle",
+    "build:app:dev": "node scripts/run-velox-profile.mjs build:app",
+    "open:app": "open desktop-velox/.build/release/Cleaning.app",
+    "open:app:dev": "open 'desktop-velox/.build/debug/Cleaning Dev.app'",
+    "test:velox-profile": "node --test scripts/velox-profile-config.test.mjs"
   },
   "dependencies": {
     "@cleanspace/desktop-api": "workspace:*",

@@ -7,6 +7,11 @@
   "scripts": {
     "dev": "pnpm --filter @cleanspace/desktop dev",
     "build": "pnpm --filter @cleanspace/desktop build",
+    "build:app": "pnpm --filter @cleanspace/desktop build:app",
+    "build:app:dev": "pnpm --filter @cleanspace/desktop build:app:dev",
+    "open:app": "pnpm --filter @cleanspace/desktop open:app",
+    "open:app:dev": "pnpm --filter @cleanspace/desktop open:app:dev",
+    "test:velox-profile": "pnpm --filter @cleanspace/desktop test:velox-profile",
     "prepare": "husky"
   },
   "devDependencies": {

@@ -29,14 +29,9 @@ public enum DesktopApp {
 
     #endif
 
-    let projectRoot = URL(fileURLWithPath: #filePath)
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-
     var config: VeloxConfig
     do {
-      config = try VeloxConfig.load(from: projectRoot)
+      config = try VeloxConfig.load()
     } catch {
       fatalError("Failed to load velox.json: \(error)")
     }

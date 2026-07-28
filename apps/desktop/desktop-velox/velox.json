@@ -39,7 +39,9 @@
     "resources": [".build/velox-bundle/libvelox_runtime_wry_ffi.dylib"],
     "macos": {
       "minimumSystemVersion": "15.0",
-      "infoPlist": "Support/Info.plist"
+      "infoPlist": "Support/Info.plist",
+      "signingIdentity": "-",
+      "hardenedRuntime": false
     }
   }
 }

@@ -51,6 +51,10 @@ export type MessageKey =
   | "rules.action.metric.tap_analyze"
   | "rules.action.caption.none"
   | "rules.action.caption.counts"
+  | "rules.action.bar.aria"
+  | "rules.action.bar.selected_label"
+  | "rules.action.bar.selected_aria"
+  | "rules.action.bar.hint_select"
   | "rules.table.category"
   | "rules.table.type"
   | "rules.table.type.path"
@@ -191,6 +195,10 @@ const EN: Catalog = {
   "rules.action.metric.tap_analyze": "Tap Analyze to measure",
   "rules.action.caption.none": "Use checkboxes in the list above, then Preview or Run Clean.",
   "rules.action.caption.counts": "{selected} selected · {path} path · {command} command",
+  "rules.action.bar.aria": "Clean-up actions",
+  "rules.action.bar.selected_label": "selected",
+  "rules.action.bar.selected_aria": "{count} rules selected",
+  "rules.action.bar.hint_select": "Select rules in the list above.",
   "rules.table.category": "Category",
   "rules.table.type": "Type",
   "rules.table.type.path": "Path",
@@ -328,6 +336,10 @@ const ZH: Catalog = {
   "rules.action.metric.tap_analyze": "点击「分析」测算大小",
   "rules.action.caption.none": "在上方列表勾选项目后，可预览或执行清理。",
   "rules.action.caption.counts": "已选 {selected} 条 · 路径类 {path} · 命令类 {command}",
+  "rules.action.bar.aria": "清理操作",
+  "rules.action.bar.selected_label": "已选",
+  "rules.action.bar.selected_aria": "已选 {count} 条规则",
+  "rules.action.bar.hint_select": "请在上方列表勾选规则。",
   "rules.table.category": "分类",
   "rules.table.type": "类型",
   "rules.table.type.path": "路径",
