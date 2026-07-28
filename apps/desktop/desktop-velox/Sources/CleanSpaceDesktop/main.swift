@@ -1,0 +1,3 @@
+import CleanSpaceDesktopRuntime
+
+DesktopApp.run()

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://velox.dev/schema/velox.schema.json",
+  "productName": "Cleaning",
+  "version": "0.1.0",
+  "identifier": "me.systembug.cleaning",
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Cleaning",
+        "width": 1120,
+        "height": 760,
+        "minWidth": 1020,
+        "minHeight": 720,
+        "url": "app://localhost/",
+        "create": true,
+        "visible": true,
+        "focus": true,
+        "resizable": true,
+        "decorations": true,
+        "customProtocols": ["app", "ipc"]
+      }
+    ],
+    "macOS": {
+      "activationPolicy": "regular"
+    }
+  },
+  "build": {
+    "frontendDist": "assets",
+    "beforeDevCommand": "cd .. && node ../../design/generate-app-icon.mjs && pnpm exec vite",
+    "beforeBuildCommand": "cd .. && node ../../design/generate-app-icon.mjs && pnpm exec vite build",
+    "beforeBundleCommand": "cd .. && node scripts/prepare-velox-bundle.mjs",
+    "devUrl": "http://localhost:5188"
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app"],
+    "icon": "Sources/CleanSpaceDesktop/Resources/AppIcon.icns",
+    "resources": [".build/velox-bundle/libvelox_runtime_wry_ffi.dylib"],
+    "macos": {
+      "minimumSystemVersion": "15.0",
+      "infoPlist": "Support/Info.plist"
+    }
+  }
+}

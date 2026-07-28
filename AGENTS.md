@@ -29,7 +29,7 @@
 
 - **pre-commit**（`.husky/pre-commit`）：`scripts/check-swift-ui-l10n.sh`、`cd app && swift build`。
 - **pre-push**（`.husky/pre-push`）：`swift build && swift test`。
-- 本地常用：`pnpm test`、`pnpm run check`、`pnpm run build:app`（见根目录 `package.json`）；依赖由 **pnpm** 管理（`pnpm-lock.yaml`）。
+- 本地常用：`pnpm dev`、`pnpm build`（见根目录 `package.json`）；依赖由 **pnpm** 管理（`pnpm-lock.yaml`）。
 
 ### 界面（macOS）
 

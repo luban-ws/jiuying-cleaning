@@ -29,15 +29,12 @@ pnpm install
 
 | 目的 | 命令 |
 |------|------|
-| 调试构建 | `pnpm run build:app` |
-| 运行应用（SwiftPM） | `pnpm run run:app` |
-| 单元测试 | `pnpm test`（同 `pnpm run test:app`） |
-| 提交前自检（l10n + 构建 + 测试） | `pnpm run check` |
-| 打可在访达双击的 `.app` | `pnpm run bundle:app` |
+| 开发（Vite + Velox） | `pnpm dev` |
+| 打 release `.app` | `pnpm build` |
 
 **应用起不来？**
 
-- 包管理器是 **pnpm**（不是 `pap` / `npm` 混用）：在**仓库根目录**（有 `package.json` 的那一层）执行 `pnpm run run:app`。`run:app` 会调用 `scripts/run-app.sh`，不依赖你当前终端是否已 `cd app`。
+- 在**仓库根目录**执行 `pnpm dev`（或 `./scripts/run-app.sh`）。
 - 若终端里构建成功但「像没反应」：窗口可能在其他应用后面，用 **Command+Tab** 或程序坞切到 **CleanSpace**。
 - 等价命令：`./scripts/run-app.sh` 或 `cd app && swift run CleanSpace`（需本机已安装 Swift / macOS SDK）。
 

@@ -7,6 +7,16 @@ package-lock.json
 # pnpm
 .pnpm-debug.log*
 
+# Monorepo (turbo + Vite + Vitest)
+.turbo/
+dist/
+coverage/
+*.tsbuildinfo
+.vite/
+
+# Velox desktop: Vite build → Velox frontendDist
+apps/desktop/desktop-velox/assets/
+
 # Swift Package Manager
 .build/
 .swiftpm/configuration/registries.json

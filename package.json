@@ -5,13 +5,8 @@
   "packageManager": "pnpm@10.27.0",
   "description": "macOS clean app - browser, Docker, AI tools space management",
   "scripts": {
-    "build:app": "./design/generate-app-icon.sh && cd app && swift build",
-    "run:app": "bash scripts/run-app.sh",
-    "app:dev": "bash scripts/dev-app.sh",
-    "bundle:app": "./scripts/bundle-mac-app.sh release",
-    "test": "cd app && swift test",
-    "test:app": "pnpm run test",
-    "check": "./scripts/check-swift-ui-l10n.sh && cd app && swift build && pnpm run test",
+    "dev": "pnpm --filter @cleanspace/desktop dev",
+    "build": "pnpm --filter @cleanspace/desktop build",
     "prepare": "husky"
   },
   "devDependencies": {

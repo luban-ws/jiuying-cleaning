@@ -5,7 +5,7 @@ set -euo pipefail
 readonly CONFIG="${1:-release}"
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-readonly APP_ROOT="${REPO_ROOT}/app"
+readonly APP_ROOT="${REPO_ROOT}/legacy"
 readonly SUPPORT_DIR="${APP_ROOT}/Support"
 readonly INFO_PLIST="${SUPPORT_DIR}/Info.plist"
 readonly BUNDLE_ID_SUFFIX="CleanSpace_CleanSpaceKit.bundle"
@@ -17,7 +17,7 @@ if [[ ! -f "${INFO_PLIST}" ]]; then
   exit 1
 fi
 
-"${REPO_ROOT}/design/generate-app-icon.sh"
+node "${REPO_ROOT}/design/generate-app-icon.mjs"
 
 swift build -c "${CONFIG}"
 
