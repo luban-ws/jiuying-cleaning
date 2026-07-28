@@ -3,21 +3,30 @@ import PackageDescription
 
 let package = Package(
     name: "CleanSpaceDesktop",
+    defaultLocalization: "en",
     platforms: [.macOS(.v15)],
     products: [
         .executable(name: "CleanSpaceDesktop", targets: ["CleanSpaceDesktop"]),
         .library(name: "CleanSpaceDesktopIPC", targets: ["CleanSpaceDesktopIPC"]),
         .library(name: "CleanSpaceDesktopRuntime", targets: ["CleanSpaceDesktopRuntime"]),
+        .library(name: "CleanSpaceKit", targets: ["CleanSpaceKit"]),
     ],
     dependencies: [
         .package(url: "https://github.com/velox-apps/velox", branch: "main"),
-        .package(path: "../../../legacy"),
     ],
     targets: [
         .target(
+            name: "CleanSpaceKit",
+            dependencies: [],
+            path: "Sources/CleanSpaceKit",
+            resources: [
+                .process("Resources"),
+            ]
+        ),
+        .target(
             name: "CleanSpaceDesktopIPC",
             dependencies: [
-                .product(name: "CleanSpaceKit", package: "legacy"),
+                "CleanSpaceKit",
             ],
             path: "Sources/CleanSpaceDesktopIPC"
         ),
@@ -60,6 +69,11 @@ let package = Package(
             name: "CleanSpaceDesktopRuntimeTests",
             dependencies: ["CleanSpaceDesktopRuntime"],
             path: "Tests/CleanSpaceDesktopRuntimeTests"
+        ),
+        .testTarget(
+            name: "CleanSpaceKitTests",
+            dependencies: ["CleanSpaceKit"],
+            path: "Tests/CleanSpaceKitTests"
         ),
     ]
 )

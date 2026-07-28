@@ -20,7 +20,7 @@
 | 共享类型/IPC 客户端 | `packages/desktop-api` | `veloxInvoke`、DTO 类型、单测 |
 | 桥接 | Velox `ipc://` | 类型化 JSON 命令 |
 | IPC 路由（模块化 Swift） | `apps/desktop/velox` → `CleanSpaceDesktopIPC` | 按域拆分 Handler + 单测 |
-| 业务 | `app/Sources/CleanSpaceKit` | 扫描、清理、规则、Docker、指标（**唯一**业务源） |
+| 业务 | `apps/desktop/desktop-velox/Sources/CleanSpaceKit` | 扫描、清理、规则、Docker、指标（**唯一**业务源） |
 | 壳 | Velox + Wry | 窗口、协议、打包 |
 
 SwiftUI `CleanSpace` 在 **Phase 4** 前并行保留；`pnpm run app:dev` 默认启动 Desktop。

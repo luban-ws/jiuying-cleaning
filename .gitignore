@@ -22,6 +22,9 @@ coverage/
 # Velox desktop: Vite build → Velox frontendDist
 apps/desktop/desktop-velox/assets/
 
+# Removed SwiftUI app tree (do not resurrect)
+legacy/
+
 # Swift Package Manager
 .build/
 .swiftpm/configuration/registries.json

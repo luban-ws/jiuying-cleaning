@@ -14,18 +14,17 @@ const designDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(designDir, "..");
 const sourcePng = join(designDir, "icon.png");
 const sourceSvg = join(designDir, "icon.svg");
-const legacyCatalog = join(
+const kitCatalog = join(
   repoRoot,
-  "legacy/Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset",
+  "apps/desktop/desktop-velox/Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset",
 );
 const veloxCatalog = join(
   repoRoot,
   "apps/desktop/desktop-velox/Sources/CleanSpaceDesktop/Resources/Assets.xcassets/AppIcon.appiconset",
 );
-const legacyPng = join(legacyCatalog, "AppIcon-1024.png");
+const kitPng = join(kitCatalog, "AppIcon-1024.png");
 const veloxPng = join(veloxCatalog, "AppIcon-1024.png");
 const reactPng = join(repoRoot, "apps/desktop/src/assets/logo.png");
-const legacyIcns = join(repoRoot, "legacy/Support/AppIcon.icns");
 const veloxIcns = join(
   repoRoot,
   "apps/desktop/desktop-velox/Sources/CleanSpaceDesktop/Resources/AppIcon.icns",
@@ -48,7 +47,7 @@ function findRsvgConvert() {
   ].find(existsSync);
 }
 
-for (const directory of [legacyCatalog, veloxCatalog, dirname(reactPng)]) {
+for (const directory of [kitCatalog, veloxCatalog, dirname(reactPng)]) {
   mkdirSync(directory, { recursive: true });
 }
 
@@ -58,7 +57,7 @@ if (existsSync(sourcePng)) {
   if (format !== "png") {
     throw new Error(`design: icon.png 实际编码为 ${format ?? "未知"}，必须为 png`);
   }
-  copyFileSync(sourcePng, legacyPng);
+  copyFileSync(sourcePng, kitPng);
 } else {
   const rsvgConvert = findRsvgConvert();
   if (!existsSync(sourceSvg)) {
@@ -67,11 +66,11 @@ if (existsSync(sourcePng)) {
   if (!rsvgConvert) {
     throw new Error("design: 未找到 rsvg-convert，无法从 icon.svg 生成 PNG");
   }
-  run(rsvgConvert, ["-w", "1024", "-h", "1024", "-o", legacyPng, sourceSvg]);
+  run(rsvgConvert, ["-w", "1024", "-h", "1024", "-o", kitPng, sourceSvg]);
 }
 
-copyFileSync(legacyPng, veloxPng);
-copyFileSync(legacyPng, reactPng);
+copyFileSync(kitPng, veloxPng);
+copyFileSync(kitPng, reactPng);
 
 const entries = [
   [16, "icon_16x16.png"],
@@ -87,7 +86,7 @@ const entries = [
 ];
 
 for (const [size, filename] of entries) {
-  const legacyOutput = join(legacyCatalog, filename);
+  const kitOutput = join(kitCatalog, filename);
   run(sips, [
     "-s",
     "format",
@@ -95,11 +94,11 @@ for (const [size, filename] of entries) {
     "-z",
     String(size),
     String(size),
-    legacyPng,
+    kitPng,
     "--out",
-    legacyOutput,
+    kitOutput,
   ]);
-  copyFileSync(legacyOutput, join(veloxCatalog, filename));
+  copyFileSync(kitOutput, join(veloxCatalog, filename));
 }
 
 const actoolOutput = mkdtempSync(join(tmpdir(), "cleanspace-actool-"));
@@ -116,13 +115,15 @@ try {
     "AppIcon",
     "--output-partial-info-plist",
     join(actoolOutput, "partial-info.plist"),
-    join(repoRoot, "legacy/Sources/CleanSpaceKit/Resources/Assets.xcassets"),
+    join(
+      repoRoot,
+      "apps/desktop/desktop-velox/Sources/CleanSpaceKit/Resources/Assets.xcassets",
+    ),
   ]);
   const generatedIcns = join(actoolOutput, "AppIcon.icns");
   if (!existsSync(generatedIcns)) {
     throw new Error("design: actool 未生成 AppIcon.icns");
   }
-  copyFileSync(generatedIcns, legacyIcns);
   copyFileSync(generatedIcns, veloxIcns);
 } finally {
   rmSync(actoolOutput, { recursive: true, force: true });
@@ -131,4 +132,4 @@ try {
 run(process.execPath, [join(repoRoot, "scripts/check-app-icon-sync.mjs")], {
   stdio: "inherit",
 });
-console.log("design: React、Velox、Legacy 图标已生成");
+console.log("design: React 与 Velox 图标已生成");

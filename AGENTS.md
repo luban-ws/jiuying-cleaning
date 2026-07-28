@@ -20,15 +20,15 @@
 
 ### 本地化（非可选）
 
-- 用户可见自然语言（含中英与说明句）放在 `app/Sources/CleanSpaceKit/Resources/` 各语言 **`Localizable.strings`**；开发语言为 **en**（与 `Package.swift` 的 `defaultLocalization` 一致）。
+- 用户可见自然语言（含中英与说明句）放在 `apps/desktop/desktop-velox/Sources/CleanSpaceKit/Resources/` 各语言 **`Localizable.strings`**；开发语言为 **en**（与 `desktop-velox/Package.swift` 的 `defaultLocalization` 一致）。
 - Swift 通过 **`L10n`**（`Localization/L10n.swift`）引用；**禁止** 在 `Text` / `Button` / `Section` / `.alert` / `title:` / `placeholder:` 等位置写 **CJK 字面量**。
 - 新键至少同步 **en.lproj** 与 **zh-Hans.lproj**；键名用点分命名，与现有一致。
 - 单元测试中断言 **稳定 id 或数值行为**，不断言随语言变化的展示文案。
 
 ### 构建与钩子
 
-- **pre-commit**（`.husky/pre-commit`）：`scripts/check-swift-ui-l10n.sh`、`cd app && swift build`。
-- **pre-push**（`.husky/pre-push`）：`swift build && swift test`。
+- **pre-commit**（`.husky/pre-commit`）：`scripts/check-swift-ui-l10n.sh`、`cd apps/desktop/desktop-velox && swift build`。
+- **pre-push**（`.husky/pre-push`）：`cd apps/desktop/desktop-velox && swift build && swift test`。
 - 本地常用：`pnpm dev`、`pnpm build`（见根目录 `package.json`）；依赖由 **pnpm** 管理（`pnpm-lock.yaml`）。
 
 ### 界面（macOS）

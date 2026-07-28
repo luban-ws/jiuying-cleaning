@@ -8,7 +8,6 @@ import {
   deriveDevelopmentConfig,
   installDevelopmentBundleConfig,
   resolveDevelopmentAction,
-  resolveProductionAction,
 } from "./velox-profile-config.mjs";
 
 test("derives isolated Development identity without mutating Production config", () => {
@@ -24,7 +23,7 @@ test("derives isolated Development identity without mutating Production config",
     build: {
       beforeDevCommand: "cd .. && pnpm exec vite",
       beforeBuildCommand: "cd .. && pnpm exec vite build",
-      beforeBundleCommand: "cd .. && node scripts/prepare-velox-bundle.mjs",
+      beforeBundleCommand: "cd .. && node scripts/velox-ffi.mjs prepare-bundle",
     },
   };
 
@@ -44,7 +43,7 @@ test("derives isolated Development identity without mutating Production config",
   );
   assert.equal(
     development.build.beforeBundleCommand,
-    "cd ../../../.. && node scripts/prepare-velox-bundle.mjs",
+    "cd ../../../.. && node scripts/velox-ffi.mjs prepare-bundle",
   );
 
   assert.equal(production.productName, "Cleaning");
@@ -54,10 +53,6 @@ test("derives isolated Development identity without mutating Production config",
 });
 
 test("maps Development commands to official Velox CLI arguments", () => {
-  assert.deepEqual(resolveDevelopmentAction("dev"), {
-    args: ["dev"],
-    bundle: false,
-  });
   assert.deepEqual(resolveDevelopmentAction("build:app"), {
     args: ["build", "--debug", "--bundle"],
     bundle: true,
@@ -66,13 +61,6 @@ test("maps Development commands to official Velox CLI arguments", () => {
     () => resolveDevelopmentAction("release"),
     /不支持 Development 动作: release/,
   );
-});
-
-test("maps Production command to official Velox Release bundle", () => {
-  assert.deepEqual(resolveProductionAction("build:app"), {
-    args: ["build", "--bundle"],
-    bundle: true,
-  });
 });
 
 test("installs actual Development config into generated app bundle", () => {

@@ -15,9 +15,9 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 ## 1. SwiftPM 项目结构（推荐）
 
 - **位置**：`app/Package.swift`；界面与业务放在库目标（如 `Sources/CleanSpaceKit/`），`@main` 入口放在可执行目标（如 `Sources/CleanSpace/`）。
-- **构建**：`cd app && swift build`；运行：`swift run <ProductName>`。
-- **产物**：可执行文件与 `*_CleanSpaceKit.bundle` 等资源包位于 `app/.build/`（应加入 `.gitignore`）。
-- **.app 包**：用脚本将可执行文件、`app/Support/Info.plist` 与资源 bundle 拷入 `Contents/MacOS` 与 `Contents/Resources`，便于访达双击（见本仓库 `scripts/bundle-mac-app.sh`）。
+- **构建**：`cd apps/desktop/desktop-velox && swift build`；前端开发：`pnpm dev`。
+- **产物**：Velox `.app` 在 `apps/desktop/desktop-velox/dist/`；Swift 构建缓存在 `desktop-velox/.build/`（应加入 `.gitignore`）。
+- **.app 包**：`pnpm build:app` 或 `scripts/bundle-mac-app.sh`（调用 Velox release 构建）。
 - **部署目标**：在 `Package.swift` 使用 `swift-tools-version: 6.0` 与 `platforms: [.macOS(.v15)]`，并与 `Support/Info.plist` 的 `LSMinimumSystemVersion`（`15.0`）对齐。
 
 ## 2. 应用图标（无图案问题）
@@ -34,8 +34,8 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 - **安装**：在仓库根目录 `pnpm add -D husky`，`package.json` 中 `"prepare": "husky"`；本仓库已用 **pnpm**（见 `pnpm-lock.yaml`）。
 - **钩子建议**：
   - **commit-msg**：校验提交信息非空、长度等（可接 commitlint）。
-  - **pre-commit**：`cd app && swift build`。
-  - **pre-push**：`cd app && swift build && swift test`。
+  - **pre-commit**：`cd apps/desktop/desktop-velox && swift build`。
+  - **pre-push**：`cd apps/desktop/desktop-velox && swift build && swift test`。
 - **钩子脚本**：放在 `.husky/`，需可执行（`chmod +x`）。
 
 ## 4. 清理类应用的可扩展设计
@@ -55,12 +55,13 @@ description: Create and maintain native macOS apps with SwiftPM (Swift Package M
 
 | 内容       | 路径 |
 |------------|------|
-| Swift 包   | `app/Package.swift` |
-| 库与资源   | `app/Sources/CleanSpaceKit/` |
-| 可执行入口 | `app/Sources/CleanSpace/` |
-| 单元测试   | `app/Tests/CleanSpaceTests/` |
+| Swift 包   | `apps/desktop/desktop-velox/Package.swift` |
+| 库与资源   | `apps/desktop/desktop-velox/Sources/CleanSpaceKit/` |
+| Velox 入口 | `apps/desktop/desktop-velox/Sources/CleanSpaceDesktop/` |
+| React UI   | `apps/desktop/src/` |
+| 单元测试   | `apps/desktop/desktop-velox/Tests/CleanSpaceKitTests/` |
 | 图标源 SVG | `design/icon.svg` |
 | 打 .app 脚本 | `scripts/bundle-mac-app.sh` |
-| Info.plist | `app/Support/Info.plist` |
+| Info.plist | `apps/desktop/desktop-velox/Support/Info.plist` |
 | Husky 钩子 | `.husky/pre-commit`, `.husky/commit-msg`, `.husky/pre-push` |
 | 仓库说明 | 根目录 `README.md` |

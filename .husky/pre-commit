@@ -1,4 +1,4 @@
-# 提交前：UI 文案不得回退为源码内 CJK 字面量；再确保 SwiftPM 可构建
+# UI 文案不得回退为源码内 CJK 字面量；确保 desktop Swift 可构建
 . "$(dirname -- "$0")/_/husky.sh"
 "$(dirname -- "$0")/../scripts/check-swift-ui-l10n.sh"
-cd legacy && swift build
+cd apps/desktop/desktop-velox && swift build

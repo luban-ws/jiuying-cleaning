@@ -7,16 +7,11 @@ import { fileURLToPath } from "node:url";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, "..");
 const sourceIcon = join(repoRoot, "design/icon.png");
-const legacyPng = join(
-  repoRoot,
-  "legacy/Sources/CleanSpaceKit/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
-);
 const reactPng = join(repoRoot, "apps/desktop/src/assets/logo.png");
 const veloxPng = join(
   repoRoot,
   "apps/desktop/desktop-velox/Sources/CleanSpaceDesktop/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
 );
-const legacyIcns = join(repoRoot, "legacy/Support/AppIcon.icns");
 const veloxIcns = join(
   repoRoot,
   "apps/desktop/desktop-velox/Sources/CleanSpaceDesktop/Resources/AppIcon.icns",
@@ -33,7 +28,7 @@ function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
-for (const icon of [sourceIcon, legacyPng, reactPng, veloxPng]) {
+for (const icon of [sourceIcon, reactPng, veloxPng]) {
   const format = formatOf(icon);
   if (format !== "png") {
     throw new Error(`icon-check: ${icon} 编码为 ${format ?? "未知"}，必须为 png`);
@@ -41,14 +36,14 @@ for (const icon of [sourceIcon, legacyPng, reactPng, veloxPng]) {
 }
 
 const sourceHash = sha256(sourceIcon);
-for (const icon of [legacyPng, reactPng, veloxPng]) {
+for (const icon of [reactPng, veloxPng]) {
   if (sha256(icon) !== sourceHash) {
     throw new Error(`icon-check: ${icon} 未与 design/icon.png 同步`);
   }
 }
 
-if (sha256(legacyIcns) !== sha256(veloxIcns)) {
-  throw new Error("icon-check: Legacy 与 Velox AppIcon.icns 不一致");
+if (!existsSync(veloxIcns)) {
+  throw new Error("icon-check: Velox AppIcon.icns 缺失");
 }
 
-console.log("icon-check: React、Velox、Legacy 图标已同步");
+console.log("icon-check: React 与 Velox 图标已同步");

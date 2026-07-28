@@ -93,18 +93,20 @@ final class CleanSpaceKitAPITests: XCTestCase {
         XCTAssertFalse(CleanSpaceKitAPI.openPath("/nonexistent/path/for/cleanspace-test").success)
     }
 
-    func testScanVolumeIncludesAccounting() {
-        let volumes = CleanSpaceKitAPI.listVolumes()
-        guard let vol = volumes.first else {
-            XCTFail("expected at least one volume")
-            return
-        }
+    func testScanVolumeIncludesAccounting() throws {
+        let fm = FileManager.default
+        let base = fm.temporaryDirectory.appendingPathComponent("CleanSpaceScanVolume-\(UUID().uuidString)")
+        try fm.createDirectory(at: base, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(at: base) }
+        try fm.createDirectory(at: base.appendingPathComponent("child"), withIntermediateDirectories: true)
+
         let result = CleanSpaceKitAPI.scanVolume(
-            volumePath: vol.path,
-            totalBytes: vol.totalBytes,
-            freeBytes: vol.freeBytes
+            volumePath: base.path,
+            totalBytes: 1_000_000,
+            freeBytes: 500_000
         )
         XCTAssertNotNil(result.accounting)
         XCTAssertGreaterThanOrEqual(result.accounting?.topLevelSum ?? 0, 0)
+        XCTAssertEqual(result.accounting?.volumeUsedBytes, 500_000)
     }
 }

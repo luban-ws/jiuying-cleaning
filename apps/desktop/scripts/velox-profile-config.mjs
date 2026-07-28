@@ -30,8 +30,6 @@ export function deriveDevelopmentConfig(production) {
 
 export function resolveDevelopmentAction(action) {
   switch (action) {
-    case "dev":
-      return { args: ["dev"], bundle: false };
     case "build:app":
       return { args: ["build", "--debug", "--bundle"], bundle: true };
     default:

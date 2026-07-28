@@ -27,9 +27,9 @@
   },
   "build": {
     "frontendDist": "assets",
-    "beforeDevCommand": "cd .. && node ../../design/generate-app-icon.mjs && pnpm exec vite",
+    "beforeDevCommand": "cd .. && node scripts/velox-ffi.mjs restore-dev && node ../../design/generate-app-icon.mjs && pnpm exec vite",
     "beforeBuildCommand": "cd .. && node ../../design/generate-app-icon.mjs && pnpm exec vite build",
-    "beforeBundleCommand": "cd .. && node scripts/prepare-velox-bundle.mjs",
+    "beforeBundleCommand": "cd .. && node scripts/velox-ffi.mjs prepare-bundle",
     "devUrl": "http://localhost:5188"
   },
   "bundle": {

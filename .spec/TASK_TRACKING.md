@@ -186,10 +186,12 @@
 
 | ID | 任务 | 状态 | 备注 |
 |----|------|------|------|
-| TASK-015-01 | Development profile config 派生与 Node 单测 | 进行中 | canonical Production config 不得被交换 |
-| TASK-015-02 | pnpm → Velox CLI 命令与 bundle config 修正 | 待办 | 不新增 `.sh` |
-| TASK-015-03 | 运行时 config 加载与单实例身份解析 | 待办 | bundle ID → env → Production fallback |
-| TASK-015-04 | 双 bundle 构建、签名、并行运行与同 variant 单实例验收 | 待办 | `Cleaning Dev.app` + `Cleaning.app` |
+| TASK-015-01 | Development profile config 派生与 Node 单测 | 已完成 | canonical Production config 未交换 |
+| TASK-015-02 | pnpm → Velox CLI 命令与 bundle config 修正 | 已完成 | `pnpm dev` 直达 `velox dev`；无新增 `.sh` |
+| TASK-015-03 | 运行时 config 加载与单实例身份解析 | 已完成 | bundle ID → env → Production fallback |
+| TASK-015-04 | 双 bundle 构建、签名、并行运行与同 variant 单实例验收 | 进行中 | bare dev Dock 图标验收失败；改由 bundle-first dev 完成 |
+| TASK-015-05 | `luban-ws/velox` 实现 macOS bundle-first dev 与 effective config bundling | 进行中 | fork `main` 基线 `f9a37ed` |
+| TASK-015-06 | Cleaning 固定 Velox fork revision并删除 bare executable 补丁 | 待办 | 完成后删除 `DevelopmentAppIcon` 与 identifier env 注入 |
 
 ---
 

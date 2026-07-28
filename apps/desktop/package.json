@@ -7,7 +7,7 @@
   "scripts": {
     "velox:cli:build": "cd desktop-velox/.build/checkouts/velox && swift build --product velox",
     "velox": "cd desktop-velox && .build/checkouts/velox/.build/debug/velox",
-    "dev": "node scripts/run-velox-profile.mjs dev",
+    "dev": "CLEANING_BUNDLE_IDENTIFIER=me.systembug.cleaning.dev pnpm run velox dev",
     "build": "pnpm run build:app",
     "build:app": "VELOX_BUNDLE_CONFIGURATION=release pnpm run velox build --bundle",
     "build:app:dev": "node scripts/run-velox-profile.mjs build:app",

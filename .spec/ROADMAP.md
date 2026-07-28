@@ -43,7 +43,7 @@
 | 12 | [012](.spec/rfc/012-ui-polishing-and-hig-compliance.md) | UI 抛光与 macOS HIG 自适应合规 | 实施中 | 针对沉浸式标题栏遮挡、网格自适应与矢量进度环的打磨细节 |
 | 13 | [013](.spec/rfc/013-velox-ui-shell-migration.md) | Desktop Shell 迁移（Velox + React + 模块化 Swift） | 已完成 | `apps/desktop` 默认；G3/G4 见 `pnpm run:swiftui`；AppIcon 单源同步 |
 | 14 | [014](rfc/014-single-instance-desktop-lifecycle.md) | Velox Desktop 单实例生命周期 | 实施中 | 核心已落地；待最小化窗口与 SwiftUI 辅助进程并存手验 |
-| 15 | [015](rfc/015-velox-development-production-isolation.md) | Velox Development / Production 应用隔离 | 实施中 | `Cleaning Dev.app` 与 `Cleaning.app` 独立身份、可并行运行 |
+| 15 | [015](rfc/015-velox-development-production-isolation.md) | Velox Development / Production 应用隔离 | 实施中 | `luban-ws/velox` bundle-first dev；`Cleaning Dev.app` 与 `Cleaning.app` 独立身份 |
 
 ## 阶段概览（与 RFC 001 对齐）
 
