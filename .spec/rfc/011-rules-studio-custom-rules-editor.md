@@ -3,7 +3,7 @@
 **状态**：草案  
 **创建日期**：2026-07-18  
 **作者**：CleanSpace  
-**依赖**：[RFC 005](./005-user-rules-yaml-and-settings-editor.md)、[RFC 009](./completed/009-user-rule-safety-and-exclusions.md)、[RFC 010](./completed/010-rules-workspace-ui-hig-and-collaboration.md)
+**依赖**：[RFC 005](./005-user-rules-yaml-and-settings-editor.md)、[RFC 009](./completed/009-user-rule-safety-and-exclusions.md)、[RFC 010](./010-rules-workspace-ui-hig-and-collaboration.md)
 
 ---
 

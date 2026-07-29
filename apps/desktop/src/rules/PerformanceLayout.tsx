@@ -22,7 +22,7 @@ export function PerformanceLayout({ ws, t }: Props) {
             focused={ws.focusedRuleId === rule.id}
             processCount={ws.processCounts[rule.id]}
             onToggle={() => ws.toggleSelected(rule.id)}
-            onFocus={() => ws.setFocusedRuleId(rule.id)}
+            onFocus={() => ws.focusRule(rule.id)}
             t={t}
           />
         ))}

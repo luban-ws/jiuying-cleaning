@@ -7,12 +7,14 @@ import {
   type VolumeSummary,
   type IPCJobHandle,
 } from "@cleanspace/desktop-api";
+import { DiskUsageMap } from "../components/DiskUsageMap";
 import { FullDiskAccessBanner } from "../components/FullDiskAccessBanner";
+import { VolumePicker } from "../components/VolumePicker";
 import { BRAND_CHART } from "../branding";
 import { DonutChart } from "../components/DonutChart";
 import { WorkspaceGuide } from "../components/WorkspaceGuide";
 import { useI18n } from "../i18n/useI18n";
-import { formatBytes, formatPercent } from "../rules/format";
+import { formatBytes, formatPercent, volumeUsageStats } from "../rules/format";
 import { buildRulesCategorySlices, type ChartSlice } from "../rules/chartSlices";
 
 export function VolumesPage() {
@@ -26,6 +28,7 @@ export function VolumesPage() {
   const [fdaDismissed, setFdaDismissed] = useState(false);
 
   const selected = volumes.find((v) => v.id === selectedId);
+  const usage = volumeUsageStats(selected?.totalBytes, selected?.freeBytes);
 
   useEffect(() => {
     void (async () => {
@@ -45,16 +48,6 @@ export function VolumesPage() {
     setScan(null);
     setFdaDismissed(false);
   }, [selectedId]);
-
-  const usedBytes = useMemo(() => {
-    if (!selected?.totalBytes || selected.freeBytes == null) return null;
-    return Math.max(0, selected.totalBytes - selected.freeBytes);
-  }, [selected]);
-
-  const usedPercent = useMemo(() => {
-    if (!selected?.totalBytes || usedBytes == null || selected.totalBytes <= 0) return 0;
-    return (usedBytes / selected.totalBytes) * 100;
-  }, [selected, usedBytes]);
 
   const folderSlices: ChartSlice[] = useMemo(() => {
     if (!scan?.folders.length) return [];
@@ -95,7 +88,7 @@ export function VolumesPage() {
   const openPath = (path: string) => void veloxInvoke("open_path", { path });
 
   return (
-    <div className="workspace form-workspace">
+    <div className="workspace form-workspace volumes-workspace">
       <h2>{t("disk.nav_title")}</h2>
       <WorkspaceGuide text={t("disk.select_volume_hint")} />
 
@@ -106,47 +99,29 @@ export function VolumesPage() {
 
       {!loading && volumes.length > 0 && (
         <>
-          <label className="field-label" htmlFor="volume-picker">
-            {t("disk.picker.label")}
-          </label>
-          <select
-            id="volume-picker"
-            className="select"
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-          >
-            {volumes.map((v) => (
-              <option key={v.id} value={v.id}>
-                {t("disk.volume_picker_format", {
-                  name: v.name,
-                  free: formatBytes(v.freeBytes ?? 0),
-                })}
-              </option>
-            ))}
-          </select>
+          <p className="field-label">{t("disk.picker.label")}</p>
+          <VolumePicker
+            volumes={volumes}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            freeLabel={(free) => t("disk.free_short", { free })}
+          />
 
           {selected && (
             <>
-              <section className="card hero-card">
-                <div className="hero-metrics">
-                  <div>
-                    <p className="muted label">{t("disk.hero.available")}</p>
-                    <p className="hero-value">{formatBytes(selected.freeBytes)}</p>
-                  </div>
-                  <div>
-                    <p className="muted label">{t("disk.hero.used")}</p>
-                    <p className="hero-value">{formatBytes(usedBytes)}</p>
-                  </div>
-                  <div>
-                    <p className="muted label">{t("disk.hero.capacity")}</p>
-                    <p className="hero-value">{formatBytes(selected.totalBytes)}</p>
-                  </div>
-                </div>
-                <div className="hero-bar">
-                  <div className="hero-bar-fill" style={{ width: `${usedPercent}%` }} />
-                </div>
-                <p className="muted mono">{selected.path}</p>
-                <div className="toolbar">
+              <section className="card volume-hero-card">
+                <DiskUsageMap
+                  stats={usage}
+                  path={selected.path}
+                  title={t("disk.map.title")}
+                  labels={{
+                    used: t("disk.hero.used"),
+                    available: t("disk.hero.available"),
+                    capacity: t("disk.hero.capacity"),
+                    usedPercent: (percent) => t("disk.usage_percent", { percent }),
+                  }}
+                />
+                <div className="toolbar volume-hero-actions">
                   <button type="button" className="btn ghost" onClick={() => openPath(selected.path)}>
                     {t("disk.show_in_finder")}
                   </button>
@@ -156,7 +131,7 @@ export function VolumesPage() {
                 </div>
               </section>
 
-              {!scan && !scanning && <p className="muted">{t("disk.scan_hint_empty")}</p>}
+              {!scan && !scanning && <p className="muted scan-hint">{t("disk.scan_hint_empty")}</p>}
 
               {scan && !fdaDismissed && (
                 <FullDiskAccessBanner
@@ -187,7 +162,11 @@ export function VolumesPage() {
                 <section className="card chart-card">
                   <h3>{t("disk.chart.card_title")}</h3>
                   <div className="chart-layout">
-                    <DonutChart percent={usedPercent} color={BRAND_CHART.volume} label={t("disk.chart.whole_volume")} />
+                    <DonutChart
+                      percent={usage.usedPercent}
+                      color={BRAND_CHART.volume}
+                      label={t("disk.chart.whole_volume")}
+                    />
                     <div className="bar-chart">
                       {folderSlices.map((slice) => (
                         <div key={slice.id} className="bar-row">

@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import type { RuleSummary } from "@cleanspace/desktop-api";
 import type { useI18n } from "../i18n/useI18n";
 import type { RulesWorkspaceState } from "./useRulesWorkspace";
@@ -10,56 +11,154 @@ type Props = {
   cat: (category: string) => string;
 };
 
+type FancySelectProps = {
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+  className?: string;
+};
+
+export function FancySelect({ value, onChange, options, placeholder, className }: FancySelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOuterClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOuterClick);
+    return () => document.removeEventListener("mousedown", handleOuterClick);
+  }, []);
+
+  const selectedOption = options.find((o) => o.value === value) || options[0];
+
+  return (
+    <div className={`fancy-select-container ${className || ""}`} ref={containerRef}>
+      <button
+        type="button"
+        className="select-trigger"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <span>{selectedOption ? selectedOption.label : placeholder}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="select-trigger-icon"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="select-content" role="listbox">
+          <div className="select-viewport">
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                className={`select-item ${opt.value === value ? "selected" : ""}`}
+                role="option"
+                aria-selected={opt.value === value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+              >
+                <span>{opt.label}</span>
+                {opt.value === value && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="select-item-indicator"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RulesFilterToolbar({ ws, t, cat }: Props) {
+  const categoryOptions = [
+    { value: "", label: t("rules.filter.all_categories") },
+    ...ws.categories.map((category) => ({
+      value: category,
+      label: cat(category),
+    })),
+  ];
+
+  const sortOptions = [
+    { value: "impact", label: t("rules.sort.impact") },
+    { value: "name", label: t("rules.sort.name") },
+    { value: "category", label: t("rules.sort.category") },
+    { value: "risk", label: t("rules.sort.risk") },
+  ];
+
   return (
     <div className="rules-filter">
-      <input
-        className="search"
-        value={ws.search}
-        onChange={(e) => ws.setSearch(e.target.value)}
-        placeholder={t("rules.filter.search_placeholder")}
-      />
-      {ws.showCategoryColumn && (
-        <select
-          className="select"
-          value={ws.categoryFilter}
-          onChange={(e) => ws.setCategoryFilter(e.target.value)}
-          aria-label={t("rules.filter.category_label")}
-        >
-          <option value="">{t("rules.filter.all_categories")}</option>
-          {ws.categories.map((category) => (
-            <option key={category} value={category}>
-              {cat(category)}
-            </option>
-          ))}
-        </select>
-      )}
-      <select
-        className="select sort-select"
-        value={ws.sortKey}
-        onChange={(e) => ws.setSortKey(e.target.value as RulesWorkspaceState["sortKey"])}
-        aria-label={t("rules.filter.sort_label")}
-      >
-        <option value="impact">{t("rules.sort.impact")}</option>
-        <option value="name">{t("rules.sort.name")}</option>
-        <option value="category">{t("rules.sort.category")}</option>
-        <option value="risk">{t("rules.sort.risk")}</option>
-      </select>
-      <span className="muted filter-meta">
-        {t("rules.filter.visible", { visible: ws.visibleRules.length, total: ws.rules.length })}
-        {ws.selectedInViewCount > 0
-          ? ` · ${t("rules.filter.selected_in_view", { count: ws.selectedInViewCount })}`
-          : ""}
-      </span>
-      <button type="button" className="btn ghost" onClick={ws.selectAllVisible}>
-        {t("rules.action.select_filtered")}
-      </button>
-      <button type="button" className="btn ghost" onClick={ws.selectAll}>
-        {t("rules.action.select_all")}
-      </button>
-      <button type="button" className="btn ghost" onClick={ws.selectNone}>
-        {t("rules.action.select_none")}
-      </button>
+      <div className="rules-filter-left">
+        <input
+          className="search"
+          value={ws.search}
+          onChange={(e) => ws.setSearch(e.target.value)}
+          placeholder={t("rules.filter.search_placeholder")}
+        />
+        {ws.showCategoryColumn && (
+          <FancySelect
+            value={ws.categoryFilter}
+            onChange={ws.setCategoryFilter}
+            options={categoryOptions}
+            placeholder={t("rules.filter.all_categories")}
+          />
+        )}
+        <FancySelect
+          value={ws.sortKey}
+          onChange={(val) => ws.setSortKey(val as RulesWorkspaceState["sortKey"])}
+          options={sortOptions}
+          className="sort-select"
+        />
+        <span className="muted filter-meta">
+          {t("rules.filter.visible", { visible: ws.visibleRules.length, total: ws.rules.length })}
+          {ws.selectedInViewCount > 0
+            ? ` · ${t("rules.filter.selected_in_view", { count: ws.selectedInViewCount })}`
+            : ""}
+        </span>
+      </div>
+      <div className="rules-filter-right">
+        <div className="segmented-control">
+          <button type="button" className="segment" onClick={ws.selectAll}>
+            {t("rules.action.select_all")}
+          </button>
+          <button type="button" className="segment" onClick={ws.selectAllVisible}>
+            {t("rules.action.select_filtered")}
+          </button>
+          <button type="button" className="segment" onClick={ws.selectNone}>
+            {t("rules.action.select_none")}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -83,7 +182,7 @@ export function RulesTable({ ws, t, cat, formatBytes }: TableProps) {
     <table className="table rules-table">
       <thead>
         <tr>
-          <th aria-label="Select" />
+          <th aria-label={t("rules.table.select")} />
           {ws.showCategoryColumn && <th>{t("rules.table.category")}</th>}
           <th>{t("rules.sort.name")}</th>
           <th>{t("rules.sort.risk")}</th>
@@ -134,8 +233,8 @@ function RulesTableRow({
 
   return (
     <tr
-      className={focused ? "focused" : undefined}
-      onClick={() => ws.setFocusedRuleId(rule.id)}
+      className={`${focused ? "focused " : ""}${selected ? "queued" : ""}`.trim() || undefined}
+      onClick={() => ws.focusRule(rule.id)}
     >
       <td onClick={(e) => e.stopPropagation()}>
         <input

@@ -63,6 +63,16 @@ test("maps Development commands to official Velox CLI arguments", () => {
   );
 });
 
+test("keeps the Velox main window usable at the approved compact size", () => {
+  const config = JSON.parse(
+    readFileSync(new URL("../desktop-velox/velox.json", import.meta.url), "utf8"),
+  );
+  const mainWindow = config.app.windows.find((window) => window.label === "main");
+
+  assert.equal(mainWindow.minWidth, 840);
+  assert.equal(mainWindow.minHeight, 700);
+});
+
 test("installs actual Development config into generated app bundle", () => {
   const temporaryRoot = mkdtempSync(join(tmpdir(), "cleaning-dev-bundle-"));
   const bundlePath = join(temporaryRoot, "Cleaning Dev.app");

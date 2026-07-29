@@ -7,7 +7,7 @@
   "scripts": {
     "velox:cli:build": "cd desktop-velox/.build/checkouts/velox && swift build --product velox",
     "velox": "cd desktop-velox && .build/checkouts/velox/.build/debug/velox",
-    "dev": "CLEANING_BUNDLE_IDENTIFIER=me.systembug.cleaning.dev pnpm run velox dev",
+    "dev": "pnpm run velox dev",
     "build": "pnpm run build:app",
     "build:app": "VELOX_BUNDLE_CONFIGURATION=release pnpm run velox build --bundle",
     "build:app:dev": "node scripts/run-velox-profile.mjs build:app",
@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@cleanspace/desktop-api": "workspace:*",
+    "@radix-ui/react-select": "^2.3.7",
+    "lucide-react": "^1.27.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.0"

@@ -20,6 +20,18 @@ export type MessageKey =
   | "rules.clean"
   | "rules.scanning"
   | "rules.cleaning"
+  | "rules.loading"
+  | "rules.empty.title"
+  | "rules.table.select"
+  | "rules.activity.progress"
+  | "rules.activity.progress_rule"
+  | "rules.activity.completed_title"
+  | "rules.activity.completed"
+  | "rules.activity.partial_title"
+  | "rules.activity.partial"
+  | "rules.activity.failed_title"
+  | "rules.activity.failed"
+  | "rules.activity.dismiss"
   | "rules.dry_run"
   | "rules.alert.confirm.title"
   | "rules.alert.result.title"
@@ -66,6 +78,9 @@ export type MessageKey =
   | "rules.inspector.include"
   | "rules.inspector.paths.title"
   | "rules.inspector.command.title"
+  | "rules.inspector.details_tab"
+  | "rules.inspector.distribution_tab"
+  | "rules.inspector.close"
   | "rules.dry_run.sheet_title"
   | "rules.dry_run.disclaimer"
   | "rules.dry_run.path_missing"
@@ -91,6 +106,9 @@ export type MessageKey =
   | "disk.picker.label"
   | "disk.select_volume_hint"
   | "disk.volume_picker_format"
+  | "disk.free_short"
+  | "disk.map.title"
+  | "disk.usage_percent"
   | "disk.hero.available"
   | "disk.hero.used"
   | "disk.hero.capacity"
@@ -161,6 +179,18 @@ const EN: Catalog = {
   "rules.clean": "Run Clean",
   "rules.scanning": "Analyzing…",
   "rules.cleaning": "Cleaning…",
+  "rules.loading": "Loading rules…",
+  "rules.empty.title": "No rules",
+  "rules.table.select": "Include in clean-up",
+  "rules.activity.progress": "{current} of {total} rules",
+  "rules.activity.progress_rule": "{current} of {total} · {rule}",
+  "rules.activity.completed_title": "Analysis complete",
+  "rules.activity.completed": "{analyzed} of {total} rules analyzed",
+  "rules.activity.partial_title": "Analysis partially complete",
+  "rules.activity.partial": "{analyzed} of {total} rules analyzed · {denied} paths unavailable",
+  "rules.activity.failed_title": "Analysis failed",
+  "rules.activity.failed": "{message}",
+  "rules.activity.dismiss": "Dismiss analysis status",
   "rules.dry_run": "Preview",
   "rules.alert.confirm.title": "Confirm clean",
   "rules.alert.result.title": "Clean result",
@@ -212,6 +242,9 @@ const EN: Catalog = {
   "rules.inspector.include": "Include in clean-up",
   "rules.inspector.paths.title": "Paths",
   "rules.inspector.command.title": "Command",
+  "rules.inspector.details_tab": "Details",
+  "rules.inspector.distribution_tab": "Distribution",
+  "rules.inspector.close": "Close inspector",
   "rules.dry_run.sheet_title": "Preview selection",
   "rules.dry_run.disclaimer":
     "This is a dry run. No files are removed until you click Clean and confirm.",
@@ -239,6 +272,9 @@ const EN: Catalog = {
   "disk.picker.label": "Volume",
   "disk.select_volume_hint": "Pick a disk to see space and scan top-level folders.",
   "disk.volume_picker_format": "{name} · {free} free",
+  "disk.free_short": "{free} free",
+  "disk.map.title": "Disk usage",
+  "disk.usage_percent": "{percent}% used",
   "disk.hero.available": "Available",
   "disk.hero.used": "Used",
   "disk.hero.capacity": "Capacity",
@@ -305,6 +341,18 @@ const ZH: Catalog = {
   "rules.clean": "运行清理",
   "rules.scanning": "正在分析…",
   "rules.cleaning": "正在清理…",
+  "rules.loading": "正在加载规则…",
+  "rules.empty.title": "没有规则",
+  "rules.table.select": "纳入清理",
+  "rules.activity.progress": "正在分析第 {current}/{total} 条规则",
+  "rules.activity.progress_rule": "正在分析第 {current}/{total} 条 · {rule}",
+  "rules.activity.completed_title": "分析完成",
+  "rules.activity.completed": "已分析 {analyzed}/{total} 条规则",
+  "rules.activity.partial_title": "分析部分完成",
+  "rules.activity.partial": "已分析 {analyzed}/{total} 条规则 · {denied} 个路径不可访问",
+  "rules.activity.failed_title": "分析失败",
+  "rules.activity.failed": "{message}",
+  "rules.activity.dismiss": "关闭分析状态",
   "rules.dry_run": "预览",
   "rules.alert.confirm.title": "清理确认",
   "rules.alert.result.title": "清理结果",
@@ -351,6 +399,9 @@ const ZH: Catalog = {
   "rules.inspector.include": "纳入清理",
   "rules.inspector.paths.title": "路径",
   "rules.inspector.command.title": "命令",
+  "rules.inspector.details_tab": "详情",
+  "rules.inspector.distribution_tab": "分布",
+  "rules.inspector.close": "关闭检查器",
   "rules.dry_run.sheet_title": "预览所选",
   "rules.dry_run.disclaimer": "这是演练预览。点击清理并确认前不会删除任何文件。",
   "rules.dry_run.path_missing": "路径不存在（若仍缺失，清理时将跳过）。",
@@ -377,6 +428,9 @@ const ZH: Catalog = {
   "disk.picker.label": "卷",
   "disk.select_volume_hint": "选择磁盘以查看空间并扫描顶层文件夹。",
   "disk.volume_picker_format": "{name} · 可用 {free}",
+  "disk.free_short": "可用 {free}",
+  "disk.map.title": "磁盘占用",
+  "disk.usage_percent": "已用 {percent}%",
   "disk.hero.available": "可用",
   "disk.hero.used": "已用",
   "disk.hero.capacity": "总容量",

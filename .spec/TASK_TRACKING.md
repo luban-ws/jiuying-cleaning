@@ -122,11 +122,16 @@
 
 | ID | 任务 | 状态 | 备注 |
 |----|------|------|------|
-| TASK-010-01 | RFC 010 正文：工具栏策略、扫描列表、AGENTS / Paul Hudson、验收标准 | 已完成 | `.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md` |
+| TASK-010-01 | RFC 010 正文：工具栏策略、扫描列表、AGENTS / Paul Hudson、验收标准 | 已完成 | `.spec/rfc/010-rules-workspace-ui-hig-and-collaboration.md` |
 | TASK-010-02 | 移除规则页重复工具栏；进度并入 `CSRulesCleanWorkflowCard` | 已完成 | `ContentView` + `WorkspaceChrome` |
 | TASK-010-03 | `RulesScanListRow` + 表列度量共用 + L10n / a11y | 已完成 | `Rules/` 下源文件 |
 | TASK-010-04 | `AGENTS.md` 合并结构 + `paul-hudson.md` + `/swiftui` | 已完成 | 根目录与 `docs/persona/` |
 | TASK-010-05 | （可选）应用菜单命令与操作卡共享动作 | 待办 | 见 RFC 010「后续可选」 |
+| TASK-010-06 | 顶部分析反馈状态模型、进度与完成/部分失败/失败摘要 | 已完成 | `RulesActivityBanner`；1120×792 实机确认部分完成摘要固定在标题下并持续显示 |
+| TASK-010-07 | React 固定工作台与单一主滚动规则表 | 已完成 | 标题、反馈、筛选、命令栏固定；规则表占剩余高度并独立滚动 |
+| TASK-010-08 | 1120 宽屏检查器与 840 紧凑图标轨道/检查器抽屉 | 已完成 | 宽屏检查器、紧凑抽屉、72px 图标轨道、路径换行；Velox 最小窗口改为 840×700 |
+| TASK-010-09 | Distribution 检查器视图与焦点/清理队列视觉语义 | 已完成 | Distribution 仅保留条形分布；删除表下圆环与重复表；焦点灰、队列金轨 |
+| TASK-010-10 | React 测试、i18n/a11y 与真实窗口双尺寸验收 | 进行中 | React 16/16、Swift 116/116、Dev bundle、1120×792 已通过；840×700 待下次 Dev 进程冷启动实机确认 |
 
 ---
 
@@ -167,7 +172,7 @@
 | TASK-013-09 | i18n：react-i18n 对齐 `Localizable.strings`（en + zh-Hans） | 完成 | `messages.ts` 全页 |
 | TASK-013-10 | UI 质量验收：布局宽 1120/840、sticky 命令栏、a11y | 完成 | form-workspace 840px；rules 1120px |
 | TASK-013-11 | AppIcon 与 React 品牌图单源生成、构建前同步与漂移检查 | 完成 | `design/icon.png` → React / Velox / Legacy；`check:icons` |
-| TASK-013-12 | Velox 官方 Bundler 与开发入口 Dock 图标验收 | 进行中 | `Cleaning.app`；`me.systembug.cleaning`；待 FFI dylib Bundle 修正后真实 Dock 验收 |
+| TASK-013-12 | Velox 官方 Bundler 与开发入口 Dock 图标验收 | 完成 | `velox dev` 运行 `Cleaning Dev.app`；FFI dylib 随 Bundle 分发；Dock 源图标验收通过 |
 
 ---
 
@@ -178,7 +183,7 @@
 | TASK-014-01 | 实现可测试的进程锁与主/次实例判定 | 已完成 | 内核非阻塞排他锁；锁文件不删除 |
 | TASK-014-02 | 实现第二实例通知与主窗口恢复、置前、激活 | 已完成 | 无载荷通知；仅影响 Velox Desktop |
 | TASK-014-03 | 在 `DesktopApp.run()` 最前端接入并保持协调器生命周期 | 已完成 | 第二实例不得初始化 Velox Runtime |
-| TASK-014-04 | 自动化测试、构建与双启动手动验收 | 进行中 | 22 项 Desktop Swift 测试及双启动通过；待最小化窗口、SwiftUI 并存手验 |
+| TASK-014-04 | 自动化测试、构建与双启动手动验收 | 已完成 | 22 项 Desktop Swift 测试、最小化/隐藏窗口恢复、及 SwiftUI 辅助进程并存双启动手验全部通过 |
 
 ---
 
@@ -189,9 +194,9 @@
 | TASK-015-01 | Development profile config 派生与 Node 单测 | 已完成 | canonical Production config 未交换 |
 | TASK-015-02 | pnpm → Velox CLI 命令与 bundle config 修正 | 已完成 | `pnpm dev` 直达 `velox dev`；无新增 `.sh` |
 | TASK-015-03 | 运行时 config 加载与单实例身份解析 | 已完成 | bundle ID → env → Production fallback |
-| TASK-015-04 | 双 bundle 构建、签名、并行运行与同 variant 单实例验收 | 进行中 | bare dev Dock 图标验收失败；改由 bundle-first dev 完成 |
-| TASK-015-05 | `luban-ws/velox` 实现 macOS bundle-first dev 与 effective config bundling | 进行中 | fork `main` 基线 `f9a37ed` |
-| TASK-015-06 | Cleaning 固定 Velox fork revision并删除 bare executable 补丁 | 待办 | 完成后删除 `DevelopmentAppIcon` 与 identifier env 注入 |
+| TASK-015-04 | 双 bundle 构建、签名、并行运行与同 variant 单实例验收 | 已完成 | Dev/Prod 各一进程并行；两个 variant 重复启动均立即退出；签名与相对 dylib 路径通过 |
+| TASK-015-05 | `luban-ws/velox` 实现 macOS bundle-first dev 与 effective config bundling | 已完成 | fork `main`：`6ded6dc`；依赖锁：`fe2ba7b` |
+| TASK-015-06 | Cleaning 固定 Velox fork revision并删除 bare executable 补丁 | 已完成 | 固定 `fe2ba7b`；删除 `DevelopmentAppIcon` 与 identifier env 注入 |
 
 ---
 

@@ -35,7 +35,7 @@
 
 - **最低系统 macOS 15**（Sequoia），与 `Package.swift` 的 `platforms: [.macOS(.v15)]`、`swift-tools-version: 6.0` 及 `Support/Info.plist` 的 `LSMinimumSystemVersion`（`15.0`）一致。
 - 窗口与工具栏参考：`docs/macos-swiftui-references.md`；设计参照 [Apple HIG — macOS](https://developer.apple.com/design/human-interface-guidelines) 与系统「设置」类应用：优先 `NavigationSplitView`、**unified** 工具栏、系统 **Material**、`.help()`，避免大块纯色底与重阴影卡片。
-- **「规则清理」主界面**（扫描列表、预览、确认与清理的 **详细 UI 设计**）只认 **[RFC 010 第二部分](.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)**。
+- **「规则清理」主界面**（扫描列表、预览、确认与清理的 **详细 UI 设计**）只认 **[RFC 010 第二部分](.spec/rfc/010-rules-workspace-ui-hig-and-collaboration.md#detailed-ui-spec)**。
 
 ### 代码结构
 

@@ -1,10 +1,10 @@
 # RFC 015：Velox Development / Production 应用隔离
 
-**状态**：实施中
+**状态**：已完成
 **创建日期**：2026-07-27
 **最后更新**：2026-07-28
 **作者**：CleanSpace
-**依赖**：[RFC 013](./013-velox-ui-shell-migration.md)、[RFC 014](./014-single-instance-desktop-lifecycle.md)
+**依赖**：[RFC 013](./013-velox-ui-shell-migration.md)、[RFC 014](../014-single-instance-desktop-lifecycle.md)
 
 ---
 
@@ -231,3 +231,5 @@ app bundle 使用 `Bundle.main.bundleIdentifier`。bundle-first dev 落地后删
 |------|------|
 | 2026-07-27 | 用户批准 Development / Production 独立 app 名称、bundle identifier 与并行运行 |
 | 2026-07-28 | 用户批准使用 `luban-ws/velox` 实现 macOS bundle-first dev，并由 Cleaning 固定该 fork |
+| 2026-07-28 | Velox `6ded6dc` 落地 bundle-first dev，`fe2ba7b` 锁定依赖；Cleaning 固定该 revision，`Cleaning Dev.app` Dock 源图标验收通过 |
+| 2026-07-28 | Dev/Prod 并行、同 variant 双启动、bundle 身份、签名与相对 dylib 路径验收通过；RFC 完成归档 |

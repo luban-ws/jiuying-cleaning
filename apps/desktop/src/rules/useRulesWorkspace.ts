@@ -25,6 +25,12 @@ import {
   RISK_ORDER,
   type SortKey,
 } from "./constants";
+import {
+  completeScanActivity,
+  progressScanActivity,
+  startScanActivity,
+  type RulesScanActivity,
+} from "./scanActivity";
 
 type ConfirmState = { message: string; risky: boolean } | null;
 
@@ -32,6 +38,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
   const [rules, setRules] = useState<RuleSummary[]>([]);
   const [selectedRuleIds, setSelectedRuleIds] = useState<Set<string>>(new Set());
   const [focusedRuleId, setFocusedRuleId] = useState<string | null>(null);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
   const [sizes, setSizes] = useState<Record<string, number>>({});
   const [processCounts, setProcessCounts] = useState<Record<string, number>>({});
   const [deniedPaths, setDeniedPaths] = useState<string[]>([]);
@@ -40,12 +47,9 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("impact");
-  const [showChart, setShowChart] = useState(true);
   const [loading, setLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
-  const [scanProgress, setScanProgress] = useState<{ current: number; total: number; ruleId?: string } | null>(
-    null,
-  );
+  const [scanActivity, setScanActivity] = useState<RulesScanActivity | null>(null);
   const [isCleaning, setIsCleaning] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -71,6 +75,8 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
       setDeniedPaths([]);
       setShowFdaBanner(false);
       setFdaDismissed(false);
+      setScanActivity(null);
+      setInspectorOpen(false);
       setFocusedRuleId((prev) => {
         if (prev && rows.some((r) => r.id === prev)) return prev;
         return rows[0]?.id ?? null;
@@ -212,13 +218,18 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
 
   const selectAll = () => setSelectedRuleIds(new Set(rules.map((r) => r.id)));
 
+  const focusRule = (id: string) => {
+    setFocusedRuleId(id);
+    setInspectorOpen(true);
+  };
+
   /** RFC 010 D4：异步扫描；始终 poll 收尾，避免事件丢失导致 isScanning 卡死。 */
   const scanAll = async () => {
     if (rules.length === 0 || isScanningRef.current) return;
     isScanningRef.current = true;
     setIsScanning(true);
     setError("");
-    setScanProgress({ current: 0, total: rules.length });
+    setScanActivity(startScanActivity(rules.length));
 
     let progressListener: number | null = null;
     let completeListener: number | null = null;
@@ -241,11 +252,13 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
       const payload = pendingScanUiRef.current;
       if (!payload) return;
       pendingScanUiRef.current = null;
-      setScanProgress({
-        current: payload.current,
-        total: payload.total,
-        ruleId: payload.ruleId ?? undefined,
-      });
+      setScanActivity(
+        progressScanActivity(
+          payload.current,
+          payload.total,
+          payload.ruleId ?? undefined,
+        ),
+      );
       setSizes(payload.sizes);
       setProcessCounts(payload.processCounts);
       setDeniedPaths(payload.deniedPaths);
@@ -265,7 +278,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
       scheduleScanUi(payload);
     };
 
-    const finishSuccess = (result: ScanRulesResult) => {
+    const finishSuccess = (result: ScanRulesResult, total: number) => {
       if (scanRafRef.current != null) {
         cancelAnimationFrame(scanRafRef.current);
         scanRafRef.current = null;
@@ -275,6 +288,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
       setProcessCounts(result.processCounts);
       setDeniedPaths(result.deniedPaths);
       setShowFdaBanner(result.deniedPaths.length > 0);
+      setScanActivity(completeScanActivity(result, total));
     };
 
     const pollIntervalMs = 300;
@@ -282,7 +296,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
 
     try {
       const start = await veloxInvoke<ScanStartResult>("scan_all_rules_start", { scope });
-      setScanProgress({ current: 0, total: start.total });
+      setScanActivity(startScanActivity(start.total));
 
       await new Promise<void>((resolve, reject) => {
         let settled = false;
@@ -313,7 +327,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
             pollTimer = null;
           }
           if (status.state === "completed" && status.result) {
-            finishSuccess(status.result);
+            finishSuccess(status.result, status.total);
             settle(() => resolve());
           } else if (status.state === "failed") {
             settle(() => reject(new Error(status.error ?? "scan failed")));
@@ -327,7 +341,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
 
         completeListener = listenVeloxEvent<ScanCompleteEvent>("scan_complete", (payload) => {
           if (payload.jobId !== start.jobId) return;
-          finishSuccess(payload.result);
+          finishSuccess(payload.result, start.total);
           settle(() => resolve());
         });
 
@@ -356,12 +370,14 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
       });
     } catch (err) {
       cleanupListeners();
-      setError(err instanceof Error ? err.message : String(err));
+      setScanActivity({
+        kind: "failed",
+        message: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       cleanupListeners();
       isScanningRef.current = false;
       setIsScanning(false);
-      setScanProgress(null);
     }
   };
 
@@ -384,17 +400,7 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
         ScanStartResult,
         RulesCleanJobStatus,
         CleanRulesResult
-      >("clean_rules_start", { rule_ids: batch }, "clean_rules_poll", (status) => status.result, {
-        onProgress: (status) => {
-          if (status.currentRuleId) {
-            setScanProgress({
-              current: status.current,
-              total: status.total,
-              ruleId: status.currentRuleId,
-            });
-          }
-        },
-      });
+      >("clean_rules_start", { rule_ids: batch }, "clean_rules_poll", (status) => status.result);
       setCleanResult(result);
       setSelectedRuleIds((prev) => {
         const next = new Set(prev);
@@ -418,7 +424,6 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsCleaning(false);
-      setScanProgress(null);
     }
   };
 
@@ -459,7 +464,9 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
     selectedRuleIds,
     focusedRule,
     focusedRuleId,
-    setFocusedRuleId,
+    focusRule,
+    inspectorOpen,
+    setInspectorOpen,
     sizes,
     processCounts,
     deniedPaths,
@@ -473,11 +480,10 @@ export function useRulesWorkspace(scope: WorkspaceScope) {
     setCategoryFilter,
     sortKey,
     setSortKey,
-    showChart,
-    setShowChart,
     loading,
     isScanning,
-    scanProgress,
+    scanActivity,
+    dismissScanActivity: () => setScanActivity(null),
     isCleaning,
     busy,
     error,

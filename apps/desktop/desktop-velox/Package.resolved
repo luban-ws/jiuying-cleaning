@@ -1,5 +1,5 @@
 {
-  "originHash" : "2c7f1a48c35a50a52b9510b3ad9364e20903742c2e930df6817dd5c5c51845cf",
+  "originHash" : "752a03f6c0715bb3afdb1098234027ce6bf4a3deace82065bab23075698ae425",
   "pins" : [
     {
       "identity" : "swift-argument-parser",
@@ -31,10 +31,9 @@
     {
       "identity" : "velox",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/velox-apps/velox",
+      "location" : "https://github.com/luban-ws/velox",
       "state" : {
-        "branch" : "main",
-        "revision" : "f9a37edbac01b160c574e96c46b084a01da1ecf8"
+        "revision" : "fe2ba7bf927b0c43fb73f74dbc946f795f9bb2dc"
       }
     }
   ],

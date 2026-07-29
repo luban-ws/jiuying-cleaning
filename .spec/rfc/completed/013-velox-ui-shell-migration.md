@@ -4,7 +4,7 @@
 **创建日期**：2026-07-27  
 **最后更新**：2026-07-27  
 **作者**：CleanSpace  
-**依赖**：[RFC 001](./001-ccleaner-style-cleaning-spec.md)、[RFC 010](./completed/010-rules-workspace-ui-hig-and-collaboration.md)
+**依赖**：[RFC 001](../001-ccleaner-style-cleaning-spec.md)、[RFC 010](./010-rules-workspace-ui-hig-and-collaboration.md)
 
 ---
 
@@ -89,7 +89,7 @@ cleaning/
 
 ### 规则（Rules / AI tools / Performance）
 
-语义以 [RFC 010](./completed/010-rules-workspace-ui-hig-and-collaboration.md) 为准（D1–D9）。
+语义以 [RFC 010](./010-rules-workspace-ui-hig-and-collaboration.md) 为准（D1–D9）。
 
 | ID | SwiftUI | Desktop | IPC |
 |----|---------|---------|-----|

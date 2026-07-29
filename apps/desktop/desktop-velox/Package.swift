@@ -12,7 +12,10 @@ let package = Package(
         .library(name: "CleanSpaceKit", targets: ["CleanSpaceKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/velox-apps/velox", branch: "main"),
+        .package(
+            url: "https://github.com/luban-ws/velox",
+            revision: "fe2ba7bf927b0c43fb73f74dbc946f795f9bb2dc"
+        ),
     ],
     targets: [
         .target(

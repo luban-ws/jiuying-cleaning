@@ -1,5 +1,6 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import logoImg from "./assets/logo.png";
+import { PersistentPage } from "./components/PersistentPage";
 import {
   IconAiTools,
   IconDocker,
@@ -80,15 +81,24 @@ export function App() {
         </div>
       </aside>
       <main className="main">
-        <Routes>
-          <Route path="/" element={<VolumesPage />} />
-          <Route path="/volumes" element={<VolumesPage />} />
-          <Route path="/rules" element={<RulesPage scope="rules" />} />
-          <Route path="/ai-tools" element={<RulesPage scope="ai_tools_space" />} />
-          <Route path="/performance" element={<RulesPage scope="performance" />} />
-          <Route path="/docker" element={<DockerPage />} />
-          <Route path="/monitor" element={<MonitorPage />} />
-        </Routes>
+        <PersistentPage path="/volumes" alsoActive={["/"]}>
+          <VolumesPage />
+        </PersistentPage>
+        <PersistentPage path="/rules">
+          <RulesPage scope="rules" />
+        </PersistentPage>
+        <PersistentPage path="/ai-tools">
+          <RulesPage scope="ai_tools_space" />
+        </PersistentPage>
+        <PersistentPage path="/performance">
+          <RulesPage scope="performance" />
+        </PersistentPage>
+        <PersistentPage path="/docker">
+          <DockerPage />
+        </PersistentPage>
+        <PersistentPage path="/monitor">
+          <MonitorPage />
+        </PersistentPage>
       </main>
     </div>
   );

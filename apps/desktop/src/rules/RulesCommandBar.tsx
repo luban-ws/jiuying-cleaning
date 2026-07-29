@@ -35,11 +35,9 @@ export function RulesCommandBar({ ws, t }: Props) {
 
   const cleanLabel = ws.performance ? t("performance.boost") : t("rules.clean");
   const scanLabel = ws.isScanning
-    ? ws.scanProgress
-      ? `${ws.performance ? t("performance.scanning") : t("rules.scanning")} (${ws.scanProgress.current}/${ws.scanProgress.total})`
-      : ws.performance
-        ? t("performance.scanning")
-        : t("rules.scanning")
+    ? ws.performance
+      ? t("performance.scanning")
+      : t("rules.scanning")
     : t("rules.scan");
   const cleanBusyLabel = ws.performance ? t("performance.boosting") : t("rules.cleaning");
 

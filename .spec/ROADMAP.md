@@ -39,11 +39,11 @@
 | 8 | [006](.spec/rfc/006-rules-import-and-export.md) | 规则导入与导出 | 草案 | 依赖 009 + 005；**v1 导出 UTF-8 JSON 数组**；默认合并保守（冲突 id 跳过） |
 | 9 | [007](.spec/rfc/007-post-clean-audit-log.md) | 清理操作审计日志 | 草案 | 可分阶段；写入失败须可观测（计数/os_log/设置） |
 | 10 | [008](.spec/rfc/008-docker-desktop-path-reset.md) | Docker Desktop 路径级重置向导 | 草案 | `hiddenFromRulesList`；与日常 prune 隔离 |
-| 11 | [010](.spec/rfc/completed/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 已完成 | 主验收已落地；可选 TASK-010-05（应用菜单共享动作）未做 |
+| 11 | [010](.spec/rfc/010-rules-workspace-ui-hig-and-collaboration.md) | 规则工作区：扫描列表/预览/确认/清理 **详细 UI**（RFC 内第二部分）+ 协作索引 | 实施中 | TASK-010-06～09 已落地；1120×792 实机通过，840×700 新 bundle 已生成，待下次 Dev 进程冷启动验收 |
 | 12 | [012](.spec/rfc/012-ui-polishing-and-hig-compliance.md) | UI 抛光与 macOS HIG 自适应合规 | 实施中 | 针对沉浸式标题栏遮挡、网格自适应与矢量进度环的打磨细节 |
-| 13 | [013](.spec/rfc/013-velox-ui-shell-migration.md) | Desktop Shell 迁移（Velox + React + 模块化 Swift） | 已完成 | `apps/desktop` 默认；G3/G4 见 `pnpm run:swiftui`；AppIcon 单源同步 |
-| 14 | [014](rfc/014-single-instance-desktop-lifecycle.md) | Velox Desktop 单实例生命周期 | 实施中 | 核心已落地；待最小化窗口与 SwiftUI 辅助进程并存手验 |
-| 15 | [015](rfc/015-velox-development-production-isolation.md) | Velox Development / Production 应用隔离 | 实施中 | `luban-ws/velox` bundle-first dev；`Cleaning Dev.app` 与 `Cleaning.app` 独立身份 |
+| 13 | [013](.spec/rfc/completed/013-velox-ui-shell-migration.md) | Desktop Shell 迁移（Velox + React + 模块化 Swift） | 已完成 | `apps/desktop` 默认；G3/G4 见 `pnpm run:swiftui`；AppIcon 单源同步 |
+| 14 | [014](rfc/completed/014-single-instance-desktop-lifecycle.md) | Velox Desktop 单实例生命周期 | 已完成 | 核心已落地；单实例内核文件锁判定、分布式唤醒与 SwiftUI 辅助并存手验全部完成 |
+| 15 | [015](rfc/completed/015-velox-development-production-isolation.md) | Velox Development / Production 应用隔离 | 已完成 | `luban-ws/velox` bundle-first dev；Dev/Prod 并行与同 variant 单实例验收通过 |
 
 ## 阶段概览（与 RFC 001 对齐）
 

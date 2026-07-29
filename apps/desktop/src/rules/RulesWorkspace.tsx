@@ -4,7 +4,7 @@ import { FullDiskAccessBanner } from "../components/FullDiskAccessBanner";
 import { WorkspaceGuide } from "../components/WorkspaceGuide";
 import { workspaceGuideKey } from "./constants";
 import { PerformanceLayout } from "./PerformanceLayout";
-import { RulesCategoryChart } from "./RulesCategoryChart";
+import { RulesActivityBanner } from "./RulesActivityBanner";
 import { RulesCommandBar } from "./RulesCommandBar";
 import { RulesFilterToolbar, RulesTable } from "./RulesFilterToolbar";
 import { RulesInspector } from "./RulesInspector";
@@ -50,13 +50,22 @@ export function RulesWorkspace({ scope }: Props) {
         </div>
       </header>
 
-      {ws.loading ? <p className="muted">Loading…</p> : null}
+      {ws.scanActivity ? (
+        <RulesActivityBanner
+          activity={ws.scanActivity}
+          performance={ws.performance}
+          t={t}
+          onDismiss={ws.dismissScanActivity}
+        />
+      ) : null}
+
+      {ws.loading ? <p className="muted">{t("rules.loading")}</p> : null}
       {ws.error ? <p className="error">{ws.error}</p> : null}
 
-      <div className="rules-workspace-scroll">
+      <div className="rules-workspace-content">
         {!ws.loading && ws.rules.length === 0 ? (
           <div className="empty-state">
-            <h3>No rules</h3>
+            <h3>{t("rules.empty.title")}</h3>
           </div>
         ) : null}
 
@@ -73,43 +82,8 @@ export function RulesWorkspace({ scope }: Props) {
                   </div>
                   <RulesInspector ws={ws} t={t} cat={cat} preview={ws.focusedPreview} />
                 </div>
-                {ws.hasDirScanResults && ws.showChart ? (
-                  <div className="chart-toolbar">
-                    <label className="chart-toggle">
-                      <input
-                        type="checkbox"
-                        checked={ws.showChart}
-                        onChange={(e) => ws.setShowChart(e.target.checked)}
-                      />
-                      {t("rules.chart.card_title")}
-                    </label>
-                  </div>
-                ) : null}
-                {ws.hasDirScanResults && ws.showChart ? (
-                  <RulesCategoryChart
-                    rules={ws.rules}
-                    scannedSizes={ws.sizes}
-                    t={t}
-                    cat={cat}
-                  />
-                ) : null}
               </>
             )}
-          </div>
-        ) : null}
-
-        {ws.isScanning && ws.scanProgress ? (
-          <div className="scan-progress" role="status">
-            <div
-              className="scan-progress-bar"
-              style={{ width: `${(ws.scanProgress.current / ws.scanProgress.total) * 100}%` }}
-            />
-            <p className="scan-progress-label">
-              {t("rules.scanning")} {ws.scanProgress.current}/{ws.scanProgress.total}
-              {ws.scanProgress.ruleId ? (
-                <span className="mono"> · {ws.scanProgress.ruleId}</span>
-              ) : null}
-            </p>
           </div>
         ) : null}
       </div>

@@ -1,10 +1,10 @@
 # RFC 014：Velox Desktop 单实例生命周期
 
-**状态**：实施中  
-**创建日期**：2026-07-27  
-**最后更新**：2026-07-27  
-**作者**：CleanSpace  
-**依赖**：[RFC 013](./013-velox-ui-shell-migration.md)
+**状态**：已完成
+**创建日期**：2026-07-27
+**最后更新**：2026-07-28
+**作者**：CleanSpace
+**依赖**：[RFC 013](./completed/013-velox-ui-shell-migration.md)
 
 ---
 
